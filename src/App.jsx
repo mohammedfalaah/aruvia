@@ -8,9 +8,9 @@ function App() {
   return (
     <>
    <div>
-
-  <div className="wrappage">
-    <Header />
+   <Header />
+  <div className="">
+  
   
     <div className="container container-content">
       <div className="collection-slide">

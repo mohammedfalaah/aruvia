@@ -3,9 +3,17 @@ import React, { useState } from 'react'
 const Header = () => {
 
      const [isCartOpen, setIsCartOpen] = useState(false);
-     console.log(isCartOpen);
-     
+     const [sideBarOpen, setsideBarOpen] = useState(false);
 
+     const handleSideBarToggle = () => {
+       setsideBarOpen(prev => !prev);
+       document.body.classList.toggle('pushmenu-push-toleft');
+     };
+     
+     const handleSidebarClose = () => {
+      setsideBarOpen(false);
+      document.body.classList.remove('pushmenu-push-toleft');
+    };
   const handleCartToggle = () => {
     setIsCartOpen(!isCartOpen);
   };
@@ -13,9 +21,9 @@ const Header = () => {
   return (
     <div>
           {/* push menu*/}
-  <div className="pushmenu menu-home5">
+  <div className={`pushmenu menu-home5 ${sideBarOpen ? "pushmenu-push-toleft" : ""}`}>
     <div className="menu-push">
-      <span className="close-left js-close"><i className="ion-ios-close-empty f-40" /></span>
+      <span onClick={handleSidebarClose} className="close-left js-close"><i className="ion-ios-close-empty f-40" /></span>
       <div className="clearfix" />
       <form role="search" method="get" id="searchform" className="searchform" action="https://landing.engotheme.com/search">
         <div>
@@ -124,7 +132,7 @@ const Header = () => {
         <ul className="list">
           <li className="item-cart">
             <div className="product-img-wrap">
-              <a href="#" title="Product"><img src="/assets/img/product/cart_product_1.jpg" alt="Product" className="img-responsive" /></a>
+              <a href="#" title="Product"><img src="./public/assets/img/product/cart_product_1.jpg" alt="Product" className="img-responsive" /></a>
             </div>
             <div className="product-details">
               <div className="inner-left">
@@ -144,7 +152,7 @@ const Header = () => {
           </li>
           <li className="item-cart">
             <div className="product-img-wrap">
-              <a href="#" title="Product"><img src="/assets/img/product/cart_product_2.jpg" alt="Product" className="img-responsive" /></a>
+              <a href="#" title="Product"><img src="./public/assets/img/product/cart_product_2.jpg" alt="Product" className="img-responsive" /></a>
             </div>
             <div className="product-details">
               <div className="inner-left">
@@ -443,7 +451,7 @@ const Header = () => {
             <div className="col-md-4 col">
               <div className="topbar-right">
                 <div className="element">
-                  <a href="#" className="icon-pushmenu js-push-menu">
+                  <a onClick={handleSideBarToggle} className={`icon-pushmenu js-push-menu ${sideBarOpen ? "active" : ""}`}>
                     <svg width={26} height={16} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66 41" style={{enableBackground: 'new 0 0 66 41'}} xmlSpace="preserve">
                       <style type="text/css" dangerouslySetInnerHTML={{__html: "\n                                                .st0 {\n                                                    fill: none;\n                                                    stroke: #000000;\n                                                    stroke-width: 3;\n                                                    stroke-linecap: round;\n                                                    stroke-miterlimit: 10;\n                                                }\n                                                " }} />
                       <g>
@@ -458,7 +466,7 @@ const Header = () => {
               </div>
             </div>
             <div className="col-md-4 col flex justify-content-center">
-              <a href="#"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></a>
+              <a href="#"><img style={{height:'75px'}} src="./public/assets/img/logo.jpg" alt className="img-reponsive" /></a>
             </div>
             <div className="col-md-4 col flex justify-content-end">
               <div className="topbar-left">
