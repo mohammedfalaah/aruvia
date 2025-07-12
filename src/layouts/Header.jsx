@@ -21,7 +21,7 @@ const Header = () => {
   return (
     <div>
           {/* push menu*/}
-  <div className={`pushmenu menu-home5 ${sideBarOpen ? "pushmenu-open" : ""}`}>
+  <div className={`pushmenu menu-home5 ₹{sideBarOpen ? "pushmenu-open" : ""}`}>
     <div className="menu-push">
       <span onClick={handleSidebarClose} className="close-left js-close"><i className="ion-ios-close-empty f-40" /></span>
       <div className="clearfix" />
@@ -121,7 +121,7 @@ const Header = () => {
   </div>
   {/* end push menu*/}
   {/* Push cart */}
-  <div className={`pushmenu pushmenu-left cart-box-container ${isCartOpen ? "pushmenu-open" : ""}`}>
+  <div className={`pushmenu pushmenu-left cart-box-container ₹{isCartOpen ? "pushmenu-open" : ""}`}>
     <div className="cart-list">
       <div className="cart-list-heading">
         <h3 className="cart-title">My cart</h3>
@@ -132,12 +132,12 @@ const Header = () => {
         <ul className="list">
           <li className="item-cart">
             <div className="product-img-wrap">
-              <a href="#" title="Product"><img src="./assets/img/product/cart_product_1.jpg" alt="Product" className="img-responsive" /></a>
+              <a href="#" title="Product"><img src="./assets/img/home9/product1.png" alt="Product" className="img-responsive" /></a>
             </div>
             <div className="product-details">
               <div className="inner-left">
-                <div className="product-name"><a href="#">Grosgrain tie cotton top</a></div>
-                <div className="product-price"><span>$20.9</span></div>
+                <div className="product-name"><a href="#">Aruvia Rosemary</a></div>
+                <div className="product-price"><span>₹20.9</span></div>
                 <div className="cart-qtt">
                   <button type="button" className="quantity-left-minus btn btn-number js-minus" data-type="minus" data-field>
                     <span className="minus-icon"><i className="ion-ios-minus-empty" /></span>
@@ -152,12 +152,12 @@ const Header = () => {
           </li>
           <li className="item-cart">
             <div className="product-img-wrap">
-              <a href="#" title="Product"><img src="/assets/img/product/cart_product_2.jpg" alt="Product" className="img-responsive" /></a>
+              <a href="#" title="Product"><img src="./assets/img/home9/product1.png" alt="Product" className="img-responsive" /></a>
             </div>
             <div className="product-details">
               <div className="inner-left">
-                <div className="product-name"><a href="#">Grosgrain tie cotton top</a></div>
-                <div className="product-price"><span>$20.9</span></div>
+                <div className="product-name"><a href="#">Aruvia Rosemary</a></div>
+                <div className="product-price"><span>₹20.9</span></div>
                 <div className="cart-qtt">
                   <button type="button" className="quantity-left-minus btn btn-number js-minus" data-type="minus" data-field>
                     <span className="minus-icon"><i className="ion-ios-minus-empty" /></span>
@@ -451,7 +451,7 @@ const Header = () => {
             <div className="col-md-4 col">
               <div className="topbar-right">
                 <div className="element">
-                  <a onClick={handleSideBarToggle} className={`icon-pushmenu js-push-menu ${sideBarOpen ? "active" : ""}`}>
+                  <a onClick={handleSideBarToggle} className={`icon-pushmenu js-push-menu ₹{sideBarOpen ? "active" : ""}`}>
                     <svg width={26} height={16} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66 41" style={{enableBackground: 'new 0 0 66 41'}} xmlSpace="preserve">
                       <style type="text/css" dangerouslySetInnerHTML={{__html: "\n                                                .st0 {\n                                                    fill: none;\n                                                    stroke: #000000;\n                                                    stroke-width: 3;\n                                                    stroke-linecap: round;\n                                                    stroke-miterlimit: 10;\n                                                }\n                                                " }} />
                       <g>

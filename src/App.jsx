@@ -75,10 +75,10 @@ function App() {
             </div>
             <div className="product-info text-center">
               <h3 className="product-title">
-                <a href="#">Grosgrain tie cotton top</a>
+                <a href="#">Aruvia Rosemary </a>
               </h3>
               <div className="product-price">
-                <span>$20.9</span>
+                <span>₹20.9</span>
               </div>
             </div>
           </div>
@@ -100,10 +100,10 @@ function App() {
             </div>
             <div className="product-info text-center">
               <h3 className="product-title">
-                <a href="#">Grosgrain tie cotton top</a>
+                <a href="#">Aruvia Rosemary </a>
               </h3>
               <div className="product-price">
-                <span>$20.9</span>
+                <span>₹20.9</span>
               </div>
               <div className="color-group">
                 <a href="#" className="circle gray" />
@@ -130,10 +130,10 @@ function App() {
             </div>
             <div className="product-info text-center">
               <h3 className="product-title">
-                <a href="#">Grosgrain tie cotton top</a>
+                <a href="#">Aruvia Rosemary </a>
               </h3>
               <div className="product-price">
-                <span>$20.9</span>
+                <span>₹20.9</span>
               </div>
             </div>
           </div>
@@ -237,7 +237,7 @@ function App() {
           </a>
         </div>
         <div className="f-col align-items-center">
-          <p>© 2018 <a className="red" href="#">Zoa.</a></p>
+          <p>© 2025 <a className="red" href="#">Aruvia.</a></p>
           <ul>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="#">Terms of Use</a></li>
@@ -245,11 +245,10 @@ function App() {
         </div>
         <div className="f-col">
           <div className="social">
-            <a href="#"><i className="fa fa-rss" /></a>
+            <a href="#"><i className="fa fa-instagram" /></a>
             <a href="#"><i className="fa fa-facebook" /></a>
-            <a href="#"><i className="fa fa-twitter" /></a>
             <a href="#"><i className="fa fa-linkedin" /></a>
-            <a href="#"><i className="fa fa-rss" /></a>
+         
           </div>
         </div>
       </div>
