@@ -454,29 +454,7 @@ const Header = () => {
                     </svg>
                   </a>
                 </div>
-                <div className="element element-currency hidden-xs hidden-sm">
-                  <a id="label3" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    <span>USD</span>
-                    <span className="ion-arrow-down-b f-10 e-arrow" />
-                  </a>
-                  <ul className="dropdown-menu" aria-labelledby="label3">
-                    <li><a href="#">USD</a></li>
-                    <li><a href="#">AUD</a></li>
-                    <li><a href="#">EUR</a></li>
-                  </ul>
-                </div>
-                <div className="element element-leaguage hidden-xs hidden-sm">
-                  <a id="label2" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    <img src="./public/assets/img/icon-l.html" alt />
-                    <span>EN</span>
-                    <span className="ion-arrow-down-b f-10 e-arrow" />
-                  </a>
-                  <ul className="dropdown-menu" aria-labelledby="label2">
-                    <li><a href="#">EN</a></li>
-                    <li><a href="#">DE</a></li>
-                    <li><a href="#">FR</a></li>
-                  </ul>
-                </div>
+                
               </div>
             </div>
             <div className="col-md-4 col flex justify-content-center">
