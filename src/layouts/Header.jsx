@@ -11,9 +11,9 @@ const Header = () => {
      };
      
      const handleSidebarClose = () => {
-      setsideBarOpen(false);
-      document.body.classList.remove('pushmenu-push-toleft');
-    };
+  setsideBarOpen(false);
+  document.body.classList.remove('pushmenu-push-toleft');
+};
   const handleCartToggle = () => {
     setIsCartOpen(!isCartOpen);
   };
@@ -21,7 +21,7 @@ const Header = () => {
   return (
     <div>
           {/* push menu*/}
-  <div className={`pushmenu menu-home5 ${sideBarOpen ? "pushmenu-push-toleft" : ""}`}>
+  <div className={`pushmenu menu-home5 ${sideBarOpen ? "pushmenu-open" : ""}`}>
     <div className="menu-push">
       <span onClick={handleSidebarClose} className="close-left js-close"><i className="ion-ios-close-empty f-40" /></span>
       <div className="clearfix" />
