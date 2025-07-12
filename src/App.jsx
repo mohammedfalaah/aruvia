@@ -19,7 +19,7 @@ function App() {
             <div className="js-slider-v2">
               <div className="slide-img">
               
-                <a href="#"><img src="./public/assets/img/home9/slide_12.jpg" alt className="img-responsive" /></a>
+                <a href="#"><img src="/assets/img/home9/slide_12.jpg" alt className="img-responsive" /></a>
                 <div className="box-center slide-content">
                   {/* <h3>Tank top<br /> hot collection</h3> */}
                   {/* <a href="#">Shop now</a> */}
@@ -32,7 +32,7 @@ function App() {
               <div className="col-xs-12 col-sm-6 col-md-12">
                 <div className="banner-img">
                   <a href="#" className="effect-img3 plus-zoom">
-                    <img src="./public/assets/images/banner/av02.jpg" alt className="img-responsive" />
+                    <img src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
                   </a>
                   <div className="box-center content3">
                     {/* <a href="#">Womens</a> */}
@@ -42,7 +42,7 @@ function App() {
               <div className="col-xs-12 col-sm-6 col-md-12">
                 <div className="banner-img">
                   <a href="#" className="effect-img3 plus-zoom">
-                    <img src="./public/assets/images/banner/av03.jpg" alt className="img-responsive" />
+                    <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
                   </a>
                   <div className="box-center content3">
                     {/* <a href="#">Kid's</a> */}
@@ -60,7 +60,7 @@ function App() {
         <div className="row">
           <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
             <div className="product-img">
-              <a href="#"><img src="./public/assets/img/home9/product1.png" alt className="img-responsive" /></a>
+              <a href="#"><img src="/assets/img/home9/product1.png" alt className="img-responsive" /></a>
               <div className="product-button-group">
                 <a href="#" className="zoa-btn zoa-quickview">
                   <span className="zoa-icon-quick-view" />
@@ -84,7 +84,7 @@ function App() {
           </div>
           <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
             <div className="product-img">
-              <a href="#"><img src="./public/assets/img/home9/product1.png" alt className="img-responsive" /></a>
+              <a href="#"><img src="/assets/img/home9/product1.png" alt className="img-responsive" /></a>
               <div className="ribbon zoa-hot"><span>Hot</span></div>
               <div className="product-button-group">
                 <a href="#" className="zoa-btn zoa-quickview">
@@ -114,7 +114,7 @@ function App() {
           </div>
           <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
             <div className="product-img">
-              <a href="#"><img src="./public/assets/img/home9/product1.png" alt className="img-responsive" /></a>
+              <a href="#"><img src="/assets/img/home9/product1.png" alt className="img-responsive" /></a>
               <div className="ribbon zoa-sale"><span>-15%</span></div>
               <div className="product-button-group">
                 <a href="#" className="zoa-btn zoa-quickview">
@@ -164,13 +164,13 @@ function App() {
           <a href="https://www.instagram.com/p/DHvi99gBiBF/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="><img src="/assets/img/instagram1.jpg" alt className="img-responsive" /></a>
         </div>
         <div className="col-md-3 col-sm-5 col-xs-7">
-          <a href="https://www.instagram.com/p/DKUUoOGhrig/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="><img src="./public/assets/img/instagram5.jpg" alt className="img-responsive" /></a>
+          <a href="https://www.instagram.com/p/DKUUoOGhrig/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="><img src="/assets/img/instagram5.jpg" alt className="img-responsive" /></a>
         </div>
         <div className="col-md-3 col-sm-5 col-xs-7">
-          <a href="#"><img src="./public/assets/img/instagram6.jpg" alt className="img-responsive" /></a>
+          <a href="#"><img src="/assets/img/instagram6.jpg" alt className="img-responsive" /></a>
         </div>
         <div className="col-md-3 col-sm-5 col-xs-7">
-          <a href="#"><img style={{height:'25rem'}} src="./public/assets/img/instagram10.jpg" alt className="img-responsive" /></a>
+          <a href="#"><img style={{height:'25rem'}} src="/assets/img/instagram10.jpg" alt className="img-responsive" /></a>
         </div>
        
       </div>
@@ -233,7 +233,7 @@ function App() {
       <div className="f-content">
         <div className="f-col hidden-xs hidden-sm">
           <a href="#">
-            <img src="./public/assets/img/f-logob.png" alt className="img-responsive" />
+            <img src="/assets/img/f-logob.png" alt className="img-responsive" />
           </a>
         </div>
         <div className="f-col align-items-center">
