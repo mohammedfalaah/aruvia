@@ -132,7 +132,7 @@ const Header = () => {
         <ul className="list">
           <li className="item-cart">
             <div className="product-img-wrap">
-              <a href="#" title="Product"><img src="./public/assets/img/product/cart_product_1.jpg" alt="Product" className="img-responsive" /></a>
+              <a href="#" title="Product"><img src="./assets/img/product/cart_product_1.jpg" alt="Product" className="img-responsive" /></a>
             </div>
             <div className="product-details">
               <div className="inner-left">
@@ -152,7 +152,7 @@ const Header = () => {
           </li>
           <li className="item-cart">
             <div className="product-img-wrap">
-              <a href="#" title="Product"><img src="./public/assets/img/product/cart_product_2.jpg" alt="Product" className="img-responsive" /></a>
+              <a href="#" title="Product"><img src="/assets/img/product/cart_product_2.jpg" alt="Product" className="img-responsive" /></a>
             </div>
             <div className="product-details">
               <div className="inner-left">
@@ -466,7 +466,7 @@ const Header = () => {
               </div>
             </div>
             <div className="col-md-4 col flex justify-content-center">
-              <a href="#"><img style={{height:'75px'}} src="./public/assets/img/logo.jpg" alt className="img-reponsive" /></a>
+              <a href="#"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></a>
             </div>
             <div className="col-md-4 col flex justify-content-end">
               <div className="topbar-left">
