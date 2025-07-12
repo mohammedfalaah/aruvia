@@ -75,7 +75,7 @@ function App() {
             </div>
             <div className="product-info text-center">
               <h3 className="product-title">
-                <a href="#">Aruvia Rosemary </a>
+                <a href="#">Aruvia Rosemary</a>
               </h3>
               <div className="product-price">
                 <span>₹20.9</span>
