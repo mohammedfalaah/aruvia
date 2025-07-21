@@ -19,7 +19,7 @@ function App() {
             <div className="js-slider-v2">
               <div className="slide-img">
               
-                <a href="#"><img src="/assets/img/home9/slide_12.jpg" alt className="img-responsive" /></a>
+                <a href="#"><img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" /></a>
                 <div className="box-center slide-content">
                   {/* <h3>Tank top<br /> hot collection</h3> */}
                   {/* <a href="#">Shop now</a> */}
