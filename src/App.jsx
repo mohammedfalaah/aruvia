@@ -152,7 +152,6 @@ function App() {
     <div className="zoa-instagram">
       <div className="insta-title2 text-center">
         <h3>INSTAGRAM</h3>
-        {/* <a href="#">@zoa.fashion91</a> */}
       </div>
       <div className="row insta-content">
         <div className="col-md-3 col-sm-5 col-xs-7">

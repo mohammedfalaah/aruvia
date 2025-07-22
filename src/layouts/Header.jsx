@@ -466,7 +466,7 @@ const Header = () => {
               </div>
             </div>
             <div className="col-md-4 col flex justify-content-center">
-              <a href="#"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></a>
+              <a href="/"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></a>
             </div>
             <div className="col-md-4 col flex justify-content-end">
               <div className="topbar-left">
