@@ -227,15 +227,15 @@ function App() {
   </div>
   {/* EndContent */}
   {/* Footer */}
-  <footer className="footer v2 bg-black">
+  <footer style={{paddingTop:'25px', paddingBottom:'25px'}} className="footer pt-50 pb-50 v2 bg-black">
     <div className="container">
-      <div className="f-content">
+      <div className="f-content ">
         <div className="f-col hidden-xs hidden-sm">
           <a href="#">
-            <img src="/assets/img/f-logob.png" alt className="img-responsive" />
           </a>
         </div>
         <div className="f-col align-items-center">
+          
           <p>© 2025 <a className="red" href="#">Aruvia.</a></p>
           <ul>
             <li><a href="#">Privacy Policy</a></li>
