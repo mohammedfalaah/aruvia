@@ -57,8 +57,8 @@ const Home = () => {
         <div className="row">
           <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
             <div className="product-img">
-              <a href="#"><img src="/assets/img/home9/product1.png" alt className="img-responsive" /></a>
-              <div className="product-button-group">
+              <a href="#"><img src="/assets/img/home9/p4.png" alt className="img-responsive" /></a>
+              <div style={{paddingBottom:'10px'}} className="product-button-group">
                 <a href="#" className="zoa-btn zoa-quickview">
                   <span className="zoa-icon-quick-view" />
                 </a>
@@ -81,9 +81,9 @@ const Home = () => {
           </div>
           <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
             <div className="product-img">
-              <a href="#"><img src="/assets/img/home9/product1.png" alt className="img-responsive" /></a>
+              <a href="#"><img src="/assets/img/home9/p1.png" alt className="img-responsive" /></a>
               <div className="ribbon zoa-hot"><span>Hot</span></div>
-              <div className="product-button-group">
+              <div style={{paddingBottom:'10px'}} className="product-button-group">
                 <a href="#" className="zoa-btn zoa-quickview">
                   <span className="zoa-icon-quick-view" />
                 </a>
@@ -111,9 +111,9 @@ const Home = () => {
           </div>
           <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
             <div className="product-img">
-              <a href="#"><img src="/assets/img/home9/product1.png" alt className="img-responsive" /></a>
+              <a href="#"><img src="/assets/img/home9/p5.png" alt className="img-responsive" /></a>
               <div className="ribbon zoa-sale"><span>-15%</span></div>
-              <div className="product-button-group">
+              <div style={{paddingBottom:'10px'}} className="product-button-group">
                 <a href="#" className="zoa-btn zoa-quickview">
                   <span className="zoa-icon-quick-view" />
                 </a>
