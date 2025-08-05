@@ -1,7 +1,27 @@
-import React from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Axioscall from '../services/Axioscall';
 
 const Home = () => {
+    const [products, setProducts] = useState([]);
+     const fetchData = async () => {
+    try {
+      const response = await Axioscall("GET","products");
+      if (response.data.success === "true") {
+        setProducts(response.data.data);
+      } else {
+        console.error("API error: ", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+useEffect(() => {
+  fetchData();
+}, []);
+
   return (
 
     <div>
@@ -51,95 +71,53 @@ const Home = () => {
         </div>
       </div>
     </div>
-    <div className="zoa-product pad4">
-      <h3 className="title text-center">featured products</h3>
+   <div className="zoa-product pad4">
+      <h3 className="title text-center">Featured Products</h3>
       <div className="container">
         <div className="row">
-          <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
-            <div className="product-img">
-              <a href="#"><img src="/assets/img/home9/p4.png" alt className="img-responsive" /></a>
-              <div style={{paddingBottom:'10px'}} className="product-button-group">
-                <a href="#" className="zoa-btn zoa-quickview">
-                  <span className="zoa-icon-quick-view" />
+          {products.map((product) => (
+            <div
+              className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
+              key={product._id}
+            >
+              <div className="product-img">
+                <a href="#">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="img-responsive"
+                  />
                 </a>
-                <a href="#" className="zoa-btn zoa-wishlist">
-                  <span className="zoa-icon-heart" />
-                </a>
-                <a href="#" className="zoa-btn zoa-addcart">
-                  <span className="zoa-icon-cart" />
-                </a>
+                <div
+                  style={{ paddingBottom: "10px" }}
+                  className="product-button-group"
+                >
+                  <a href="#" className="zoa-btn zoa-quickview">
+                    <span className="zoa-icon-quick-view" />
+                  </a>
+                  <a href="#" className="zoa-btn zoa-wishlist">
+                    <span className="zoa-icon-heart" />
+                  </a>
+                  <a href="#" className="zoa-btn zoa-addcart">
+                    <span className="zoa-icon-cart" />
+                  </a>
+                </div>
+              </div>
+              <div className="product-info text-center">
+                <h3 className="product-title">
+                  <a href="#">{product.name}</a>
+                </h3>
+                <div className="product-price">
+                  <span>₹{product.price}</span>
+                </div>
               </div>
             </div>
-            <div className="product-info text-center">
-              <h3 className="product-title">
-                <a href="#">Aruvia Rosemary</a>
-              </h3>
-              <div className="product-price">
-                <span>₹20.9</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
-            <div className="product-img">
-              <a href="#"><img src="/assets/img/home9/p1.png" alt className="img-responsive" /></a>
-              <div className="ribbon zoa-hot"><span>Hot</span></div>
-              <div style={{paddingBottom:'10px'}} className="product-button-group">
-                <a href="#" className="zoa-btn zoa-quickview">
-                  <span className="zoa-icon-quick-view" />
-                </a>
-                <a href="#" className="zoa-btn zoa-wishlist">
-                  <span className="zoa-icon-heart" />
-                </a>
-                <a href="#" className="zoa-btn zoa-addcart">
-                  <span className="zoa-icon-cart" />
-                </a>
-              </div>
-            </div>
-            <div className="product-info text-center">
-              <h3 className="product-title">
-                <a href="#">Aruvia Rosemary </a>
-              </h3>
-              <div className="product-price">
-                <span>₹20.9</span>
-              </div>
-              <div className="color-group">
-                <a href="#" className="circle gray" />
-                <a href="#" className="circle yellow active" />
-                <a href="#" className="circle white" />
-              </div>
-            </div>
-          </div>
-          <div className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item">
-            <div className="product-img">
-              <a href="#"><img src="/assets/img/home9/p5.png" alt className="img-responsive" /></a>
-              <div className="ribbon zoa-sale"><span>-15%</span></div>
-              <div style={{paddingBottom:'10px'}} className="product-button-group">
-                <a href="#" className="zoa-btn zoa-quickview">
-                  <span className="zoa-icon-quick-view" />
-                </a>
-                <a href="#" className="zoa-btn zoa-wishlist">
-                  <span className="zoa-icon-heart" />
-                </a>
-                <a href="#" className="zoa-btn zoa-addcart">  
-                  <span className="zoa-icon-cart" />
-                </a>
-              </div>
-            </div>
-            <div className="product-info text-center">
-              <h3 className="product-title">
-                <a href="#">Aruvia Rosemary </a>
-              </h3>
-              <div className="product-price">
-                <span>₹20.9</span>
-              </div>
-            </div>
-          </div>
-    
-       
-       
+          ))}
         </div>
         <div className="text-center">
-          <a href="#" className="zoa-btn btn-loadmore">Load more</a>
+          <a href="#" className="zoa-btn btn-loadmore">
+            Load more
+          </a>
         </div>
       </div>
     </div>
