@@ -1,13 +1,17 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Axioscall from '../services/Axioscall';
+import { useContext } from 'react';
+import { contextData } from '../services/Context'; 
 
 const Home = () => {
     const [products, setProducts] = useState([]);
-     const fetchData = async () => {
+    const { handleCartToggle } = useContext(contextData);
+
+useEffect(() => {
+  const fetchData = async () => {
     try {
-      const response = await Axioscall("GET","products");
+   const response = await axios.get(`https://aruvia-backend.onrender.com/api/products`);
       if (response.data.success === "true") {
         setProducts(response.data.data);
       } else {
@@ -18,7 +22,6 @@ const Home = () => {
     }
   };
 
-useEffect(() => {
   fetchData();
 }, []);
 
@@ -98,7 +101,7 @@ useEffect(() => {
                   <a href="#" className="zoa-btn zoa-wishlist">
                     <span className="zoa-icon-heart" />
                   </a>
-                  <a href="#" className="zoa-btn zoa-addcart">
+                  <a  className="zoa-btn zoa-addcart" onClick={handleCartToggle}>
                     <span className="zoa-icon-cart" />
                   </a>
                 </div>

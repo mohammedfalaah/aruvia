@@ -6,39 +6,54 @@ import toast from 'react-hot-toast';
 
 
 
-export default async function Axioscall(method,endpoint,datalist,header) {
-
+export default async function Axioscall(method, endpoint, datalist, header) {
   try {
-    let base_url = Baseurl+'/'+endpoint
+    let base_url = Baseurl + '/' + endpoint;
     let data;
-    let body = {
-      method:method,
-      url:base_url,
-      data:datalist
-    }
-    if(header){
-      const headerauth = {'Authorization': `Bearer ${localStorage.getItem('token')}`}
-      body.headers = headerauth
-    }
-    if(method==="GET"){
-      data = await axios.get(base_url,{params:datalist,headers:{'Authorization': `Bearer ${localStorage.getItem('token')}`}})
-    }else {
 
-      data = await axios(body)
+    if (method === "GET") {
+      data = await axios.get(base_url, {
+        params: datalist,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+    } else {
+      let config = {
+        method: method,
+        url: base_url,
+        data: datalist,
+      };
+
+      if (header) {
+        config.headers = {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        };
+      }
+
+      data = await axios(config);
     }
-    
-    return data
+
+    return data;
+
   } catch (error) {
-    console.log("error",error)
-    toast.error(error.response.data.message,false)
-    if(error.message==="Request failed with status code 403"){
-        window.localStorage.clear()
-        return navigate("/");
+    console.log("error", error);
+    toast.error(error.response?.data?.message || "Server Error");
+
+    if (error.response?.status === 403) {
+      localStorage.clear();
+      window.location.href = "/";
     }
-    return error
+
+    return {
+      data: {
+        success: false,
+        message: error.response?.data?.message || "Unknown error"
+      }
+    };
   }
-    
 }
+
 export const APIsCall = async (method, endpoint, data, params, is_formdata) => {
   var headers = {
     "Content-Type": is_formdata ? "multipart/form-data" : "application/json",
