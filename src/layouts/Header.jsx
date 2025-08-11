@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react'
 import { contextData } from '../services/Context';
 
@@ -8,9 +9,33 @@ const Header = () => {
         handleSideBarToggle,
         isCartOpen, 
         setIsCartOpen,
-        handleCartToggle 
+        handleCartToggle,
+        cartItems,
+        getCartTotal,
+        getCartItemCount,
+        updateCartItemQuantity,
+        removeFromCart,
+        loading
     } = useContext(contextData);
-    
+
+    // Handle quantity increment
+    const handleQuantityIncrease = async (productId, currentQuantity) => {
+        await updateCartItemQuantity(productId, currentQuantity + 1);
+    };
+
+    // Handle quantity decrement
+    const handleQuantityDecrease = async (productId, currentQuantity) => {
+        if (currentQuantity > 1) {
+            await updateCartItemQuantity(productId, currentQuantity - 1);
+        } else {
+            await removeFromCart(productId);
+        }
+    };
+
+    // Handle remove item
+    const handleRemoveItem = async (productId) => {
+        await removeFromCart(productId);
+    };
     return (
         <div>
             {/* push menu*/}
@@ -128,63 +153,115 @@ const Header = () => {
                         </span>
                     </div>
                     <div className="cart-inside">
-                        <ul className="list">
-                            <li className="item-cart">
-                                <div className="product-img-wrap">
-                                    <a href="#" title="Product">
-                                        <img src="./assets/img/home9/product1.png" alt="Product" className="img-responsive" />
-                                    </a>
-                                </div>
-                                <div className="product-details">
-                                    <div className="inner-left">
-                                        <div className="product-name"><a href="#">Aruvia Rosemary </a></div>
-                                        <div className="product-price"><span>₹20.9</span></div>
-                                        <div className="cart-qtt">
-                                            <button type="button" className="quantity-left-minus btn btn-number js-minus" data-type="minus" data-field="">
-                                                <span className="minus-icon"><i className="ion-ios-minus-empty" /></span>
-                                            </button>
-                                            <input type="text" name="number" defaultValue={1} className="product_quantity_number js-number" />
-                                            <button type="button" className="quantity-right-plus btn btn-number js-plus" data-type="plus" data-field="">
-                                                <span className="plus-icon"><i className="ion-ios-plus-empty" /></span>
-                                            </button>
+                         {cartItems && cartItems.length > 0 ? (
+                            <>
+                                <ul className="list">
+                                    {cartItems.map((item) => (
+                                        <li key={item._id || item.productId} className="item-cart">
+                                            <div className="product-img-wrap">
+                                                <a href="#" title={item.name}>
+                                                    <img 
+                                                        src={item.image || "/assets/img/home9/product1.png"} 
+                                                        alt={item.name} 
+                                                        className="img-responsive" 
+                                                    />
+                                                </a>
+                                            </div>
+                                            <div className="product-details">
+                                                <div className="inner-left">
+                                                    <div className="product-name">
+                                                        <a href="#">{item.name}</a>
+                                                        {/* Remove button */}
+                                                        <button 
+                                                            onClick={() => handleRemoveItem(item._id || item.productId)}
+                                                            style={{
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                color: '#dc3545',
+                                                                cursor: 'pointer',
+                                                                fontSize: '12px',
+                                                                marginLeft: '10px'
+                                                            }}
+                                                            title="Remove item"
+                                                        >
+                                                            <i className="ion-ios-close-empty"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div className="product-price">
+                                                        <span>₹{item.price}</span>
+                                                        <small style={{ marginLeft: '5px', color: '#666' }}>
+                                                            (₹{(item.price * item.quantity).toFixed(2)})
+                                                        </small>
+                                                    </div>
+                                                    <div className="cart-qtt">
+                                                        <button 
+                                                            type="button" 
+                                                            className="quantity-left-minus btn btn-number js-minus" 
+                                                            onClick={() => handleQuantityDecrease(item._id || item.productId, item.quantity)}
+                                                            disabled={loading}
+                                                        >
+                                                            <span className="minus-icon">
+                                                                <i className="ion-ios-minus-empty" />
+                                                            </span>
+                                                        </button>
+                                                        <input 
+                                                            type="text" 
+                                                            value={item.quantity} 
+                                                            className="product_quantity_number js-number" 
+                                                            readOnly
+                                                        />
+                                                        <button 
+                                                            type="button" 
+                                                            className="quantity-right-plus btn btn-number js-plus" 
+                                                            onClick={() => handleQuantityIncrease(item._id || item.productId, item.quantity)}
+                                                            disabled={loading}
+                                                        >
+                                                            <span className="plus-icon">
+                                                                <i className="ion-ios-plus-empty" />
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="cart-bottom">
+                                    <div className="cart-total" style={{ padding: '15px 0', borderTop: '1px solid #eee' }}>
+                                        <h4>Total: ₹{getCartTotal().toFixed(2)}</h4>
+                                    </div>
+                                    <div className="cart-form">
+                                        <div className="cart-note-form">
+                                            <label htmlFor="CartSpecialInstructions" className="cart-note cart-note_text_label small--text-center">Special Offer:</label>
+                                            <textarea 
+                                                rows={6} 
+                                                name="note" 
+                                                id="CartSpecialInstructions" 
+                                                className="cart-note__input form-control note--input" 
+                                                defaultValue={""} 
+                                            />
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                            <li className="item-cart">
-                                <div className="product-img-wrap">
-                                    <a href="#" title="Product">
-                                        <img src="/assets/img/home9/product1.png" alt="Product" className="img-responsive" />
-                                    </a>
-                                </div>
-                                <div className="product-details">
-                                    <div className="inner-left">
-                                        <div className="product-name"><a href="#">Aruvia Rosemary </a></div>
-                                        <div className="product-price"><span>₹20.9</span></div>
-                                        <div className="cart-qtt">
-                                            <button type="button" className="quantity-left-minus btn btn-number js-minus" data-type="minus" data-field="">
-                                                <span className="minus-icon"><i className="ion-ios-minus-empty" /></span>
-                                            </button>
-                                            <input type="text" name="number" defaultValue={1} className="product_quantity_number js-number" />
-                                            <button type="button" className="quantity-right-plus btn btn-number js-plus" data-type="plus" data-field="">
-                                                <span className="plus-icon"><i className="ion-ios-plus-empty" /></span>
-                                            </button>
-                                        </div>
+                                    <div className="cart-button mg-top-30">
+                                        <a className="zoa-btn checkout" href="#" title="">
+                                            Check out (₹{getCartTotal().toFixed(2)})
+                                        </a>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
-                        <div className="cart-bottom">
-                            <div className="cart-form">
-                                <div className="cart-note-form">
-                                    <label htmlFor="CartSpecialInstructions" className="cart-note cart-note_text_label small--text-center">Special Offer:</label>
-                                    <textarea rows={6} name="note" id="CartSpecialInstructions" className="cart-note__input form-control note--input" defaultValue={""} />
-                                </div>
+                            </>
+                        ) : (
+                            <div className="empty-cart" style={{ textAlign: 'center', padding: '20px' }}>
+                                <i className="ion-ios-cart" style={{ fontSize: '48px', color: '#ccc', marginBottom: '10px' }}></i>
+                                <p style={{ color: '#666' }}>Your cart is empty</p>
+                                <button 
+                                    onClick={() => setIsCartOpen(false)}
+                                    className="zoa-btn"
+                                    style={{ marginTop: '10px' }}
+                                >
+                                    Continue Shopping
+                                </button>
                             </div>
-                            <div className="cart-button mg-top-30">
-                                <a className="zoa-btn checkout" href="#" title="">Check out</a>
-                            </div>
-                        </div>
+                        )}
                     </div>
                     {/* End cart bottom */}
                 </div>
