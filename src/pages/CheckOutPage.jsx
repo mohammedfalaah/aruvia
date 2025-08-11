@@ -488,7 +488,7 @@ const CheckOutPage = () => {
                         <div className="total" style={{borderTop: '2px solid #333', paddingTop: 10}}>
                           <h5 className="sub-total" style={{fontWeight: 'bold'}}>Total</h5>
                           <h5 className="prince" style={{fontWeight: 'bold', color: '#f33'}}>
-                            ₹{getFinalTotal().toFixed(2)}
+                            ₹{getCartTotal().toFixed(2)}
                           </h5>
                         </div>
                         
@@ -510,32 +510,9 @@ const CheckOutPage = () => {
                           </p>
                           <hr />
                           
-                          <label>
-                            <input 
-                              type="radio" 
-                              name="payment"
-                              value="check"
-                              checked={paymentMethod === 'check'}
-                              onChange={(e) => setPaymentMethod(e.target.value)}
-                            />
-                            <span style={{fontSize: 16, color: '#494949', marginLeft: 5}}>
-                              Check Payments
-                            </span>
-                          </label><br />
-                          <hr />
+                         
                           
-                          <label>
-                            <input 
-                              type="radio" 
-                              name="payment"
-                              value="cod"
-                              checked={paymentMethod === 'cod'}
-                              onChange={(e) => setPaymentMethod(e.target.value)}
-                            />
-                            <span style={{fontSize: 16, color: '#494949', marginLeft: 5}}>
-                              Cash On Delivery
-                            </span>
-                          </label>
+                        
                         </div>
                         
                         <div className="place-ober">
