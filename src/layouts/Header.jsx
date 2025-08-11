@@ -20,6 +20,8 @@ const Header = () => {
         loading
     } = useContext(contextData);
 
+    const cartCount = getCartItemCount();
+
     // Handle quantity increment
     const handleQuantityIncrease = async (productId, currentQuantity) => {
         await updateCartItemQuantity(productId, currentQuantity + 1);
@@ -572,7 +574,7 @@ const Header = () => {
   z" />
                                                 </g>
                                             </svg>
-                                            <span className="count cart-count">0</span>
+                                            <span className="count cart-count">{cartCount}</span>
                                         </a>
                                     </div>
                                 </div>
