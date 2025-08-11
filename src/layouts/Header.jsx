@@ -1,6 +1,8 @@
 
 import React, { useContext } from 'react'
 import { contextData } from '../services/Context';
+import { Link } from 'react-router-dom';
+import CheckOutPage from '../pages/CheckOutPage';
 
 const Header = () => {
     const { 
@@ -230,7 +232,7 @@ const Header = () => {
                                     <div className="cart-total" style={{ padding: '15px 0', borderTop: '1px solid #eee' }}>
                                         <h4>Total: ₹{getCartTotal().toFixed(2)}</h4>
                                     </div>
-                                    <div className="cart-form">
+                                    {/* <div className="cart-form">
                                         <div className="cart-note-form">
                                             <label htmlFor="CartSpecialInstructions" className="cart-note cart-note_text_label small--text-center">Special Offer:</label>
                                             <textarea 
@@ -241,11 +243,11 @@ const Header = () => {
                                                 defaultValue={""} 
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="cart-button mg-top-30">
-                                        <a className="zoa-btn checkout" href="#" title="">
+                                        <Link to={'/checkout'} className="zoa-btn checkout" href="#" title="">
                                             Check out (₹{getCartTotal().toFixed(2)})
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
                             </>

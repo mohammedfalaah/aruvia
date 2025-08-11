@@ -6,6 +6,7 @@ import TermsCondition from "./pages/TermsCondition"
 import Refund from "./pages/Refund"
 import Contact from "./pages/Contact"
 import Delivery from "./pages/Delivery"
+import CheckoutPage from "./pages/CheckOutPage"
 
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
     <>
 
     <Routes>
-      <Route path="/" element={<Home/>} />    
+      <Route path="/" element={<Home/>} /> 
+      <Route path="/checkout" element={<CheckoutPage />} />   
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-and-conditions" element={<TermsCondition/>} />
       <Route path="/cancellation-refund" element={<Refund />} />
