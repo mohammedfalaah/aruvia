@@ -197,9 +197,7 @@ const Home = () => {
                             <a href="#" className="zoa-btn zoa-quickview">
                                 <span className="zoa-icon-quick-view" />
                             </a>
-                            <a href="#" className="zoa-btn zoa-wishlist">
-                                <span className="zoa-icon-heart" />
-                            </a>
+                           
                             <a 
                                 className="zoa-btn zoa-addcart" 
                                 onClick={() => handleAddToCart(product._id)}
