@@ -115,7 +115,7 @@ const Home = () => {
                     </div>
                 </div>
                 
-<div className="zoa-product pad4">
+<div id='future-product' className="zoa-product pad4">
     <h3 className="title text-center">Featured Products</h3>
     <div className="container">
         <div className="row">

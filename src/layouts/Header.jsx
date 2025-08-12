@@ -49,88 +49,19 @@ const Header = () => {
                         <i className="ion-ios-close-empty f-40" />
                     </span>
                     <div className="clearfix" />
-                    <form role="search" method="get" id="searchform" className="searchform" action="https://landing.engotheme.com/search">
-                        <div>
-                            <label className="screen-reader-text" htmlFor="q" />
-                            <input type="text" placeholder="Search for products" defaultValue name="q" id="q" autoComplete="off" />
-                            <input type="hidden" name="type" defaultValue="product" />
-                            <button type="submit" id="searchsubmit">
-                                <i className="ion-ios-search-strong" />
-                            </button>
-                        </div>
-                    </form>
+                  
                     <ul className="nav-home5 js-menubar">
                         <li className="level1 active dropdown">
-                            <a href="#">Home</a>
-                            <span className="icon-sub-menu" />
-                            <ul className="menu-level1 js-open-menu">
-                                <li className="level2"><a href="01-Home-v1.html" title="home1">Demo 1</a></li>
-                                <li className="level2"><a href="01-Home-v2.html" title="home2">Demo 2</a></li>
-                                <li className="level2"><a href="01-Home-v3.html" title="home3">Demo 3</a></li>
-                                <li className="level2"><a href="01-Home-v4.html" title="home4">Demo 4</a></li>
-                                <li className="level2"><a href="01-Home-v5.html" title="home5">Demo 5</a></li>
-                                <li className="level2"><a href="01-Home-v6.html" title="">Demo 6</a></li>
-                                <li className="level2"><a href="01-Home-v7.html" title="">Demo 7</a></li>
-                                <li className="level2"><a href="01-Home-v8.html" title="">Demo 8</a></li>
-                                <li className="level2"><a href="01-Home-v9.html" title="">Demo 9</a></li>
-                                <li className="level2"><a href="01-Home-v10.html" title="">Demo 10</a></li>
-                                <li className="level2"><a href="01-Home-v11.html" title="">Demo 11</a></li>
-                            </ul>
+                            <a href="/">Home</a>
+                
                         </li>
                         <li className="level1 active dropdown">
-                            <a href="#">Shop</a>
-                            <span className="icon-sub-menu" />
-                            <div className="menu-level1 js-open-menu">
-                                <ul className="level1">
-                                    <li className="level2">
-                                        <a href="#">Shop Layout</a>
-                                        <ul className="menu-level-2">
-                                            <li className="level3"><a href="02-Shop_v1.html" title="">Shop Page v1</a></li>
-                                            <li className="level3"><a href="s02-Shop_v2.html" title="">Shop Page v2</a></li>
-                                            <li className="level3"><a href="02-Shop_v3.html" title="">Shop Page v3</a></li>
-                                            <li className="level3"><a href="02-Shop_v4.html" title="">Shop Page v4</a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="level2">
-                                        <a href="#">Single Product</a>
-                                        <ul className="menu-level-2">
-                                            <li className="level3"><a href="03-Single_product_v1.html" title="">Single product v1</a></li>
-                                            <li className="level3"><a href="03-Single_product_v2.html" title="">Single product v2</a></li>
-                                            <li className="level3"><a href="03-Single_product_v3.html" title="">Single product v3</a></li>
-                                            <li className="level3"><a href="03-Single_product_v4.html" title="">Single product v4</a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="level2">
-                                        <a href="#">Other Pages</a>
-                                        <ul className="menu-level-2">
-                                            <li className="level3"><a href="02-Shop_v4.html" title="">Shop</a></li>
-                                            <li className="level3"><a href="13-Cart.html" title="">Cart</a></li>
-                                            <li className="level3"><a href="09-Check-out.html" title="">Checkout</a></li>
-                                            <li className="level3"><a href="08-My-Account.html" title="">My Account</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <div className="clearfix" />
-                            </div>
+                            <a href="future-product">Shop</a>
+                            
                         </li>
                         <li className="level1">
-                            <a href="#">Pages</a>
-                            <span className="icon-sub-menu" />
-                            <ul className="menu-level1 js-open-menu">
-                                <li className="level2"><a href="04-About.html" title="About Us ">About Us </a></li>
-                                <li className="level2"><a href="05-Contact.html" title="Contact">Contact</a></li>
-                                <li className="level2"><a href="11-FAQS.html" title="FAQs">FAQs</a></li>
-                                <li className="level2"><a href="10-404.html" title="404">404</a></li>
-                                <li className="level2"><a href="12-Coming-Soon.html" title="Coming Soon">Coming Soon</a></li>
-                            </ul>
-                        </li>
-                        <li className="level1">
-                            <a href="#">Blog</a>
-                            <span className="icon-sub-menu" />
-                            <ul className="menu-level1 js-open-menu">
-                                <li className="level2"><a href="06-Blog.html" title="Blog Standar">Blog Standard</a></li>
-                                <li className="level2"><a href="07-Blog_single.html" title="Blog Single">Blog Single</a></li>
-                            </ul>
+                            <a href="#">Checkout</a>
+                           
                         </li>
                     </ul>
                     <ul className="mobile-account">
@@ -247,9 +178,17 @@ const Header = () => {
                                         </div>
                                     </div> */}
                                     <div className="cart-button mg-top-30">
-                                        <Link to={'/checkout'} className="zoa-btn checkout" href="#" title="">
-                                            Check out (₹{getCartTotal().toFixed(2)})
-                                        </Link>
+                                       <Link 
+    to={'/checkout'} 
+    className="zoa-btn checkout" 
+    title=""
+    onClick={
+        // Close sidebar immediately when clicked
+        handleSidebarClose
+    }
+>
+    Check out (₹{getCartTotal().toFixed(2)})
+</Link>
                                     </div>
                                 </div>
                             </>
@@ -271,28 +210,7 @@ const Header = () => {
                 </div>
             </div>
             {/* Search form */}
-            <div className="search-form-wrapper header-search-form">
-                <div className="container">
-                    <div className="search-results-wrapper">
-                        <div className="btn-search-close">
-                            <i className="ion-ios-close-empty" />
-                        </div>
-                    </div>
-                    <ul className="zoa-category text-center">
-                        <li><a href="#">All Categories</a></li>
-                        <li><a href="#">Woman</a></li>
-                        <li><a href="#">Man</a></li>
-                        <li><a href="#">Accessories</a></li>
-                        <li><a href="#">Kid</a></li>
-                        <li><a href="#">Others</a></li>
-                    </ul>
-                    <form method="get" action="https://landing.engotheme.com/search" role="search" className="search-form  has-categories-select">
-                        <input name="q" className="search-input" type="text" defaultValue placeholder="Enter your keywords..." autoComplete="off" />
-                        <input type="hidden" name="post_type" defaultValue="product" />
-                        <button type="submit" id="search-btn"><i className="ion-ios-search-strong" /></button>
-                    </form>
-                </div>
-            </div>
+            
             {/* End search form */}
             {/* Account */}
             <div className="account-form-wrapper">
@@ -528,18 +446,7 @@ const Header = () => {
                             </div>
                             <div className="col-md-4 col flex justify-content-end">
                                 <div className="topbar-left">
-                                    <div className="element element-search hidden-xs hidden-sm">
-                                        <a href="#" className="zoa-icon search-toggle">
-                                            <svg width={20} height={20} version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 90 90" style={{enableBackground: 'new 0 0 90 90'}} xmlSpace="preserve">
-                                                <g>
-                                                    <path d="M0,39.4C0,50,4.1,59.9,11.6,67.3c7.4,7.5,17.3,11.6,27.8,11.6c9.5,0,18.5-3.4,25.7-9.5l19.8,19.7c1.2,1.2,3.1,1.2,4.2,0
-  c0.6-0.6,0.9-1.3,0.9-2.1s-0.3-1.5-0.9-2.1L69.3,65.1c6.2-7.1,9.5-16.2,9.5-25.7c0-10.5-4.1-20.4-11.6-27.9C59.9,4.1,50,0,39.4,0
-  C28.8,0,19,4.1,11.6,11.6S0,28.9,0,39.4z M63.1,15.8c6.3,6.3,9.8,14.7,9.8,23.6S69.4,56.7,63.1,63s-14.7,9.8-23.6,9.8
-  S22.2,69.3,15.9,63C9.5,56.8,6,48.4,6,39.4s3.5-17.3,9.8-23.6S30.5,6,39.4,6S56.8,9.5,63.1,15.8z" />
-                                                </g>
-                                            </svg>
-                                        </a>
-                                    </div>
+                                    
                                     <div className="element element-user hidden-xs hidden-sm">
                                         <a href="#" className="zoa-icon js-user">
                                             <svg width={19} height={20} version="1.1" id="Layer_3" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 102.8" style={{enableBackground: 'new 0 0 100 102.8'}} xmlSpace="preserve">
