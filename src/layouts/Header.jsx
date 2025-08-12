@@ -178,14 +178,14 @@ const Header = () => {
                                         </div>
                                     </div> */}
                                     <div className="cart-button mg-top-30">
-                                       <Link 
+<Link 
     to={'/checkout'} 
     className="zoa-btn checkout" 
     title=""
-    onClick={
+    onClick={() => {
         // Close sidebar immediately when clicked
-        handleSidebarClose
-    }
+        handleSidebarClose();
+    }}
 >
     Check out (₹{getCartTotal().toFixed(2)})
 </Link>
