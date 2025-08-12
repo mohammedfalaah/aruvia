@@ -182,9 +182,9 @@ const Header = () => {
     to={'/checkout'} 
     className="zoa-btn checkout" 
     title=""
-    onClick={() => {
-        // Close sidebar immediately when clicked
-        handleSidebarClose();
+   onClick={() => {
+        // Close the cart sidebar (not the main sidebar)
+        setIsCartOpen(false);
     }}
 >
     Check out (₹{getCartTotal().toFixed(2)})
