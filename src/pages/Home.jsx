@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
@@ -9,6 +9,8 @@ const Home = () => {
     const [fetchError, setFetchError] = useState(null);
     const [isProductsLoading, setIsProductsLoading] = useState(true);
     const [retryCount, setRetryCount] = useState(0);
+    const [imageLoadingStates, setImageLoadingStates] = useState({});
+    const [visibleProducts, setVisibleProducts] = useState(12); // Start with 12 products
     
     const { 
         addToCart, 
@@ -19,13 +21,61 @@ const Home = () => {
     } = useContext(contextData);
     const [loading, setLoading] = useState(false);
 
+    // Memoize products to display (for performance)
+    const displayProducts = useMemo(() => 
+        products.slice(0, visibleProducts), 
+        [products, visibleProducts]
+    );
+
     // Get item count for a specific product
-    const getProductCartCount = (productId) => {
+    const getProductCartCount = useCallback((productId) => {
         const item = cartItems.find(item => item._id === productId || item.productId === productId);
         return item ? item.quantity : 0;
+    }, [cartItems]);
+
+    // Image optimization function
+    const optimizeImageUrl = (url, width = 400, quality = 75) => {
+        if (!url) return '/assets/images/placeholder.jpg';
+        
+        // If using a CDN like Cloudinary, ImageKit, or similar
+        // Replace with your CDN's optimization parameters
+        
+        // Example for Cloudinary:
+        // return url.replace('/upload/', `/upload/w_${width},q_${quality},f_auto/`);
+        
+        // Example for ImageKit:
+        // return `${url}?tr=w-${width},q-${quality}`;
+        
+        // For now, return original URL
+        return url;
     };
 
-    // Improved fetch function with retry logic and better error handling
+    // Preload critical images
+    const preloadImage = (src) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = src;
+        });
+    };
+
+    // Handle image load state
+    const handleImageLoad = (productId) => {
+        setImageLoadingStates(prev => ({
+            ...prev,
+            [productId]: 'loaded'
+        }));
+    };
+
+    const handleImageError = (productId) => {
+        setImageLoadingStates(prev => ({
+            ...prev,
+            [productId]: 'error'
+        }));
+    };
+
+    // Improved fetch function with image preloading
     const fetchProducts = async (attempt = 1) => {
         const maxRetries = 3;
         setIsProductsLoading(true);
@@ -37,7 +87,7 @@ const Home = () => {
             const response = await axios.get(
                 'https://aruvia-backend.onrender.com/api/products',
                 {
-                    timeout: 15000, // 15 second timeout
+                    timeout: 15000,
                     headers: {
                         'Content-Type': 'application/json',
                     }
@@ -46,16 +96,34 @@ const Home = () => {
             
             console.log('API Response:', response.data);
             
-            // More robust response checking
             if (response.data && response.data.success === "true" && Array.isArray(response.data.data)) {
-                setProducts(response.data.data);
+                const productsData = response.data.data;
+                setProducts(productsData);
                 setRetryCount(0);
-                console.log(`Successfully fetched ${response.data.data.length} products`);
+                
+                // Initialize image loading states
+                const initialImageStates = {};
+                productsData.forEach(product => {
+                    initialImageStates[product._id] = 'loading';
+                });
+                setImageLoadingStates(initialImageStates);
+                
+                // Preload first few images for better perceived performance
+                const firstFewProducts = productsData.slice(0, 6);
+                firstFewProducts.forEach(product => {
+                    if (product.image) {
+                        preloadImage(optimizeImageUrl(product.image))
+                            .then(() => handleImageLoad(product._id))
+                            .catch(() => handleImageError(product._id));
+                    }
+                });
+                
+                console.log(`Successfully fetched ${productsData.length} products`);
             } else if (response.data && response.data.success === true && Array.isArray(response.data.data)) {
-                // Handle boolean true instead of string "true"
-                setProducts(response.data.data);
+                const productsData = response.data.data;
+                setProducts(productsData);
                 setRetryCount(0);
-                console.log(`Successfully fetched ${response.data.data.length} products`);
+                console.log(`Successfully fetched ${productsData.length} products`);
             } else {
                 throw new Error(response.data?.message || 'Invalid response format from server');
             }
@@ -77,9 +145,8 @@ const Home = () => {
             
             setFetchError(errorMessage);
             
-            // Retry logic
             if (attempt < maxRetries) {
-                const delay = attempt * 2000; // Progressive delay: 2s, 4s, 6s
+                const delay = attempt * 2000;
                 console.log(`Retrying in ${delay}ms...`);
                 setTimeout(() => {
                     setRetryCount(attempt);
@@ -94,6 +161,11 @@ const Home = () => {
         }
     };
 
+    // Load more products
+    const loadMoreProducts = () => {
+        setVisibleProducts(prev => Math.min(prev + 12, products.length));
+    };
+
     // Manual retry function
     const handleRetry = () => {
         fetchProducts();
@@ -101,16 +173,14 @@ const Home = () => {
 
     useEffect(() => {
         fetchProducts();
-        // Fetch cart items on component mount
         fetchCartItems();
-    }, []); // Remove fetchCartItems from dependency array if it doesn't change
+    }, []);
 
-    // Handle add to cart click - simplified to use context function
+    // Handle add to cart click
     const handleAddToCart = async (productId) => {
         setLoading(true);
         
         try {
-            // Find the product from the products array
             const product = products.find(p => p._id === productId);
             
             if (!product) {
@@ -119,7 +189,6 @@ const Home = () => {
                 return;
             }
 
-            // Use the context addToCart function which handles localStorage
             const result = await addToCart(productId, product, 1);
             
             if (result.success) {
@@ -135,7 +204,132 @@ const Home = () => {
         }
     };
 
-    // Loading state component
+    // Optimized Product Image Component
+    const ProductImage = React.memo(({ product }) => {
+        const [imageLoaded, setImageLoaded] = useState(false);
+        const [imageError, setImageError] = useState(false);
+        
+        const optimizedImageUrl = useMemo(() => 
+            optimizeImageUrl(product.image, 400, 75), 
+            [product.image]
+        );
+        
+        return (
+            <div className="product-img" style={{ position: 'relative', overflow: 'hidden' }}>
+                {/* Loading placeholder */}
+                {!imageLoaded && !imageError && (
+                    <div 
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '200px',
+                            backgroundColor: '#f8f9fa',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1
+                        }}
+                    >
+                        <div style={{
+                            width: '40px',
+                            height: '40px',
+                            border: '3px solid #e9ecef',
+                            borderTop: '3px solid #007bff',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite'
+                        }} />
+                    </div>
+                )}
+                
+                {/* Error placeholder */}
+                {imageError && (
+                    <div 
+                        style={{
+                            width: '100%',
+                            height: '200px',
+                            backgroundColor: '#f8f9fa',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#6c757d',
+                            fontSize: '14px'
+                        }}
+                    >
+                        Image not available
+                    </div>
+                )}
+                
+                {/* Actual image */}
+                <img
+                    src={optimizedImageUrl}
+                    alt={product.name}
+                    className="img-responsive"
+                    loading="lazy" // Native lazy loading
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => {
+                        setImageError(true);
+                        setImageLoaded(false);
+                    }}
+                    style={{
+                        opacity: imageLoaded ? 1 : 0,
+                        transition: 'opacity 0.3s ease',
+                        width: '100%',
+                        height: 'auto'
+                    }}
+                />
+                
+                {/* Product action buttons */}
+                <div
+                    className="product-button-group hidden-xs"
+                    style={{ paddingBottom: "10px" }}
+                >
+                    <a href="#" className="zoa-btn zoa-quickview">
+                        <span className="zoa-icon-quick-view" />
+                    </a>
+                    <a href="#" className="zoa-btn zoa-wishlist">
+                        <span className="zoa-icon-heart" />
+                    </a>
+                    <a 
+                        className="zoa-btn zoa-addcart" 
+                        onClick={() => handleAddToCart(product._id)}
+                        style={{ 
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            opacity: loading ? 0.6 : 1,
+                            position: 'relative'
+                        }}
+                    >
+                        <span className="zoa-icon-cart" />
+                        {loading && <span style={{ marginLeft: '5px' }}>...</span>}
+                        
+                        {getProductCartCount(product._id) > 0 && (
+                            <span 
+                                style={{
+                                    position: 'absolute',
+                                    top: '-5px',
+                                    right: '-5px',
+                                    backgroundColor: '#dc3545',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                    width: '18px',
+                                    height: '18px',
+                                    fontSize: '10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                {getProductCartCount(product._id)}
+                            </span>
+                        )}
+                    </a>
+                </div>
+            </div>
+        );
+    });
+
+    // Loading component
     const LoadingComponent = () => (
         <div className="text-center" style={{ padding: '50px 0' }}>
             <div style={{ fontSize: '18px', marginBottom: '20px' }}>
@@ -156,7 +350,7 @@ const Home = () => {
         </div>
     );
 
-    // Error state component
+    // Error component
     const ErrorComponent = () => (
         <div className="text-center" style={{ padding: '50px 0' }}>
             <div style={{ 
@@ -198,8 +392,6 @@ const Home = () => {
                                     <div className="slide-img">
                                         <a href="#"><img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" /></a>
                                         <div className="box-center slide-content">
-                                            {/* <h3>Tank top<br /> hot collection</h3> */}
-                                            {/* <a href="#">Shop now</a> */}
                                         </div>
                                     </div>
                                 </div>
@@ -212,7 +404,6 @@ const Home = () => {
                                                 <img src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
                                             </a>
                                             <div className="box-center content3">
-                                                {/* <a href="#">Womens</a> */}
                                             </div>
                                         </div>
                                     </div>
@@ -222,7 +413,6 @@ const Home = () => {
                                                 <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
                                             </a>
                                             <div className="box-center content3">
-                                                {/* <a href="#">Kid's</a> */}
                                             </div>
                                         </div>
                                     </div>
@@ -235,77 +425,19 @@ const Home = () => {
                 <div id='future-product' className="zoa-product pad4">
                     <h3 className="title text-center">Featured Products</h3>
                     <div className="container">
-                        {/* Show loading state */}
                         {isProductsLoading && <LoadingComponent />}
                         
-                        {/* Show error state */}
                         {!isProductsLoading && fetchError && <ErrorComponent />}
                         
-                        {/* Show products */}
-                        {!isProductsLoading && !fetchError && products.length > 0 && (
+                        {!isProductsLoading && !fetchError && displayProducts.length > 0 && (
                             <>
                                 <div className="row">
-                                    {products.map((product) => (
+                                    {displayProducts.map((product) => (
                                         <div
                                             className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
                                             key={product._id}
                                         >
-                                            <div className="product-img">
-                                                <a href="#">
-                                                    <img
-                                                        src={product.image}
-                                                        alt={product.name}
-                                                        className="img-responsive"
-                                                    />
-                                                </a>
-                                                
-                                                {/* Desktop/Tablet Button Group - Hidden on mobile */}
-                                                <div
-                                                    className="product-button-group hidden-xs"
-                                                    style={{ paddingBottom: "10px" }}
-                                                >
-                                                    <a href="#" className="zoa-btn zoa-quickview">
-                                                        <span className="zoa-icon-quick-view" />
-                                                    </a>
-                                                    <a href="#" className="zoa-btn zoa-wishlist">
-                                                        <span className="zoa-icon-heart" />
-                                                    </a>
-                                                    <a 
-                                                        className="zoa-btn zoa-addcart" 
-                                                        onClick={() => handleAddToCart(product._id)}
-                                                        style={{ 
-                                                            cursor: loading ? 'not-allowed' : 'pointer',
-                                                            opacity: loading ? 0.6 : 1,
-                                                            position: 'relative'
-                                                        }}
-                                                    >
-                                                        <span className="zoa-icon-cart" />
-                                                        {loading && <span style={{ marginLeft: '5px' }}>...</span>}
-                                                        
-                                                        {/* Show cart count badge if item is in cart */}
-                                                        {getProductCartCount(product._id) > 0 && (
-                                                            <span 
-                                                                style={{
-                                                                    position: 'absolute',
-                                                                    top: '-5px',
-                                                                    right: '-5px',
-                                                                    backgroundColor: '#dc3545',
-                                                                    color: 'white',
-                                                                    borderRadius: '50%',
-                                                                    width: '18px',
-                                                                    height: '18px',
-                                                                    fontSize: '10px',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center'
-                                                                }}
-                                                            >
-                                                                {getProductCartCount(product._id)}
-                                                            </span>
-                                                        )}
-                                                    </a>
-                                                </div>
-                                            </div>
+                                            <ProductImage product={product} />
                                             
                                             <div className="product-info text-center">
                                                 <h3 className="product-title">
@@ -315,7 +447,7 @@ const Home = () => {
                                                     <span>₹{product.price}</span>
                                                 </div>
                                                 
-                                                {/* Mobile Button Group - Exact same style as desktop */}
+                                                {/* Mobile Button Group */}
                                                 <div 
                                                     className="visible-xs product-button-group"
                                                     style={{ paddingBottom: "10px", marginTop: "10px" }}
@@ -336,7 +468,6 @@ const Home = () => {
                                                         <span className="zoa-icon-cart" />
                                                         {loading && <span style={{ marginLeft: '5px' }}>...</span>}
                                                         
-                                                        {/* Mobile cart count badge - same as desktop */}
                                                         {getProductCartCount(product._id) > 0 && (
                                                             <span 
                                                                 style={{
@@ -363,15 +494,29 @@ const Home = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="text-center">
-                                    <a href="#" className="zoa-btn btn-loadmore">
-                                        Load more
-                                    </a>
-                                </div>
+                                
+                                {/* Load More Button */}
+                                {visibleProducts < products.length && (
+                                    <div className="text-center">
+                                        <button 
+                                            onClick={loadMoreProducts}
+                                            className="zoa-btn btn-loadmore"
+                                            style={{
+                                                backgroundColor: '#007bff',
+                                                color: 'white',
+                                                padding: '10px 30px',
+                                                border: 'none',
+                                                borderRadius: '5px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Load More ({products.length - visibleProducts} remaining)
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         )}
                         
-                        {/* Show message when no products found */}
                         {!isProductsLoading && !fetchError && products.length === 0 && (
                             <div className="text-center" style={{ padding: '50px 0' }}>
                                 <h4>No products found</h4>
@@ -394,11 +539,34 @@ const Home = () => {
                         )}
                     </div>
                     
-                    {/* CSS for mobile responsiveness and loading animation */}
+                    {/* Enhanced CSS for performance */}
                     <style jsx>{`
                         @keyframes spin {
                             0% { transform: rotate(0deg); }
                             100% { transform: rotate(360deg); }
+                        }
+                        
+                        /* Image optimization */
+                        .product-img img {
+                            will-change: opacity;
+                            backface-visibility: hidden;
+                            transform: translateZ(0);
+                        }
+                        
+                        /* Performance optimizations */
+                        .product-item {
+                            transform: translateZ(0);
+                            backface-visibility: hidden;
+                        }
+                        
+                        /* Lazy loading support */
+                        img[loading="lazy"] {
+                            opacity: 0;
+                            transition: opacity 0.3s;
+                        }
+                        
+                        img[loading="lazy"].loaded {
+                            opacity: 1;
                         }
                         
                         @media (max-width: 767px) {
@@ -409,6 +577,8 @@ const Home = () => {
                             .product-img img {
                                 width: 100%;
                                 height: auto;
+                                max-height: 200px;
+                                object-fit: cover;
                             }
                             
                             .product-title {
@@ -423,7 +593,6 @@ const Home = () => {
                             }
                         }
                         
-                        /* Ensure buttons are properly sized on all screens */
                         .zoa-btn {
                             display: inline-block;
                             text-decoration: none;
@@ -435,7 +604,6 @@ const Home = () => {
                             gap: 5px;
                         }
                         
-                        /* Hide desktop buttons on mobile, show mobile buttons */
                         @media (max-width: 767px) {
                             .hidden-xs {
                                 display: none !important;
@@ -445,16 +613,23 @@ const Home = () => {
                             }
                         }
                         
-                        /* Hide mobile buttons on desktop */
                         @media (min-width: 768px) {
                             .visible-xs {
                                 display: none !important;
+                            }
+                        }
+                        
+                        /* Optimize for mobile performance */
+                        @media (max-width: 767px) {
+                            .product-img {
+                                contain: layout style paint;
                             }
                         }
                     `}</style>
                 </div>
             </div>
 
+            {/* Rest of the component remains the same */}
             <div className="container container-content">
                 <div className="zoa-instagram">
                     <div className="insta-title2 text-center">
@@ -482,7 +657,6 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Content */}
             <div className="newsletter v3">
                 <div className="container">
                     <div className="row">
@@ -518,7 +692,6 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Toast Notification */}
             {notification && (
                 <div 
                     style={{
