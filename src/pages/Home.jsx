@@ -215,11 +215,8 @@ const Home = () => {
                                             />
                                         </a>
                                         
-                                        {/* Desktop/Tablet Button Group - Hidden on mobile */}
-                                        <div
-                                            className="product-button-group hidden-xs"
-                                            style={{ paddingBottom: "10px" }}
-                                        >
+                                        {/* Button Group - Always visible and properly positioned */}
+                                        <div className="product-button-group">
                                             <a href="#" className="zoa-btn zoa-quickview">
                                                 <span className="zoa-icon-quick-view" />
                                             </a>
@@ -270,51 +267,6 @@ const Home = () => {
                                         <div className="product-price">
                                             <span>₹{product.price}</span>
                                         </div>
-                                        
-                                        {/* Mobile Button Group - Exact same style as desktop */}
-                                        <div 
-                                            className="visible-xs product-button-group"
-                                            style={{ paddingBottom: "10px", marginTop: "10px" }}
-                                        >
-                                            <a href="#" className="zoa-btn zoa-quickview">
-                                                <span className="zoa-icon-quick-view" />
-                                            </a>
-                                           
-                                            <a 
-                                                className="zoa-btn zoa-addcart" 
-                                                onClick={() => handleAddToCart(product._id)}
-                                                style={{ 
-                                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                                    opacity: loading ? 0.6 : 1,
-                                                    position: 'relative'
-                                                }}
-                                            >
-                                                <span className="zoa-icon-cart" />
-                                                {loading && <span style={{ marginLeft: '5px' }}>...</span>}
-                                                
-                                                {/* Mobile cart count badge - same as desktop */}
-                                                {getProductCartCount(product._id) > 0 && (
-                                                    <span 
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '-5px',
-                                                            right: '-5px',
-                                                            backgroundColor: '#dc3545',
-                                                            color: 'white',
-                                                            borderRadius: '50%',
-                                                            width: '18px',
-                                                            height: '18px',
-                                                            fontSize: '10px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center'
-                                                        }}
-                                                    >
-                                                        {getProductCartCount(product._id)}
-                                                    </span>
-                                                )}
-                                            </a>
-                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -326,57 +278,123 @@ const Home = () => {
                         </div>
                     </div>
                     
-                    {/* CSS for mobile responsiveness - using exact same styles */}
+                    {/* Fixed CSS for mobile responsiveness */}
                     <style jsx>{`
+                        /* Override existing styles to ensure buttons are always visible */
+                        .product-item .product-button-group {
+                            display: flex !important;
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                            position: absolute !important;
+                            bottom: 10px !important;
+                            left: 50% !important;
+                            transform: translateX(-50%) !important;
+                            width: auto !important;
+                            height: auto !important;
+                            justify-content: center !important;
+                            align-items: center !important;
+                            gap: 5px !important;
+                            z-index: 10 !important;
+                        }
+
+                        .product-item .product-button-group .zoa-btn {
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                            transform: translateY(0px) !important;
+                            width: 40px !important;
+                            height: 40px !important;
+                            border-radius: 50% !important;
+                            background-color: rgba(0, 0, 0, 0.8) !important;
+                            color: white !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            margin: 0 3px !important;
+                            transition: all 0.3s ease !important;
+                        }
+
+                        .product-item .product-button-group .zoa-btn:hover {
+                            background-color: #333 !important;
+                            transform: scale(1.1) !important;
+                        }
+
+                        /* Mobile specific styles */
                         @media (max-width: 767px) {
                             .product-item {
-                                margin-bottom: 20px;
+                                margin-bottom: 30px !important;
+                                position: relative !important;
+                            }
+                            
+                            .product-item .product-img {
+                                position: relative !important;
+                                overflow: hidden !important;
+                            }
+
+                            .product-item .product-button-group {
+                                bottom: 5px !important;
+                            }
+
+                            .product-item .product-button-group .zoa-btn {
+                                width: 35px !important;
+                                height: 35px !important;
+                                margin: 0 2px !important;
                             }
                             
                             .product-img img {
-                                width: 100%;
-                                height: auto;
+                                width: 100% !important;
+                                height: auto !important;
                             }
                             
                             .product-title {
-                                font-size: 14px;
-                                margin: 8px 0 5px 0;
+                                font-size: 14px !important;
+                                margin: 8px 0 5px 0 !important;
                             }
                             
                             .product-price {
-                                font-size: 16px;
-                                font-weight: bold;
-                                margin-bottom: 8px;
+                                font-size: 16px !important;
+                                font-weight: bold !important;
+                                margin-bottom: 8px !important;
                             }
                         }
-                        
-                        /* Ensure buttons are properly sized on all screens */
-                        .zoa-btn {
-                            display: inline-block;
-                            text-decoration: none;
-                        }
-                        
-                        .product-button-group {
-                            display: flex;
-                            justify-content: center;
-                            gap: 5px;
-                        }
-                        
-                        /* Hide desktop buttons on mobile, show mobile buttons */
-                        @media (max-width: 767px) {
-                            .hidden-xs {
-                                display: none !important;
+
+                        /* Tablet styles */
+                        @media (min-width: 768px) and (max-width: 1024px) {
+                            .product-item .product-button-group {
+                                bottom: 8px !important;
                             }
-                            .visible-xs {
-                                display: block !important;
+
+                            .product-item .product-button-group .zoa-btn {
+                                width: 38px !important;
+                                height: 38px !important;
                             }
                         }
-                        
-                        /* Hide mobile buttons on desktop */
-                        @media (min-width: 768px) {
-                            .visible-xs {
-                                display: none !important;
+
+                        /* Desktop styles - maintain hover effects */
+                        @media (min-width: 1025px) {
+                            .product-item .product-button-group {
+                                opacity: 0 !important;
+                                visibility: hidden !important;
+                                transition: all 0.3s ease !important;
                             }
+
+                            .product-item:hover .product-button-group {
+                                opacity: 1 !important;
+                                visibility: visible !important;
+                            }
+
+                            .product-item:hover .product-button-group .zoa-btn {
+                                transform: translateY(-10px) !important;
+                            }
+                        }
+
+                        /* Ensure product container has proper positioning */
+                        .product-item {
+                            position: relative !important;
+                        }
+
+                        .product-img {
+                            position: relative !important;
+                            overflow: hidden !important;
                         }
                     `}</style>
                 </div>
