@@ -11620,7 +11620,7 @@ input.firstname {
   display: block;
   width: 100%;
   height: 50px;
-  border: 1px solid #f33;
+  /* border: 1px solid #f33; */
   padding-left: 20px;
   color: #f33;
   margin-bottom: 20px;
@@ -11631,7 +11631,7 @@ input.lastname {
   display: block;
   width: 100%;
   height: 50px;
-  border: 1px solid #03b452;
+  /* border: 1px solid #03b452; */
   padding-left: 20px;
   color: #00f;
   margin-bottom: 20px;

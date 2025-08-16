@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { contextData } from '../services/Context';
+import { show_toast } from '../utils/Toast';
 
 const CheckOutPage = () => {
   const { 
@@ -21,7 +22,7 @@ const CheckOutPage = () => {
     street: '',
     city: '',
     state: '',
-    country: '',
+    country: 'India', // Default to India for Indian e-commerce
     postcode: '',
     landmark: '',
     orderNote: ''
@@ -32,21 +33,90 @@ const CheckOutPage = () => {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderError, setOrderError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
 
-  // Handle form input changes
+  // Validate email format
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Validate phone number (Indian format)
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phone.replace(/\s+/g, ''));
+  };
+
+  // Validate postal code (Indian format)
+  const validatePostcode = (postcode) => {
+    const postcodeRegex = /^[1-9][0-9]{5}$/;
+    return postcodeRegex.test(postcode);
+  };
+
+  // Handle form input changes with validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    // Clear specific field error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+
+    // Real-time validation for specific fields
+    if (name === 'email' && value && !validateEmail(value)) {
+      setFormErrors(prev => ({
+        ...prev,
+        email: 'Please enter a valid email address'
+      }));
+    }
+
+    if (name === 'phone' && value && !validatePhone(value)) {
+      setFormErrors(prev => ({
+        ...prev,
+        phone: 'Please enter a valid 10-digit phone number'
+      }));
+    }
+  };
+
+  // Validate form data
+  const validateForm = () => {
+    const errors = {};
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'state', 'country','landmark'];
+
+    requiredFields.forEach(field => {
+      if (!formData[field] || formData[field].trim() === '') {
+        errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+      }
+    });
+
+    // Specific validations
+    if (formData.email && !validateEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (formData.phone && !validatePhone(formData.phone)) {
+      errors.phone = 'Please enter a valid 10-digit phone number';
+    }
+
+    if (formData.postcode && formData.postcode.trim() && !validatePostcode(formData.postcode)) {
+      errors.postcode = 'Please enter a valid 6-digit postal code';
+    }
+
+    return errors;
   };
 
   // Calculate shipping cost
   const getShippingCost = () => {
     switch (shippingOption) {
-      case 'flat': return 12.00;
-      case 'local': return 5.00;
+      case 'flat': return 50.00; // More realistic shipping cost for India
+      case 'local': return 25.00;
       case 'free': 
       default: return 0.00;
     }
@@ -60,6 +130,12 @@ const CheckOutPage = () => {
   // Load Razorpay script dynamically
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
+      // Check if Razorpay is already loaded
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => resolve(true);
@@ -73,15 +149,16 @@ const CheckOutPage = () => {
     const scriptLoaded = await loadRazorpayScript();
     
     if (!scriptLoaded) {
-      alert('Razorpay SDK failed to load. Please check your internet connection.');
+      show_toast('Razorpay SDK failed to load. Please check your internet connection.', false);
+      setOrderLoading(false);
       return;
     }
 
     const options = {
-      key: 'rzp_live_iFvbsicduHI4Lb', // Replace with your Razorpay Key ID
+      key: 'rzp_live_iFvbsicduHI4Lb', // Replace with your actual Razorpay Key ID
       amount: Math.round(getFinalTotal() * 100), // Amount in paise
       currency: 'INR',
-      name: 'Aruvia', // Replace with your store name
+      name: 'Aruvia',
       description: 'Order Payment',
       order_id: razorpayOrderId,
       handler: async function (response) {
@@ -94,15 +171,17 @@ const CheckOutPage = () => {
             orderId: orderData._id
           };
 
+          const token = localStorage.getItem("token");
+          
           // Call your payment verification API
           const verifyResponse = await axios.post(
-            'https://aruvia-backend.onrender.com/api/payment/verify', // Replace with your verification endpoint
+            'https://aruvia-backend.onrender.com/api/payment/verify',
             verificationData,
             {
               headers: {
                 'Content-Type': 'application/json',
-                ...(localStorage.getItem("token") && { 
-                  'Authorization': `Bearer ₹{localStorage.getItem("token")}` 
+                ...(token && { 
+                  'Authorization': `Bearer ${token}` // Fixed template literal
                 })
               }
             }
@@ -110,31 +189,37 @@ const CheckOutPage = () => {
 
           if (verifyResponse.data.success) {
             setOrderSuccess(true);
+            setOrderError('');
             await clearCart();
-            alert('Payment successful! Your order has been placed.');
+            show_toast('Payment successful! Your order has been placed.', true);
             
-            // Redirect to order confirmation page
-            // window.location.href = '/order-confirmation';
+            // Optional: Redirect to order confirmation page after a delay
+            setTimeout(() => {
+              // window.location.href = '/order-confirmation';
+            }, 2000);
           } else {
             throw new Error('Payment verification failed');
           }
         } catch (error) {
           console.error('Payment verification error:', error);
-          alert('Payment verification failed. Please contact support.');
+          setOrderError('Payment verification failed. Please contact support.');
+          show_toast('Payment verification failed. Please contact support.', false);
+        } finally {
+          setOrderLoading(false);
         }
       },
       prefill: {
-        name: `₹{formData.firstName} ₹{formData.lastName}`,
+        name: `${formData.firstName} ${formData.lastName}`, // Fixed template literal
         email: formData.email,
         contact: formData.phone
       },
       notes: {
-        address: `₹{formData.street}, ₹{formData.city}, ₹{formData.state}`,
+        address: `${formData.street}, ${formData.city}, ${formData.state}`, // Fixed template literal
         landmark: formData.landmark,
         orderNote: formData.orderNote
       },
       theme: {
-        color: '#f33' // Customize based on your brand color
+        color: '#f33'
       },
       modal: {
         ondismiss: function() {
@@ -152,39 +237,43 @@ const CheckOutPage = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     
-    // Validate required fields
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'state', 'country'];
-    const missingFields = requiredFields.filter(field => !formData[field]);
-    
-    if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ₹{missingFields.join(', ')}`);
+    // Validate form
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      const firstError = Object.values(errors)[0];
+      show_toast(firstError, false);
       return;
     }
 
     if (cartItems.length === 0) {
-      alert('Your cart is empty. Please add items before checkout.');
+      show_toast('Your cart is empty. Please add items before checkout.', false);
       return;
     }
 
     setOrderLoading(true);
     setOrderError('');
+    setFormErrors({});
     
     try {
-      // Get token from localStorage
       const token = localStorage.getItem("token");
       
       // Prepare products array for API
       const products = cartItems.map(item => ({
         productId: item._id || item.productId,
-        quantity: item.quantity
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name
       }));
 
       // Prepare order data for API
       const orderData = {
         products: products,
         totalAmount: getFinalTotal(),
+        subtotal: getCartTotal(),
+        shippingCost: getShippingCost(),
         address: {
-          name: `₹{formData.firstName} ₹{formData.lastName}`,
+          name: `${formData.firstName} ${formData.lastName}`, // Fixed template literal
           email: formData.email,
           phoneNumber: formData.phone,
           street: formData.street,
@@ -208,7 +297,7 @@ const CheckOutPage = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ₹{token}` })
+            ...(token && { 'Authorization': `Bearer ${token}` }) // Fixed template literal
           }
         }
       );
@@ -223,11 +312,15 @@ const CheckOutPage = () => {
         } else {
           // For COD or other payment methods
           setOrderSuccess(true);
+          setOrderError('');
           await clearCart();
-          alert('Order placed successfully! Thank you for your purchase.');
+          show_toast('Order placed successfully! Thank you for your purchase.', true);
+          setOrderLoading(false);
           
-          // Optionally redirect to order confirmation page
-          // window.location.href = '/order-confirmation';
+          // Optional: Redirect to order confirmation page after delay
+          setTimeout(() => {
+            // window.location.href = '/order-confirmation';
+          }, 2000);
         }
       } else {
         throw new Error(response.data.message || 'Failed to place order');
@@ -235,22 +328,46 @@ const CheckOutPage = () => {
 
     } catch (error) {
       console.error('Error placing order:', error);
-      setOrderError(
-        error.response?.data?.message || 
-        error.message || 
-        'Failed to place order. Please try again.'
-      );
-      alert(`Error: ₹{error.response?.data?.message || error.message || 'Failed to place order'}`);
-    } finally {
-      if (paymentMethod !== 'bank') {
-        setOrderLoading(false);
-      }
-      // For bank payment, loading will be disabled in Razorpay modal dismiss handler
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Failed to place order. Please try again.';
+      
+      setOrderError(errorMessage);
+      show_toast(`Error: ${errorMessage}`, false); // Fixed template literal
+      setOrderLoading(false);
     }
+  };
+
+  // Helper function to get input class with error styling
+  const getInputClass = (fieldName, baseClass = '') => {
+    return `${baseClass} ${formErrors[fieldName] ? 'error-input' : ''}`.trim();
   };
 
   return (
     <div>
+      <style jsx>{`
+        .error-input {
+          border: 1px solid #f33 !important;
+          background-color: #ffebee !important;
+        }
+        .error-text {
+          color: #f33;
+          font-size: 12px;
+          margin-top: 5px;
+          display: block;
+        }
+        .shipping-option {
+          margin: 10px 0;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+        .shipping-option.selected {
+          border-color: #f33;
+          background-color: #fff5f5;
+        }
+      `}</style>
+
       <div className="wrappage">
         <div className="container container-content">
           <ul className="breadcrumb v2">
@@ -293,8 +410,9 @@ const CheckOutPage = () => {
                               onChange={handleInputChange}
                               placeholder="Enter first name" 
                               required 
-                              className="firstname" 
+                              className={getInputClass('firstName', 'firstname')}
                             />
+                            {formErrors.firstName && <span className="error-text">{formErrors.firstName}</span>}
                           </div>
                           <div className="col-md-6 col-sm-6">
                             <label className="out">
@@ -307,8 +425,9 @@ const CheckOutPage = () => {
                               onChange={handleInputChange}
                               placeholder="Enter last name" 
                               required 
-                              className="lastname" 
+                              className={getInputClass('lastName', 'lastname')}
                             />
+                            {formErrors.lastName && <span className="error-text">{formErrors.lastName}</span>}
                           </div>
                         </div>
                         
@@ -324,8 +443,9 @@ const CheckOutPage = () => {
                               onChange={handleInputChange}
                               placeholder="Enter email address"
                               required 
-                              className="form-control" 
+                              className={getInputClass('email', 'district')}
                             />
+                            {formErrors.email && <span className="error-text">{formErrors.email}</span>}
                           </div>
                           <div className="col-md-6 col-sm-6">
                             <label className="out">
@@ -336,15 +456,17 @@ const CheckOutPage = () => {
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              placeholder="Enter phone number"
+                              placeholder="Enter 10-digit phone number"
                               required 
-                              className="district" 
+                              maxLength="10"
+                              className={getInputClass('phone', 'district')}
                             />
+                            {formErrors.phone && <span className="error-text">{formErrors.phone}</span>}
                           </div>
                         </div>
                         
                         <label className="out">
-                          Street<span style={{color: '#f33'}}>*</span>
+                          Street Address<span style={{color: '#f33'}}>*</span>
                         </label><br />
                         <input 
                           type="text" 
@@ -353,8 +475,9 @@ const CheckOutPage = () => {
                           onChange={handleInputChange}
                           placeholder="Enter street address"
                           required 
-                          className="district" 
+                          className={getInputClass('street', 'district')}
                         />
+                        {formErrors.street && <span className="error-text">{formErrors.street}</span>}
                         
                         <label className="out">
                           City<span style={{color: '#f33'}}>*</span>
@@ -366,8 +489,9 @@ const CheckOutPage = () => {
                           onChange={handleInputChange}
                           placeholder="Enter city"
                           required 
-                          className="district" 
+                          className={getInputClass('city', 'district')}
                         />
+                        {formErrors.city && <span className="error-text">{formErrors.city}</span>}
                         
                         <label className="out">
                           State<span style={{color: '#f33'}}>*</span>
@@ -379,8 +503,9 @@ const CheckOutPage = () => {
                           onChange={handleInputChange}
                           placeholder="Enter state"
                           required 
-                          className="district" 
+                          className={getInputClass('state', 'district')}
                         />
+                        {formErrors.state && <span className="error-text">{formErrors.state}</span>}
                         
                         <label className="out">
                           Country<span style={{color: '#f33'}}>*</span>
@@ -392,20 +517,23 @@ const CheckOutPage = () => {
                           onChange={handleInputChange}
                           placeholder="Enter country"
                           required 
-                          className="district" 
+                          className={getInputClass('country', 'district')}
                         />
+                        {formErrors.country && <span className="error-text">{formErrors.country}</span>}
 
                         <div className="row">
                           <div className="col-md-6 col-sm-6">
-                            <label className="out">Postcode/ZIP</label><br />
+                            <label className="out">Postal Code</label><br />
                             <input 
                               type="text" 
                               name="postcode"
                               value={formData.postcode}
                               onChange={handleInputChange}
-                              placeholder="Enter postcode"
-                              className="country" 
+                              placeholder="Enter 6-digit postal code"
+                              maxLength="6"
+                              className={getInputClass('postcode', 'country')}
                             />
+                            {formErrors.postcode && <span className="error-text">{formErrors.postcode}</span>}
                           </div>
                           <div className="col-md-6 col-sm-6">
                             <label className="out">Landmark</label><br />
@@ -417,18 +545,54 @@ const CheckOutPage = () => {
                               placeholder="Enter landmark"
                               className="district" 
                             />
+                           {formErrors.landmark && <span className="error-text">{formErrors.landmark}</span>}
+
                           </div>
                         </div>
                         
+                        {/* Shipping Options */}
+                        <div style={{marginTop: 30, marginBottom: 20}}>
+                          <h4>Shipping Options</h4>
+                          
+                          <div className={`shipping-option ${shippingOption === 'free' ? 'selected' : ''}`}>
+                            <label>
+                              <input 
+                                type="radio" 
+                                name="shipping"
+                                value="free"
+                                checked={shippingOption === 'free'}
+                                onChange={(e) => setShippingOption(e.target.value)}
+                              />
+                              <span style={{marginLeft: 10}}>Free Shipping (5-7 business days) - ₹0.00</span>
+                            </label>
+                          </div>
+                          
+                          <div className={`shipping-option ${shippingOption === 'flat' ? 'selected' : ''}`}>
+                            <label>
+                              <input 
+                                type="radio" 
+                                name="shipping"
+                                value="flat"
+                                checked={shippingOption === 'flat'}
+                                onChange={(e) => setShippingOption(e.target.value)}
+                              />
+                              <span style={{marginLeft: 10}}>Standard Shipping (3-5 business days) - ₹50.00</span>
+                            </label>
+                          </div>
+                          
+                          
+                        </div>
+                        
                         <label className="out" style={{marginTop: 20}}>
-                          Order Note
+                          Order Notes (Optional)
                         </label>
                         <textarea 
                           name="orderNote" 
                           value={formData.orderNote}
                           onChange={handleInputChange}
                           placeholder="Special instructions for your order"
-                          className="comment" 
+                          className="comment"
+                          rows="4"
                         />
                       </form>
                     </div>
@@ -453,16 +617,16 @@ const CheckOutPage = () => {
                             {cartItems.map((item) => (
                               <tr key={item._id || item.productId}>
                                 <td>
-                                  {item.name}
-                                  {item.image && (
-                                    <div style={{marginTop: 5}}>
+                                  <div style={{display: 'flex', alignItems: 'center'}}>
+                                    {item.image && (
                                       <img 
                                         src={item.image} 
                                         alt={item.name}
-                                        style={{width: '40px', height: '40px', objectFit: 'cover'}}
+                                        style={{width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px'}}
                                       />
-                                    </div>
-                                  )}
+                                    )}
+                                    <span>{item.name}</span>
+                                  </div>
                                 </td>
                                 <td>
                                   <i className="fa fa-times" aria-hidden="true" />
@@ -481,19 +645,22 @@ const CheckOutPage = () => {
                           <h5 className="prince">₹{getCartTotal().toFixed(2)}</h5>
                         </div>
                         
-                       
-                        
-                       
+                        <div className="total">
+                          <h5 className="sub-total">Shipping</h5>
+                          <h5 className="prince">₹{getShippingCost().toFixed(2)}</h5>
+                        </div>
                         
                         <div className="total" style={{borderTop: '2px solid #333', paddingTop: 10}}>
                           <h5 className="sub-total" style={{fontWeight: 'bold'}}>Total</h5>
                           <h5 className="prince" style={{fontWeight: 'bold', color: '#f33'}}>
-                            ₹{getCartTotal().toFixed(2)}
+                            ₹{getFinalTotal().toFixed(2)}
                           </h5>
                         </div>
                         
                         <div className="payment">
-                          <label>
+                          <h4 style={{marginBottom: 15}}>Payment Method</h4>
+                          
+                          <label style={{display: 'block', marginBottom: 15}}>
                             <input 
                               type="radio" 
                               name="payment"
@@ -505,25 +672,26 @@ const CheckOutPage = () => {
                               Online Payment (Razorpay)
                             </span>
                           </label>
-                          <p style={{paddingLeft: 20, paddingBottom: 20}}>
-                            Pay securely using your credit card, debit card, or net banking through Razorpay.
+                          <p style={{paddingLeft: 25, marginBottom: 15, fontSize: 14, color: '#666'}}>
+                            Pay securely using credit card, debit card, UPI, or net banking through Razorpay.
                           </p>
-                          <hr />
                           
                          
-                          
-                        
+                          <p style={{paddingLeft: 25, marginBottom: 20, fontSize: 14, color: '#666'}}>
+                            Pay when your order is delivered to your doorstep.
+                          </p>
                         </div>
                         
                         <div className="place-ober">
                           {orderError && (
                             <div style={{
                               color: '#f33', 
-                              marginBottom: '10px', 
-                              padding: '10px', 
+                              marginBottom: '15px', 
+                              padding: '12px', 
                               backgroundColor: '#ffebee',
                               border: '1px solid #f33',
-                              borderRadius: '4px'
+                              borderRadius: '6px',
+                              fontSize: '14px'
                             }}>
                               {orderError}
                             </div>
@@ -532,13 +700,14 @@ const CheckOutPage = () => {
                           {orderSuccess && (
                             <div style={{
                               color: '#4caf50', 
-                              marginBottom: '10px', 
-                              padding: '10px', 
+                              marginBottom: '15px', 
+                              padding: '12px', 
                               backgroundColor: '#e8f5e8',
                               border: '1px solid #4caf50',
-                              borderRadius: '4px'
+                              borderRadius: '6px',
+                              fontSize: '14px'
                             }}>
-                              Order placed successfully!
+                              ✓ Order placed successfully! Thank you for your purchase.
                             </div>
                           )}
                           
@@ -546,16 +715,21 @@ const CheckOutPage = () => {
                             className="ober"
                             type="button"
                             onClick={handlePlaceOrder}
-                            disabled={cartItems.length === 0 || orderLoading}
+                            disabled={cartItems.length === 0 || orderLoading || orderSuccess}
                             style={{
-                              opacity: (cartItems.length === 0 || orderLoading) ? 0.6 : 1,
-                              cursor: (cartItems.length === 0 || orderLoading) ? 'not-allowed' : 'pointer'
+                              opacity: (cartItems.length === 0 || orderLoading || orderSuccess) ? 0.6 : 1,
+                              cursor: (cartItems.length === 0 || orderLoading || orderSuccess) ? 'not-allowed' : 'pointer',
+                              width: '100%',
+                              padding: '12px',
+                              fontSize: '16px',
+                              fontWeight: 'bold'
                             }}
                           >
                             {orderLoading ? 
-              (paymentMethod === 'bank' ? 'Redirecting to Payment...' : 'Placing Order...') : 
-              (paymentMethod === 'bank' ? 'Proceed to Payment' : 'Place Order')
-            }
+                              (paymentMethod === 'bank' ? 'Redirecting to Payment...' : 'Placing Order...') : 
+                              orderSuccess ? 'Order Placed!' :
+                              (paymentMethod === 'bank' ? 'Proceed to Payment' : 'Place Order')
+                            }
                           </button>
                         </div>
                       </div>
