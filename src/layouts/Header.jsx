@@ -1,7 +1,6 @@
-
 import React, { useContext } from 'react'
 import { contextData } from '../services/Context';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CheckOutPage from '../pages/CheckOutPage';
 
 const Header = () => {
@@ -20,6 +19,7 @@ const Header = () => {
         loading
     } = useContext(contextData);
 
+    const navigate = useNavigate();
     const cartCount = getCartItemCount();
 
     // Handle quantity increment
@@ -40,6 +40,36 @@ const Header = () => {
     const handleRemoveItem = async (productId) => {
         await removeFromCart(productId);
     };
+
+    // Handle Shop navigation
+    const handleShopClick = () => {
+        // First close the sidebar
+        handleSidebarClose();
+        
+        // Navigate to home if not already there
+        if (window.location.pathname !== '/') {
+            navigate('/');
+            // Wait for navigation then scroll
+            setTimeout(() => {
+                scrollToFeaturedProducts();
+            }, 100);
+        } else {
+            // Already on home page, just scroll
+            scrollToFeaturedProducts();
+        }
+    };
+
+    // Function to scroll to featured products section
+    const scrollToFeaturedProducts = () => {
+        const featuredSection = document.getElementById('future-product');
+        if (featuredSection) {
+            featuredSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    };
+
     return (
         <div>
             {/* push menu*/}
@@ -52,16 +82,22 @@ const Header = () => {
                   
                     <ul className="nav-home5 js-menubar">
                         <li className="level1 active dropdown">
-                            <a href="/">Home</a>
-                
+                            <Link to="/" onClick={handleSidebarClose}>Home</Link>
                         </li>
                         <li className="level1 active dropdown">
-                            <a href="future-product">Shop</a>
-                            
+                            <a 
+                                href="#" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleShopClick();
+                                }}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Shop
+                            </a>
                         </li>
                         <li className="level1">
-                            <a href="#">Checkout</a>
-                           
+                            <Link to="/checkout" onClick={handleSidebarClose}>Checkout</Link>
                         </li>
                     </ul>
                     <ul className="mobile-account">
@@ -78,6 +114,7 @@ const Header = () => {
                 </div>
             </div>
             {/* end push menu*/}
+            
             {/* Push cart */}
             <div className={`pushmenu pushmenu-left cart-box-container ${isCartOpen ? "pushmenu-open" : ""}`}>
                 <div className="cart-list">
@@ -165,30 +202,18 @@ const Header = () => {
                                     <div className="cart-total" style={{ padding: '15px 0', borderTop: '1px solid #eee' }}>
                                         <h4>Total: ₹{getCartTotal().toFixed(2)}</h4>
                                     </div>
-                                    {/* <div className="cart-form">
-                                        <div className="cart-note-form">
-                                            <label htmlFor="CartSpecialInstructions" className="cart-note cart-note_text_label small--text-center">Special Offer:</label>
-                                            <textarea 
-                                                rows={6} 
-                                                name="note" 
-                                                id="CartSpecialInstructions" 
-                                                className="cart-note__input form-control note--input" 
-                                                defaultValue={""} 
-                                            />
-                                        </div>
-                                    </div> */}
                                     <div className="cart-button mg-top-30">
-<Link 
-    to={'/checkout'} 
-    className="zoa-btn checkout" 
-    title=""
-   onClick={() => {
-        // Close the cart sidebar (not the main sidebar)
-        setIsCartOpen(false);
-    }}
->
-    Check out (₹{getCartTotal().toFixed(2)})
-</Link>
+                                        <Link 
+                                            to={'/checkout'} 
+                                            className="zoa-btn checkout" 
+                                            title=""
+                                            onClick={() => {
+                                                // Close the cart sidebar (not the main sidebar)
+                                                setIsCartOpen(false);
+                                            }}
+                                        >
+                                            Check out (₹{getCartTotal().toFixed(2)})
+                                        </Link>
                                     </div>
                                 </div>
                             </>
@@ -209,9 +234,10 @@ const Header = () => {
                     {/* End cart bottom */}
                 </div>
             </div>
-            {/* Search form */}
             
+            {/* Search form */}
             {/* End search form */}
+            
             {/* Account */}
             <div className="account-form-wrapper">
                 <div className="container">
@@ -421,6 +447,7 @@ const Header = () => {
                 </div>
                 {/* End Account */}
             </div>
+            
             <header id="header" className="header-v1">
                 <div className="header-center">
                     <div className="container container-content ">
@@ -442,11 +469,10 @@ const Header = () => {
                                 </div>
                             </div>
                             <div className="col-md-4 col flex justify-content-center">
-                                <a href="/"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></a>
+                                <Link to="/"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></Link>
                             </div>
                             <div className="col-md-4 col flex justify-content-end">
                                 <div className="topbar-left">
-                                    
                                     <div className="element element-user hidden-xs hidden-sm">
                                         <a href="#" className="zoa-icon js-user">
                                             <svg width={19} height={20} version="1.1" id="Layer_3" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 102.8" style={{enableBackground: 'new 0 0 100 102.8'}} xmlSpace="preserve">
