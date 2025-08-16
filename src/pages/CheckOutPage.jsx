@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { contextData } from '../services/Context';
 
@@ -27,173 +27,21 @@ const CheckOutPage = () => {
     orderNote: ''
   });
 
-  // Validation errors state
-  const [validationErrors, setValidationErrors] = useState({});
-  const [touched, setTouched] = useState({});
-
   const [paymentMethod, setPaymentMethod] = useState('bank'); // bank, check, cod
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderError, setOrderError] = useState('');
-  const [showContent, setShowContent] = useState(false);
 
-  // Validation rules
-  const validationRules = {
-    firstName: {
-      required: true,
-      minLength: 2,
-      pattern: /^[a-zA-Z\s]+$/,
-      message: 'First name must be at least 2 characters and contain only letters'
-    },
-    lastName: {
-      required: true,
-      minLength: 2,
-      pattern: /^[a-zA-Z\s]+$/,
-      message: 'Last name must be at least 2 characters and contain only letters'
-    },
-    email: {
-      required: true,
-      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: 'Please enter a valid email address'
-    },
-    phone: {
-      required: true,
-      pattern: /^[+]?[\d\s\-()]{10,15}$/,
-      message: 'Please enter a valid phone number (10-15 digits)'
-    },
-    street: {
-      required: true,
-      minLength: 5,
-      message: 'Street address must be at least 5 characters long'
-    },
-    city: {
-      required: true,
-      minLength: 2,
-      pattern: /^[a-zA-Z\s]+$/,
-      message: 'City must be at least 2 characters and contain only letters'
-    },
-    state: {
-      required: true,
-      minLength: 2,
-      pattern: /^[a-zA-Z\s]+$/,
-      message: 'State must be at least 2 characters and contain only letters'
-    },
-    country: {
-      required: true,
-      minLength: 2,
-      pattern: /^[a-zA-Z\s]+$/,
-      message: 'Country must be at least 2 characters and contain only letters'
-    },
-    postcode: {
-      required: false,
-      pattern: /^[a-zA-Z0-9\s\-]{3,10}$/,
-      message: 'Please enter a valid postal code'
-    }
-  };
-
-  // Validate single field
-  const validateField = (name, value) => {
-    const rule = validationRules[name];
-    if (!rule) return '';
-
-    if (rule.required && (!value || value.trim() === '')) {
-      return `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
-    }
-
-    if (value && rule.minLength && value.trim().length < rule.minLength) {
-      return rule.message || `${name} must be at least ${rule.minLength} characters`;
-    }
-
-    if (value && rule.pattern && !rule.pattern.test(value.trim())) {
-      return rule.message || `Invalid ${name} format`;
-    }
-
-    return '';
-  };
-
-  // Validate all fields
-  const validateAllFields = () => {
-    const errors = {};
-    Object.keys(validationRules).forEach(field => {
-      const error = validateField(field, formData[field]);
-      if (error) errors[field] = error;
-    });
-    return errors;
-  };
-
-  // Check if form is valid
-  const isFormValid = () => {
-    const errors = validateAllFields();
-    return Object.keys(errors).length === 0;
-  };
-
-  // Scroll to top function
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  // Scroll to first error
-  const scrollToFirstError = () => {
-    const firstErrorField = document.querySelector('.error-field');
-    if (firstErrorField) {
-      firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      firstErrorField.focus();
-    }
-  };
-
-  // Effect to handle initial load sequence
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true);
-      setTimeout(() => {
-        scrollToTop();
-      }, 100);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle form input changes with validation
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-
-    // Mark field as touched
-    setTouched(prev => ({
-      ...prev,
-      [name]: true
-    }));
-
-    // Validate field in real-time
-    const error = validateField(name, value);
-    setValidationErrors(prev => ({
-      ...prev,
-      [name]: error
-    }));
   };
 
-  // Handle field blur (when user leaves the field)
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched(prev => ({
-      ...prev,
-      [name]: true
-    }));
-  };
-
-  // Get field error (only show if touched)
-  const getFieldError = (fieldName) => {
-    return touched[fieldName] ? validationErrors[fieldName] : '';
-  };
-
-  // Calculate final total
+  // Calculate final total (now just the cart total)
   const getFinalTotal = () => {
     return getCartTotal();
   };
@@ -219,14 +67,15 @@ const CheckOutPage = () => {
     }
 
     const options = {
-      key: 'rzp_live_iFvbsicduHI4Lb',
-      amount: Math.round(getFinalTotal() * 100),
+      key: 'rzp_live_iFvbsicduHI4Lb', // Replace with your Razorpay Key ID
+      amount: Math.round(getFinalTotal() * 100), // Amount in paise
       currency: 'INR',
-      name: 'Aruvia',
+      name: 'Aruvia', // Replace with your store name
       description: 'Order Payment',
       order_id: razorpayOrderId,
       handler: async function (response) {
         try {
+          // Verify payment with your backend
           const verificationData = {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
@@ -234,8 +83,9 @@ const CheckOutPage = () => {
             orderId: orderData._id
           };
 
+          // Call your payment verification API
           const verifyResponse = await axios.post(
-            'https://aruvia-backend.onrender.com/api/payment/verify',
+            'https://aruvia-backend.onrender.com/api/payment/verify', // Replace with your verification endpoint
             verificationData,
             {
               headers: {
@@ -251,7 +101,9 @@ const CheckOutPage = () => {
             setOrderSuccess(true);
             await clearCart();
             alert('Payment successful! Your order has been placed.');
-            scrollToTop();
+            
+            // Redirect to order confirmation page
+            // window.location.href = '/order-confirmation';
           } else {
             throw new Error('Payment verification failed');
           }
@@ -271,12 +123,14 @@ const CheckOutPage = () => {
         orderNote: formData.orderNote
       },
       theme: {
-        color: '#f33'
+        color: '#f33' // Customize based on your brand color
       },
       modal: {
         ondismiss: function() {
           console.log('Payment modal closed by user');
           setOrderLoading(false);
+          console.log("Change to product payment ")
+
         }
       }
     };
@@ -285,69 +139,59 @@ const CheckOutPage = () => {
     razorpay.open();
   };
 
-  // Handle form submission with comprehensive validation
+  // Handle form submission
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     
-    // Mark all fields as touched for validation display
-    const allFields = Object.keys(validationRules);
-    setTouched(allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}));
+    // Validate required fields
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'state', 'country'];
+    const missingFields = requiredFields.filter(field => !formData[field]);
     
-    // Validate all fields
-    const errors = validateAllFields();
-    setValidationErrors(errors);
-    
-    // Check if there are validation errors
-    if (Object.keys(errors).length > 0) {
-      scrollToFirstError();
-      setOrderError('Please fix the validation errors above before proceeding.');
+    if (missingFields.length > 0) {
+      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
       return;
     }
 
-    // Check cart
     if (cartItems.length === 0) {
       alert('Your cart is empty. Please add items before checkout.');
       return;
     }
 
-    // Additional business logic validations
-    if (getFinalTotal() <= 0) {
-      setOrderError('Order total must be greater than zero.');
-      return;
-    }
-
-    scrollToTop();
     setOrderLoading(true);
     setOrderError('');
     
     try {
+      // Get token from localStorage
       const token = localStorage.getItem("token");
       
+      // Prepare products array for API
       const products = cartItems.map(item => ({
         productId: item._id || item.productId,
         quantity: item.quantity
       }));
 
+      // Prepare order data for API
       const orderData = {
         products: products,
         totalAmount: getFinalTotal(),
         address: {
-          name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
-          email: formData.email.trim().toLowerCase(),
-          phoneNumber: formData.phone.trim(),
-          street: formData.street.trim(),
-          city: formData.city.trim(),
-          state: formData.state.trim(),
-          postalCode: formData.postcode.trim(),
-          country: formData.country.trim(),
-          landmark: formData.landmark.trim()
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phoneNumber: formData.phone,
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+          postalCode: formData.postcode,
+          country: formData.country,
+          landmark: formData.landmark
         },
         paymentMethod: paymentMethod,
-        orderNote: formData.orderNote.trim()
+        orderNote: formData.orderNote
       };
 
       console.log('Sending order data:', orderData);
 
+      // Make API call
       const response = await axios.post(
         'https://aruvia-backend.onrender.com/api/order/createorder',
         orderData,
@@ -362,13 +206,18 @@ const CheckOutPage = () => {
       console.log('Order response:', response.data);
 
       if (response.data.success === "true" || response.data.success === true) {
+        // Check if payment method requires online payment
         if (paymentMethod === 'bank' && response.data.razorpayOrderId) {
+          // Redirect to Razorpay for online payment
           await handleRazorpayPayment(response.data.order, response.data.razorpayOrderId);
         } else {
+          // For COD or other payment methods
           setOrderSuccess(true);
           await clearCart();
           alert('Order placed successfully! Thank you for your purchase.');
-          scrollToTop();
+          
+          // Optionally redirect to order confirmation page
+          // window.location.href = '/order-confirmation';
         }
       } else {
         throw new Error(response.data.message || 'Failed to place order');
@@ -376,67 +225,19 @@ const CheckOutPage = () => {
 
     } catch (error) {
       console.error('Error placing order:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to place order. Please try again.';
-      setOrderError(errorMessage);
-      scrollToTop();
+      setOrderError(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to place order. Please try again.'
+      );
+      alert(`Error: ${error.response?.data?.message || error.message || 'Failed to place order'}`);
     } finally {
       if (paymentMethod !== 'bank') {
         setOrderLoading(false);
       }
+      // For bank payment, loading will be disabled in Razorpay modal dismiss handler
     }
   };
-
-  // Input component with validation styling
-  const ValidatedInput = ({ name, type = "text", placeholder, required = false, className = "", ...props }) => {
-    const error = getFieldError(name);
-    const hasError = !!error;
-    
-    return (
-      <div style={{ marginBottom: '15px' }}>
-        <input
-          type={type}
-          name={name}
-          value={formData[name]}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          className={`${className} ${hasError ? 'error-field' : ''}`}
-          style={{
-            border: hasError ? '2px solid #f33' : '1px solid #ddd',
-            backgroundColor: hasError ? '#fff5f5' : 'white',
-            ...props.style
-          }}
-          {...props}
-        />
-        {hasError && (
-          <div style={{
-            color: '#f33',
-            fontSize: '12px',
-            marginTop: '5px',
-            display: 'block'
-          }}>
-            {error}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Loading state
-  if (!showContent) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '50vh',
-        fontSize: '18px',
-        color: '#666'
-      }}>
-        Loading checkout...
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -452,37 +253,6 @@ const CheckOutPage = () => {
           <div className="container">
             <div className="titlell">
               <h2>Checkout</h2>
-              {/* Scroll to top button */}
-              <button 
-                onClick={scrollToTop}
-                style={{
-                  position: 'fixed',
-                  bottom: '20px',
-                  right: '20px',
-                  backgroundColor: '#f33',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '50px',
-                  height: '50px',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  zIndex: 1000,
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#d11';
-                  e.target.style.transform = 'scale(1.1)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = '#f33';
-                  e.target.style.transform = 'scale(1)';
-                }}
-                title="Scroll to top"
-              >
-                ↑
-              </button>
             </div>
             
             {cartItems.length === 0 ? (
@@ -500,28 +270,34 @@ const CheckOutPage = () => {
                         Order Details
                       </h2>
                       
-                      <form onSubmit={handlePlaceOrder} noValidate>
+                      <form onSubmit={handlePlaceOrder}>
                         <div className="row">
                           <div className="col-md-6 col-sm-6">
                             <label className="out">
                               First Name<span style={{color: '#f33'}}>*</span>
                             </label><br />
-                            <ValidatedInput
+                            <input 
+                              type="text" 
                               name="firstName"
-                              placeholder="Enter first name"
-                              className="firstname"
-                              required
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              placeholder="Enter first name" 
+                              required 
+                              className="firstname" 
                             />
                           </div>
                           <div className="col-md-6 col-sm-6">
                             <label className="out">
                               Last Name<span style={{color: '#f33'}}>*</span>
                             </label><br />
-                            <ValidatedInput
+                            <input 
+                              type="text" 
                               name="lastName"
-                              placeholder="Enter last name"
-                              className="lastname"
-                              required
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              placeholder="Enter last name" 
+                              required 
+                              className="lastname" 
                             />
                           </div>
                         </div>
@@ -531,24 +307,28 @@ const CheckOutPage = () => {
                             <label className="out">
                               Email Address<span style={{color: '#f33'}}>*</span>
                             </label><br />
-                            <ValidatedInput
+                            <input 
+                              type="email" 
                               name="email"
-                              type="email"
+                              value={formData.email}
+                              onChange={handleInputChange}
                               placeholder="Enter email address"
-                              className="form-control"
-                              required
+                              required 
+                              className="form-control" 
                             />
                           </div>
                           <div className="col-md-6 col-sm-6">
                             <label className="out">
                               Phone<span style={{color: '#f33'}}>*</span>
                             </label><br />
-                            <ValidatedInput
+                            <input 
+                              type="tel" 
                               name="phone"
-                              type="tel"
+                              value={formData.phone}
+                              onChange={handleInputChange}
                               placeholder="Enter phone number"
-                              className="district"
-                              required
+                              required 
+                              className="district" 
                             />
                           </div>
                         </div>
@@ -556,50 +336,65 @@ const CheckOutPage = () => {
                         <label className="out">
                           Street<span style={{color: '#f33'}}>*</span>
                         </label><br />
-                        <ValidatedInput
+                        <input 
+                          type="text" 
                           name="street"
+                          value={formData.street}
+                          onChange={handleInputChange}
                           placeholder="Enter street address"
-                          className="district"
-                          required
+                          required 
+                          className="district" 
                         />
                         
                         <label className="out">
                           City<span style={{color: '#f33'}}>*</span>
                         </label><br />
-                        <ValidatedInput
+                        <input 
+                          type="text" 
                           name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
                           placeholder="Enter city"
-                          className="district"
-                          required
+                          required 
+                          className="district" 
                         />
                         
                         <label className="out">
                           State<span style={{color: '#f33'}}>*</span>
                         </label><br />
-                        <ValidatedInput
+                        <input 
+                          type="text" 
                           name="state"
+                          value={formData.state}
+                          onChange={handleInputChange}
                           placeholder="Enter state"
-                          className="district"
-                          required
+                          required 
+                          className="district" 
                         />
                         
                         <label className="out">
                           Country<span style={{color: '#f33'}}>*</span>
                         </label><br />
-                        <ValidatedInput
+                        <input 
+                          type="text" 
                           name="country"
+                          value={formData.country}
+                          onChange={handleInputChange}
                           placeholder="Enter country"
-                          className="district"
-                          required
+                          required 
+                          className="district" 
                         />
 
                         <div className="row">
                           <div className="col-md-6 col-sm-6">
                             <label className="out">Postcode/ZIP</label><br />
-                            <ValidatedInput
+                            <input 
+                              type="text" 
                               name="postcode"
+                              value={formData.postcode}
+                              onChange={handleInputChange}
                               placeholder="Enter postcode"
-                              className="country"
+                              className="country" 
                             />
                           </div>
                           <div className="col-md-6 col-sm-6">
@@ -705,8 +500,7 @@ const CheckOutPage = () => {
                               padding: '10px', 
                               backgroundColor: '#ffebee',
                               border: '1px solid #f33',
-                              borderRadius: '4px',
-                              fontSize: '14px'
+                              borderRadius: '4px'
                             }}>
                               {orderError}
                             </div>
@@ -729,28 +523,17 @@ const CheckOutPage = () => {
                             className="ober"
                             type="button"
                             onClick={handlePlaceOrder}
-                            disabled={cartItems.length === 0 || orderLoading || !isFormValid()}
+                            disabled={cartItems.length === 0 || orderLoading}
                             style={{
-                              opacity: (cartItems.length === 0 || orderLoading || !isFormValid()) ? 0.6 : 1,
-                              cursor: (cartItems.length === 0 || orderLoading || !isFormValid()) ? 'not-allowed' : 'pointer'
+                              opacity: (cartItems.length === 0 || orderLoading) ? 0.6 : 1,
+                              cursor: (cartItems.length === 0 || orderLoading) ? 'not-allowed' : 'pointer'
                             }}
                           >
                             {orderLoading ? 
-                              (paymentMethod === 'bank' ? 'Redirecting to Payment...' : 'Placing Order...') : 
-                              (paymentMethod === 'bank' ? 'Proceed to Payment' : 'Place Order')
-                            }
+              (paymentMethod === 'bank' ? 'Redirecting to Payment...' : 'Placing Order...') : 
+              (paymentMethod === 'bank' ? 'Proceed to Payment' : 'Place Order')
+            }
                           </button>
-                          
-                          {!isFormValid() && Object.keys(touched).length > 0 && (
-                            <div style={{
-                              fontSize: '12px',
-                              color: '#f33',
-                              marginTop: '8px',
-                              textAlign: 'center'
-                            }}>
-                              Please fix validation errors to proceed
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
