@@ -124,7 +124,7 @@ const Home = () => {
                             <div className="col-md-9 col-sm-12 col-xs-12">
                                 <div className="js-slider-v2">
                                     <div className="slide-img">
-                                        <a href="#"><img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" /></a>
+                                        <a href="#future-product" ><img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" /></a>
                                         <div className="box-center slide-content">
                                             {/* <h3>Tank top<br /> hot collection</h3> */}
                                             {/* <a href="#">Shop now</a> */}
@@ -136,7 +136,7 @@ const Home = () => {
                                 <div className="row banner">
                                     <div className="col-xs-12 col-sm-6 col-md-12">
                                         <div className="banner-img">
-                                            <a href="#" className="effect-img3 plus-zoom">
+                                            <a href="#future-product"  className="effect-img3 plus-zoom">
                                                 <img src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
                                             </a>
                                             <div className="box-center content3">
@@ -146,7 +146,7 @@ const Home = () => {
                                     </div>
                                     <div className="col-xs-12 col-sm-6 col-md-12">
                                         <div className="banner-img">
-                                            <a href="#" className="effect-img3 plus-zoom">
+                                            <a href="#future-product"  className="effect-img3 plus-zoom">
                                                 <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
                                             </a>
                                             <div className="box-center content3">
@@ -170,7 +170,7 @@ const Home = () => {
                     key={product._id}
                 >
                     <div className="product-img">
-                        <a href="#">
+                        <a  onClick={() => handleAddToCart(product._id)}>
                             <img
                                 src={product.image}
                                 alt={product.name}
