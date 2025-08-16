@@ -100,11 +100,11 @@ const Header = () => {
                             <Link to="/checkout" onClick={handleSidebarClose}>Checkout</Link>
                         </li>
                     </ul>
-                    <ul className="mobile-account">
+                    {/* <ul className="mobile-account">
                         <li><a href="#"><i className="fa fa-unlock-alt" />Login</a></li>
                         <li><a href="#"><i className="fa fa-user-plus" />Register</a></li>
                         <li><a href="#"><i className="fa fa-heart" />Wishlist</a></li>
-                    </ul>
+                    </ul> */}
                     <h4 className="mb-title">connect and follow</h4>
                     <div className="mobile-social mg-bottom-30">
                         <a href="#"><i className="fa fa-facebook" /></a>
