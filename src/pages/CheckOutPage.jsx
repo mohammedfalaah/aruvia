@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { contextData } from '../services/Context';
 
@@ -31,6 +31,29 @@ const CheckOutPage = () => {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderError, setOrderError] = useState('');
+  const [showContent, setShowContent] = useState(false);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Effect to handle initial load sequence
+  useEffect(() => {
+    // Small delay to show content first
+    const timer = setTimeout(() => {
+      setShowContent(true);
+      // Then scroll to top after content is shown
+      setTimeout(() => {
+        scrollToTop();
+      }, 100);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -102,6 +125,9 @@ const CheckOutPage = () => {
             await clearCart();
             alert('Payment successful! Your order has been placed.');
             
+            // Scroll to top after successful payment
+            scrollToTop();
+            
             // Redirect to order confirmation page
             // window.location.href = '/order-confirmation';
           } else {
@@ -129,8 +155,7 @@ const CheckOutPage = () => {
         ondismiss: function() {
           console.log('Payment modal closed by user');
           setOrderLoading(false);
-          console.log("Change to product payment ")
-
+          console.log("Change to product payment ");
         }
       }
     };
@@ -142,6 +167,9 @@ const CheckOutPage = () => {
   // Handle form submission
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+    
+    // Scroll to top when placing order
+    scrollToTop();
     
     // Validate required fields
     const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'state', 'country'];
@@ -216,6 +244,9 @@ const CheckOutPage = () => {
           await clearCart();
           alert('Order placed successfully! Thank you for your purchase.');
           
+          // Scroll to top after successful order
+          scrollToTop();
+          
           // Optionally redirect to order confirmation page
           // window.location.href = '/order-confirmation';
         }
@@ -239,6 +270,22 @@ const CheckOutPage = () => {
     }
   };
 
+  // Loading state while content is being prepared
+  if (!showContent) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '50vh',
+        fontSize: '18px',
+        color: '#666'
+      }}>
+        Loading checkout...
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="wrappage">
@@ -253,6 +300,37 @@ const CheckOutPage = () => {
           <div className="container">
             <div className="titlell">
               <h2>Checkout</h2>
+              {/* Scroll to top button */}
+              <button 
+                onClick={scrollToTop}
+                style={{
+                  position: 'fixed',
+                  bottom: '20px',
+                  right: '20px',
+                  backgroundColor: '#f33',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '50px',
+                  height: '50px',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  zIndex: 1000,
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#d11';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = '#f33';
+                  e.target.style.transform = 'scale(1)';
+                }}
+                title="Scroll to top"
+              >
+                ↑
+              </button>
             </div>
             
             {cartItems.length === 0 ? (
