@@ -6,6 +6,7 @@ import { contextData } from '../services/Context';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
+        const [error, setError] = useState(null);
     const { 
         addToCart, 
         fetchCartItems, 
@@ -21,24 +22,68 @@ const Home = () => {
         return item ? item.quantity : 0;
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`https://aruvia-backend.onrender.com/api/products`);
-                if (response.data.success === "true") {
-                    setProducts(response.data.data);
-                } else {
-                    console.error("API error: ", response.data.message);
-                }
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            }
-        };
+      const [retryCount, setRetryCount] = useState(0);
 
-        fetchData();
-        // Fetch cart items on component mount
-        fetchCartItems();
+    // Configure axios with timeout
+    const apiClient = axios.create({
+        timeout: 15000, // 15 seconds timeout
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    const fetchProducts = async (attempt = 1, maxAttempts = 3) => {
+        try {
+            setLoading(true);
+            setError(null);
+            
+            console.log(`Fetching products... Attempt ${attempt}/${maxAttempts}`);
+            
+            const response = await apiClient.get('https://aruvia-backend.onrender.com/api/products');
+            
+            // Check if response structure is correct
+            if (response.data && response.data.success === "true" && response.data.data) {
+                setProducts(response.data.data);
+                setRetryCount(0);
+                console.log(`Successfully fetched ${response.data.data.length} products`);
+            } else {
+                throw new Error(response.data?.message || "Invalid response structure");
+            }
+            
+        } catch (error) {
+            console.error(`Attempt ${attempt} failed:`, error.message);
+            
+            // Determine if we should retry
+            const shouldRetry = attempt < maxAttempts && (
+                error.code === 'ECONNABORTED' || // Timeout
+                error.code === 'NETWORK_ERROR' ||
+                error.response?.status >= 500 || // Server errors
+                !error.response // Network issues
+            );
+            
+            if (shouldRetry) {
+                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // Exponential backoff (max 10s)
+                console.log(`Retrying in ${delay}ms...`);
+                
+                setTimeout(() => {
+                    setRetryCount(attempt);
+                    fetchProducts(attempt + 1, maxAttempts);
+                }, delay);
+            } else {
+                // Final failure
+                setError(error.response?.data?.message || error.message || 'Failed to fetch products');
+                setProducts([]); // Set empty array as fallback
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+        fetchCartItems(); // Your existing cart fetch
     }, []);
+
 
     // Handle add to cart click - simplified to use context function
     const handleAddToCart = async (productId) => {
