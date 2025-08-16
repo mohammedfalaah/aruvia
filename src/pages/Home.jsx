@@ -6,6 +6,9 @@ import { contextData } from '../services/Context';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
     const { 
         addToCart, 
         fetchCartItems, 
@@ -23,22 +26,55 @@ const Home = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
+            setError(null);
+            
             try {
-                const response = await axios.get(`https://aruvia-backend.onrender.com/api/products`);
-                if (response.data.success === "true") {
-                    setProducts(response.data.data);
+                console.log('Fetching products...');
+                const response = await axios.get(`https://aruvia-backend.onrender.com/api/products`, {
+                    timeout: 10000 // 10 second timeout
+                });
+                
+                console.log('API Response:', response.data);
+                
+                // Fix the condition - check if success is true (boolean) or "true" (string)
+                if (response.data.success === true || response.data.success === "true") {
+                    if (response.data.data && Array.isArray(response.data.data)) {
+                        setProducts(response.data.data);
+                        console.log('Products loaded:', response.data.data.length);
+                    } else {
+                        console.error("API returned success but data is not an array:", response.data.data);
+                        setError("Invalid data format received from server");
+                        setProducts([]);
+                    }
                 } else {
                     console.error("API error: ", response.data.message);
+                    setError(response.data.message || "Failed to fetch products");
+                    setProducts([]);
                 }
             } catch (error) {
                 console.error("Error fetching products:", error);
+                
+                // More specific error handling
+                if (error.code === 'ECONNABORTED') {
+                    setError("Request timeout - please try again");
+                } else if (error.response) {
+                    setError(`Server error: ${error.response.status} - ${error.response.data?.message || error.message}`);
+                } else if (error.request) {
+                    setError("Network error - please check your connection");
+                } else {
+                    setError("An unexpected error occurred");
+                }
+                setProducts([]);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchData();
         // Fetch cart items on component mount
         fetchCartItems();
-    }, []);
+    }, [fetchCartItems]);
 
     // Handle add to cart click - simplified to use context function
     const handleAddToCart = async (productId) => {
@@ -69,6 +105,146 @@ const Home = () => {
             setLoading(false);
         }
     };
+
+    // Render loading state
+    if (isLoading) {
+        return (
+            <div>
+                <div className="wrappage">
+                    <div className="container container-content">
+                        <div className="collection-slide">
+                            <div className="row first">
+                                <div className="col-md-9 col-sm-12 col-xs-12">
+                                    <div className="js-slider-v2">
+                                        <div className="slide-img">
+                                            <a href="#"><img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" /></a>
+                                            <div className="box-center slide-content">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-3 col-sm-12 col-xs-12">
+                                    <div className="row banner">
+                                        <div className="col-xs-12 col-sm-6 col-md-12">
+                                            <div className="banner-img">
+                                                <a href="#" className="effect-img3 plus-zoom">
+                                                    <img src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
+                                                </a>
+                                                <div className="box-center content3">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-xs-12 col-sm-6 col-md-12">
+                                            <div className="banner-img">
+                                                <a href="#" className="effect-img3 plus-zoom">
+                                                    <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
+                                                </a>
+                                                <div className="box-center content3">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id='future-product' className="zoa-product pad4">
+                        <h3 className="title text-center">Featured Products</h3>
+                        <div className="container">
+                            <div className="text-center" style={{ padding: '50px 0' }}>
+                                <div>Loading products...</div>
+                                <div style={{ marginTop: '20px' }}>
+                                    <div className="spinner" style={{
+                                        border: '4px solid #f3f3f3',
+                                        borderTop: '4px solid #3498db',
+                                        borderRadius: '50%',
+                                        width: '40px',
+                                        height: '40px',
+                                        animation: 'spin 2s linear infinite',
+                                        margin: '0 auto'
+                                    }}></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Render error state
+    if (error) {
+        return (
+            <div>
+                <div className="wrappage">
+                    <div className="container container-content">
+                        <div className="collection-slide">
+                            <div className="row first">
+                                <div className="col-md-9 col-sm-12 col-xs-12">
+                                    <div className="js-slider-v2">
+                                        <div className="slide-img">
+                                            <a href="#"><img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" /></a>
+                                            <div className="box-center slide-content">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-3 col-sm-12 col-xs-12">
+                                    <div className="row banner">
+                                        <div className="col-xs-12 col-sm-6 col-md-12">
+                                            <div className="banner-img">
+                                                <a href="#" className="effect-img3 plus-zoom">
+                                                    <img src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
+                                                </a>
+                                                <div className="box-center content3">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-xs-12 col-sm-6 col-md-12">
+                                            <div className="banner-img">
+                                                <a href="#" className="effect-img3 plus-zoom">
+                                                    <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
+                                                </a>
+                                                <div className="box-center content3">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id='future-product' className="zoa-product pad4">
+                        <h3 className="title text-center">Featured Products</h3>
+                        <div className="container">
+                            <div className="text-center" style={{ padding: '50px 0' }}>
+                                <div style={{ color: '#dc3545', marginBottom: '20px' }}>
+                                    <h4>Error loading products</h4>
+                                    <p>{error}</p>
+                                </div>
+                                <button 
+                                    className="zoa-btn" 
+                                    onClick={() => window.location.reload()}
+                                    style={{ 
+                                        backgroundColor: '#007bff', 
+                                        color: 'white', 
+                                        padding: '10px 20px',
+                                        border: 'none',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Try Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -118,125 +294,135 @@ const Home = () => {
 <div id='future-product' className="zoa-product pad4">
     <h3 className="title text-center">Featured Products</h3>
     <div className="container">
-        <div className="row">
-            {products.map((product) => (
-                <div
-                    className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
-                    key={product._id}
-                >
-                    <div className="product-img">
-                        <a href="#">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="img-responsive"
-                            />
-                        </a>
-                        
-                        {/* Desktop/Tablet Button Group - Hidden on mobile */}
-                        <div
-                            className="product-button-group hidden-xs"
-                            style={{ paddingBottom: "10px" }}
-                        >
-                            <a href="#" className="zoa-btn zoa-quickview">
-                                <span className="zoa-icon-quick-view" />
+        {products.length === 0 ? (
+            <div className="text-center" style={{ padding: '50px 0' }}>
+                <p>No products available at the moment.</p>
+            </div>
+        ) : (
+            <div className="row">
+                {products.map((product) => (
+                    <div
+                        className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
+                        key={product._id}
+                    >
+                        <div className="product-img">
+                            <a href="#">
+                                <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="img-responsive"
+                                    onError={(e) => {
+                                        e.target.src = '/assets/images/placeholder.jpg'; // fallback image
+                                        console.log('Image failed to load:', product.image);
+                                    }}
+                                />
                             </a>
-                            <a href="#" className="zoa-btn zoa-wishlist">
-                                <span className="zoa-icon-heart" />
-                            </a>
-                            <a 
-                                className="zoa-btn zoa-addcart" 
-                                onClick={() => handleAddToCart(product._id)}
-                                style={{ 
-                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                    opacity: loading ? 0.6 : 1,
-                                    position: 'relative'
-                                }}
+                            
+                            {/* Desktop/Tablet Button Group - Hidden on mobile */}
+                            <div
+                                className="product-button-group hidden-xs"
+                                style={{ paddingBottom: "10px" }}
                             >
-                                <span className="zoa-icon-cart" />
-                                {loading && <span style={{ marginLeft: '5px' }}>...</span>}
-                                
-                                {/* Show cart count badge if item is in cart */}
-                                {getProductCartCount(product._id) > 0 && (
-                                    <span 
-                                        style={{
-                                            position: 'absolute',
-                                            top: '-5px',
-                                            right: '-5px',
-                                            backgroundColor: '#dc3545',
-                                            color: 'white',
-                                            borderRadius: '50%',
-                                            width: '18px',
-                                            height: '18px',
-                                            fontSize: '10px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        {getProductCartCount(product._id)}
-                                    </span>
-                                )}
-                            </a>
+                                <a href="#" className="zoa-btn zoa-quickview">
+                                    <span className="zoa-icon-quick-view" />
+                                </a>
+                                <a href="#" className="zoa-btn zoa-wishlist">
+                                    <span className="zoa-icon-heart" />
+                                </a>
+                                <a 
+                                    className="zoa-btn zoa-addcart" 
+                                    onClick={() => handleAddToCart(product._id)}
+                                    style={{ 
+                                        cursor: loading ? 'not-allowed' : 'pointer',
+                                        opacity: loading ? 0.6 : 1,
+                                        position: 'relative'
+                                    }}
+                                >
+                                    <span className="zoa-icon-cart" />
+                                    {loading && <span style={{ marginLeft: '5px' }}>...</span>}
+                                    
+                                    {/* Show cart count badge if item is in cart */}
+                                    {getProductCartCount(product._id) > 0 && (
+                                        <span 
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-5px',
+                                                right: '-5px',
+                                                backgroundColor: '#dc3545',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                width: '18px',
+                                                height: '18px',
+                                                fontSize: '10px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            {getProductCartCount(product._id)}
+                                        </span>
+                                    )}
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div className="product-info text-center">
+                            <h3 className="product-title">
+                                <a href="#">{product.name || 'Untitled Product'}</a>
+                            </h3>
+                            <div className="product-price">
+                                <span>₹{product.price || '0'}</span>
+                            </div>
+                            
+                            {/* Mobile Button Group - Exact same style as desktop */}
+                            <div 
+                                className="visible-xs product-button-group"
+                                style={{ paddingBottom: "10px", marginTop: "10px" }}
+                            >
+                                <a href="#" className="zoa-btn zoa-quickview">
+                                    <span className="zoa-icon-quick-view" />
+                                </a>
+                               
+                                <a 
+                                    className="zoa-btn zoa-addcart" 
+                                    onClick={() => handleAddToCart(product._id)}
+                                    style={{ 
+                                        cursor: loading ? 'not-allowed' : 'pointer',
+                                        opacity: loading ? 0.6 : 1,
+                                        position: 'relative'
+                                    }}
+                                >
+                                    <span className="zoa-icon-cart" />
+                                    {loading && <span style={{ marginLeft: '5px' }}>...</span>}
+                                    
+                                    {/* Mobile cart count badge - same as desktop */}
+                                    {getProductCartCount(product._id) > 0 && (
+                                        <span 
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-5px',
+                                                right: '-5px',
+                                                backgroundColor: '#dc3545',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                width: '18px',
+                                                height: '18px',
+                                                fontSize: '10px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            {getProductCartCount(product._id)}
+                                        </span>
+                                    )}
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div className="product-info text-center">
-                        <h3 className="product-title">
-                            <a href="#">{product.name}</a>
-                        </h3>
-                        <div className="product-price">
-                            <span>₹{product.price}</span>
-                        </div>
-                        
-                        {/* Mobile Button Group - Exact same style as desktop */}
-                        <div 
-                            className="visible-xs product-button-group"
-                            style={{ paddingBottom: "10px", marginTop: "10px" }}
-                        >
-                            <a href="#" className="zoa-btn zoa-quickview">
-                                <span className="zoa-icon-quick-view" />
-                            </a>
-                           
-                            <a 
-                                className="zoa-btn zoa-addcart" 
-                                onClick={() => handleAddToCart(product._id)}
-                                style={{ 
-                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                    opacity: loading ? 0.6 : 1,
-                                    position: 'relative'
-                                }}
-                            >
-                                <span className="zoa-icon-cart" />
-                                {loading && <span style={{ marginLeft: '5px' }}>...</span>}
-                                
-                                {/* Mobile cart count badge - same as desktop */}
-                                {getProductCartCount(product._id) > 0 && (
-                                    <span 
-                                        style={{
-                                            position: 'absolute',
-                                            top: '-5px',
-                                            right: '-5px',
-                                            backgroundColor: '#dc3545',
-                                            color: 'white',
-                                            borderRadius: '50%',
-                                            width: '18px',
-                                            height: '18px',
-                                            fontSize: '10px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        {getProductCartCount(product._id)}
-                                    </span>
-                                )}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        )}
         <div className="text-center">
             <a href="#" className="zoa-btn btn-loadmore">
                 Load more
@@ -246,6 +432,11 @@ const Home = () => {
     
     {/* CSS for mobile responsiveness - using exact same styles */}
     <style jsx>{`
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         @media (max-width: 767px) {
             .product-item {
                 margin-bottom: 20px;
