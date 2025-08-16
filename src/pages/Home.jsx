@@ -152,9 +152,12 @@ const Home = () => {
                                     <div className="slide-img">
                                         <a href="#future-product" onClick={(e) => {
                                             e.preventDefault();
-                                            smoothScrollTo('future-product', 600); // Fast smooth scroll
+                                            smoothScrollTo('future-product', 600);
                                         }}>
-                                            <img src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" />
+                                            <img href="#future-product" onClick={(e) => {
+                                            e.preventDefault();
+                                            smoothScrollTo('future-product', 600); // Fast smooth scroll
+                                        }} src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" />
                                         </a>
                                         <div className="box-center slide-content">
                                             {/* <h3>Tank top<br /> hot collection</h3> */}
@@ -220,9 +223,9 @@ const Home = () => {
                                             <a href="#" className="zoa-btn zoa-quickview">
                                                 <span className="zoa-icon-quick-view" />
                                             </a>
-                                            <a href="#" className="zoa-btn zoa-wishlist">
+                                            {/* <a href="#" className="zoa-btn zoa-wishlist">
                                                 <span className="zoa-icon-heart" />
-                                            </a>
+                                            </a> */}
                                             <a 
                                                 className="zoa-btn zoa-addcart" 
                                                 onClick={() => handleAddToCart(product._id)}
