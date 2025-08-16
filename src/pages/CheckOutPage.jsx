@@ -27,6 +27,7 @@ const CheckOutPage = () => {
     orderNote: ''
   });
 
+  const [shippingOption, setShippingOption] = useState('flat'); // flat, free, local
   const [paymentMethod, setPaymentMethod] = useState('bank'); // bank, check, cod
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -41,9 +42,19 @@ const CheckOutPage = () => {
     }));
   };
 
-  // Calculate final total (now just the cart total)
+  // Calculate shipping cost
+  const getShippingCost = () => {
+    switch (shippingOption) {
+      case 'flat': return 12.00;
+      case 'local': return 5.00;
+      case 'free': 
+      default: return 0.00;
+    }
+  };
+
+  // Calculate final total
   const getFinalTotal = () => {
-    return getCartTotal();
+    return getCartTotal() + getShippingCost();
   };
 
   // Load Razorpay script dynamically
@@ -91,7 +102,7 @@ const CheckOutPage = () => {
               headers: {
                 'Content-Type': 'application/json',
                 ...(localStorage.getItem("token") && { 
-                  'Authorization': `Bearer ${localStorage.getItem("token")}` 
+                  'Authorization': `Bearer ₹{localStorage.getItem("token")}` 
                 })
               }
             }
@@ -113,12 +124,12 @@ const CheckOutPage = () => {
         }
       },
       prefill: {
-        name: `${formData.firstName} ${formData.lastName}`,
+        name: `₹{formData.firstName} ₹{formData.lastName}`,
         email: formData.email,
         contact: formData.phone
       },
       notes: {
-        address: `${formData.street}, ${formData.city}, ${formData.state}`,
+        address: `₹{formData.street}, ₹{formData.city}, ₹{formData.state}`,
         landmark: formData.landmark,
         orderNote: formData.orderNote
       },
@@ -129,8 +140,6 @@ const CheckOutPage = () => {
         ondismiss: function() {
           console.log('Payment modal closed by user');
           setOrderLoading(false);
-          console.log("Change to product payment ")
-
         }
       }
     };
@@ -148,7 +157,7 @@ const CheckOutPage = () => {
     const missingFields = requiredFields.filter(field => !formData[field]);
     
     if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      alert(`Please fill in all required fields: ₹{missingFields.join(', ')}`);
       return;
     }
 
@@ -175,7 +184,7 @@ const CheckOutPage = () => {
         products: products,
         totalAmount: getFinalTotal(),
         address: {
-          name: `${formData.firstName} ${formData.lastName}`,
+          name: `₹{formData.firstName} ₹{formData.lastName}`,
           email: formData.email,
           phoneNumber: formData.phone,
           street: formData.street,
@@ -185,6 +194,7 @@ const CheckOutPage = () => {
           country: formData.country,
           landmark: formData.landmark
         },
+        shippingMethod: shippingOption,
         paymentMethod: paymentMethod,
         orderNote: formData.orderNote
       };
@@ -198,7 +208,7 @@ const CheckOutPage = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` })
+            ...(token && { 'Authorization': `Bearer ₹{token}` })
           }
         }
       );
@@ -230,7 +240,7 @@ const CheckOutPage = () => {
         error.message || 
         'Failed to place order. Please try again.'
       );
-      alert(`Error: ${error.response?.data?.message || error.message || 'Failed to place order'}`);
+      alert(`Error: ₹{error.response?.data?.message || error.message || 'Failed to place order'}`);
     } finally {
       if (paymentMethod !== 'bank') {
         setOrderLoading(false);
@@ -466,6 +476,15 @@ const CheckOutPage = () => {
                       </div>
                       
                       <div className="content-total">
+                        <div className="total">
+                          <h5 className="sub-total">Subtotal</h5>
+                          <h5 className="prince">₹{getCartTotal().toFixed(2)}</h5>
+                        </div>
+                        
+                       
+                        
+                       
+                        
                         <div className="total" style={{borderTop: '2px solid #333', paddingTop: 10}}>
                           <h5 className="sub-total" style={{fontWeight: 'bold'}}>Total</h5>
                           <h5 className="prince" style={{fontWeight: 'bold', color: '#f33'}}>
@@ -490,6 +509,10 @@ const CheckOutPage = () => {
                             Pay securely using your credit card, debit card, or net banking through Razorpay.
                           </p>
                           <hr />
+                          
+                         
+                          
+                        
                         </div>
                         
                         <div className="place-ober">
