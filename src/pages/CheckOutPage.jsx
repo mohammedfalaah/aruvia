@@ -234,109 +234,119 @@ const CheckOutPage = () => {
   };
 
   // Handle form submission
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
+ const handlePlaceOrder = async (e) => {
+  e.preventDefault();
+  
+  // Validate form
+  const errors = validateForm();
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
     
-    // Validate form
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      const firstError = Object.values(errors)[0];
-      show_toast(firstError, false);
-      return;
-    }
-
-    if (cartItems.length === 0) {
-      show_toast('Your cart is empty. Please add items before checkout.', false);
-      return;
-    }
-
-    setOrderLoading(true);
-    setOrderError('');
-    setFormErrors({});
+    // REMOVED: show_toast(firstError, false);
+    // Let the inline error messages handle field validation display
     
-    try {
-      const token = localStorage.getItem("token");
-      
-      // Prepare products array for API
-      const products = cartItems.map(item => ({
-        productId: item._id || item.productId,
-        quantity: item.quantity,
-        price: item.price,
-        name: item.name
-      }));
+    // Optional: Scroll to first error field for better UX
+    const firstErrorField = Object.keys(errors)[0];
+    const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+    if (errorElement) {
+      errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      errorElement.focus();
+    }
+    
+    return;
+  }
 
-      // Prepare order data for API
-      const orderData = {
-        products: products,
-        totalAmount: getFinalTotal(),
-        subtotal: getCartTotal(),
-        shippingCost: getShippingCost(),
-        address: {
-          name: `${formData.firstName} ${formData.lastName}`, // Fixed template literal
-          email: formData.email,
-          phoneNumber: formData.phone,
-          street: formData.street,
-          city: formData.city,
-          state: formData.state,
-          postalCode: formData.postcode,
-          country: formData.country,
-          landmark: formData.landmark
-        },
-        shippingMethod: shippingOption,
-        paymentMethod: paymentMethod,
-        orderNote: formData.orderNote
-      };
+  if (cartItems.length === 0) {
+    show_toast('Your cart is empty. Please add items before checkout.', false);
+    return;
+  }
 
-      console.log('Sending order data:', orderData);
+  setOrderLoading(true);
+  setOrderError('');
+  setFormErrors({});
+  
+  try {
+    const token = localStorage.getItem("token");
+    
+    // Prepare products array for API
+    const products = cartItems.map(item => ({
+      productId: item._id || item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      name: item.name
+    }));
 
-      // Make API call
-      const response = await axios.post(
-        'https://aruvia-backend.onrender.com/api/order/createorder',
-        orderData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` }) // Fixed template literal
-          }
+    // Prepare order data for API
+    const orderData = {
+      products: products,
+      totalAmount: getFinalTotal(),
+      subtotal: getCartTotal(),
+      shippingCost: getShippingCost(),
+      address: {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        street: formData.street,
+        city: formData.city,
+        state: formData.state,
+        postalCode: formData.postcode,
+        country: formData.country,
+        landmark: formData.landmark
+      },
+      shippingMethod: shippingOption,
+      paymentMethod: paymentMethod,
+      orderNote: formData.orderNote
+    };
+
+    console.log('Sending order data:', orderData);
+
+    // Make API call
+    const response = await axios.post(
+      'https://aruvia-backend.onrender.com/api/order/createorder',
+      orderData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
         }
-      );
-
-      console.log('Order response:', response.data);
-
-      if (response.data.success === "true" || response.data.success === true) {
-        // Check if payment method requires online payment
-        if (paymentMethod === 'bank' && response.data.razorpayOrderId) {
-          // Redirect to Razorpay for online payment
-          await handleRazorpayPayment(response.data.order, response.data.razorpayOrderId);
-        } else {
-          // For COD or other payment methods
-          setOrderSuccess(true);
-          setOrderError('');
-          await clearCart();
-          show_toast('Order placed successfully! Thank you for your purchase.', true);
-          setOrderLoading(false);
-          
-          // Optional: Redirect to order confirmation page after delay
-          setTimeout(() => {
-            // window.location.href = '/order-confirmation';
-          }, 2000);
-        }
-      } else {
-        throw new Error(response.data.message || 'Failed to place order');
       }
+    );
 
-    } catch (error) {
-      console.error('Error placing order:', error);
-      const errorMessage = error.response?.data?.message || 
-                          error.message || 
-                          'Failed to place order. Please try again.';
-      
-      setOrderError(errorMessage);
-      show_toast(`Error: ${errorMessage}`, false); // Fixed template literal
-      setOrderLoading(false);
+    console.log('Order response:', response.data);
+
+    if (response.data.success === "true" || response.data.success === true) {
+      // Check if payment method requires online payment
+      if (paymentMethod === 'bank' && response.data.razorpayOrderId) {
+        // Redirect to Razorpay for online payment
+        await handleRazorpayPayment(response.data.order, response.data.razorpayOrderId);
+      } else {
+        // For COD or other payment methods
+        setOrderSuccess(true);
+        setOrderError('');
+        await clearCart();
+        show_toast('Order placed successfully! Thank you for your purchase.', true);
+        setOrderLoading(false);
+        
+        // Optional: Redirect to order confirmation page after delay
+        setTimeout(() => {
+          // window.location.href = '/order-confirmation';
+        }, 2000);
+      }
+    } else {
+      throw new Error(response.data.message || 'Failed to place order');
     }
-  };
+
+  } catch (error) {
+    console.error('Error placing order:', error);
+    const errorMessage = error.response?.data?.message || 
+                        error.message || 
+                        'Failed to place order. Please try again.';
+    
+    setOrderError(errorMessage);
+    show_toast(`Error: ${errorMessage}`, false);
+    setOrderLoading(false);
+  }
+};
 
   // Helper function to get input class with error styling
   const getInputClass = (fieldName, baseClass = '') => {

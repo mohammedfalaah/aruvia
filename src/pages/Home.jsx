@@ -17,6 +17,8 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
 
+    
+
     // Custom smooth scroll function with faster speed
     const smoothScrollTo = (elementId, duration = 600) => {
         const target = document.getElementById(elementId);
@@ -105,7 +107,21 @@ const Home = () => {
             setLoading(false);
         }
     };
-
+ const handleBannerClick = (e) => {
+        console.log('Banner clicked!'); // Add this for debugging
+        e.preventDefault();
+        e.stopPropagation(); // Prevent event bubbling
+        
+        // Force scroll even if smooth scroll fails
+        const target = document.getElementById('future-product');
+        if (target) {
+            smoothScrollTo('future-product', 600);
+            // Fallback: immediate scroll if smooth scroll doesn't work
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    };
     useEffect(() => {
         fetchProducts();
         fetchCartItems(); // Your existing cart fetch
@@ -150,15 +166,26 @@ const Home = () => {
                             <div className="col-md-9 col-sm-12 col-xs-12">
                                 <div className="js-slider-v2">
                                     <div className="slide-img">
-                                        <a href="#future-product" onClick={(e) => {
-                                            e.preventDefault();
-                                            smoothScrollTo('future-product', 600);
-                                        }}>
-                                            <img href="#future-product" onClick={(e) => {
-                                            e.preventDefault();
-                                            smoothScrollTo('future-product', 600); // Fast smooth scroll
-                                        }} src="/assets/images/banner/Aruvia_banner01.jpg" alt className="img-responsive" />
-                                        </a>
+                                        <div
+                                        onClick={handleBannerClick}
+                                            style={{ 
+                                                cursor: 'pointer',
+                                                position: 'relative',
+                                                zIndex: 999,
+                                                display: 'block',
+                                                width: '100%',
+                                                height: '100%'
+                                            }}
+                                        >
+                                            <img 
+                                                src="/assets/images/banner/Aruvia_banner01.jpg" 
+                                                alt="Aruvia Banner" 
+                                                className="img-responsive"
+ style={{ 
+                                                    cursor: 'pointer',
+                                                    pointerEvents: 'none'  // Prevent img from blocking clicks
+                                                }}                                            />
+                                        </div>
                                         <div className="box-center slide-content">
                                             {/* <h3>Tank top<br /> hot collection</h3> */}
                                             {/* <a href="#">Shop now</a> */}
