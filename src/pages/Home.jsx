@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
@@ -16,8 +16,7 @@ const Home = () => {
     } = useContext(contextData);
     const [loading, setLoading] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
-
-    
+    const [isRetrying, setIsRetrying] = useState(false);
 
     // Custom smooth scroll function with faster speed
     const smoothScrollTo = (elementId, duration = 600) => {
@@ -61,10 +60,12 @@ const Home = () => {
         }
     });
 
-    const fetchProducts = async (attempt = 1, maxAttempts = 3) => {
+    // Memoized fetch function to prevent unnecessary re-renders
+    const fetchProducts = useCallback(async (attempt = 1, maxAttempts = 3) => {
         try {
             setLoading(true);
             setError(null);
+            if (attempt > 1) setIsRetrying(true);
             
             console.log(`Fetching products... Attempt ${attempt}/${maxAttempts}`);
             
@@ -74,6 +75,7 @@ const Home = () => {
             if (response.data && response.data.success === "true" && response.data.data) {
                 setProducts(response.data.data);
                 setRetryCount(0);
+                setIsRetrying(false);
                 console.log(`Successfully fetched ${response.data.data.length} products`);
             } else {
                 throw new Error(response.data?.message || "Invalid response structure");
@@ -102,37 +104,90 @@ const Home = () => {
                 // Final failure
                 setError(error.response?.data?.message || error.message || 'Failed to fetch products');
                 setProducts([]); // Set empty array as fallback
+                setIsRetrying(false);
             }
         } finally {
             setLoading(false);
         }
+    }, []);
+
+    // Manual retry function
+    const handleManualRetry = () => {
+        setRetryCount(0);
+        fetchProducts();
     };
- const handleBannerClick = (e) => {
-        console.log('Banner clicked!'); // Add this for debugging
+
+    const handleBannerClick = (e) => {
+        console.log('Banner clicked!');
         e.preventDefault();
-        e.stopPropagation(); // Prevent event bubbling
+        e.stopPropagation();
         
-        // Force scroll even if smooth scroll fails
         const target = document.getElementById('future-product');
         if (target) {
             smoothScrollTo('future-product', 600);
-            // Fallback: immediate scroll if smooth scroll doesn't work
             setTimeout(() => {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
         }
     };
-    useEffect(() => {
-        fetchProducts();
-        fetchCartItems(); // Your existing cart fetch
-    }, []);
 
-    // Handle add to cart click - simplified to use context function
+    // Enhanced useEffect with retry logic
+    useEffect(() => {
+        let retryTimer;
+        
+        const initializeData = async () => {
+            // Initial fetch
+            await fetchProducts();
+            
+            // Also fetch cart items
+            if (fetchCartItems) {
+                fetchCartItems();
+            }
+            
+            // If products didn't load and no error, retry after 3 seconds
+            setTimeout(() => {
+                if (products.length === 0 && !loading && !error) {
+                    console.log('Products not loaded, retrying...');
+                    fetchProducts();
+                }
+            }, 3000);
+        };
+
+        initializeData();
+
+        // Cleanup function
+        return () => {
+            if (retryTimer) {
+                clearTimeout(retryTimer);
+            }
+        };
+    }, []); // Empty dependency array for initial load only
+
+    // Additional useEffect to monitor products array and retry if needed
+    useEffect(() => {
+        let retryTimer;
+        
+        // Only retry if we're not currently loading, have no products, no error, and haven't exceeded retry attempts
+        if (!loading && !isRetrying && products.length === 0 && !error && retryCount < 2) {
+            console.log('Products still empty, scheduling retry...');
+            retryTimer = setTimeout(() => {
+                console.log('Auto-retrying due to empty products...');
+                fetchProducts(retryCount + 1, 3);
+            }, 5000); // Wait 5 seconds before auto-retry
+        }
+
+        return () => {
+            if (retryTimer) {
+                clearTimeout(retryTimer);
+            }
+        };
+    }, [products.length, loading, isRetrying, error, retryCount, fetchProducts]);
+
+    // Handle add to cart click
     const handleAddToCart = async (productId) => {
         setLoading(true);
         
         try {
-            // Find the product from the products array
             const product = products.find(p => p._id === productId);
             
             if (!product) {
@@ -141,7 +196,6 @@ const Home = () => {
                 return;
             }
 
-            // Use the context addToCart function which handles localStorage
             const result = await addToCart(productId, product, 1);
             
             if (result.success) {
@@ -157,6 +211,77 @@ const Home = () => {
         }
     };
 
+    // Loading state component
+    const LoadingSpinner = () => (
+        <div className="text-center" style={{ padding: '50px 0' }}>
+            <div style={{ 
+                display: 'inline-block', 
+                width: '40px', 
+                height: '40px', 
+                border: '4px solid #f3f3f3',
+                borderTop: '4px solid #333',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+            }}></div>
+            <p style={{ marginTop: '15px', color: '#666' }}>
+                {isRetrying ? `Retrying... (${retryCount}/3)` : 'Loading products...'}
+            </p>
+            <style jsx>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
+        </div>
+    );
+
+    // Error state component
+    const ErrorState = () => (
+        <div className="text-center" style={{ padding: '50px 0' }}>
+            <div style={{ color: '#dc3545', fontSize: '48px', marginBottom: '20px' }}>⚠️</div>
+            <h4 style={{ color: '#dc3545', marginBottom: '15px' }}>Failed to Load Products</h4>
+            <p style={{ color: '#666', marginBottom: '20px' }}>{error}</p>
+            <button 
+                onClick={handleManualRetry}
+                className="zoa-btn"
+                style={{
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '5px',
+                    cursor: 'pointer'
+                }}
+                disabled={loading}
+            >
+                {loading ? 'Retrying...' : 'Try Again'}
+            </button>
+        </div>
+    );
+
+    // Empty state component
+    const EmptyState = () => (
+        <div className="text-center" style={{ padding: '50px 0' }}>
+            <div style={{ fontSize: '48px', marginBottom: '20px' }}>📦</div>
+            <h4 style={{ color: '#666', marginBottom: '15px' }}>No Products Found</h4>
+            <p style={{ color: '#999', marginBottom: '20px' }}>We couldn't find any products right now.</p>
+            <button 
+                onClick={handleManualRetry}
+                className="zoa-btn"
+                style={{
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '5px',
+                    cursor: 'pointer'
+                }}
+            >
+                Refresh Products
+            </button>
+        </div>
+    );
+
     return (
         <div>
             <div className="wrappage">
@@ -167,7 +292,7 @@ const Home = () => {
                                 <div className="js-slider-v2">
                                     <div className="slide-img">
                                         <div
-                                        onClick={handleBannerClick}
+                                            onClick={handleBannerClick}
                                             style={{ 
                                                 cursor: 'pointer',
                                                 position: 'relative',
@@ -181,14 +306,13 @@ const Home = () => {
                                                 src="/assets/images/banner/Aruvia_banner01.jpg" 
                                                 alt="Aruvia Banner" 
                                                 className="img-responsive"
- style={{ 
+                                                style={{ 
                                                     cursor: 'pointer',
-                                                    pointerEvents: 'none'  // Prevent img from blocking clicks
-                                                }}                                            />
+                                                    pointerEvents: 'none'
+                                                }}
+                                            />
                                         </div>
                                         <div className="box-center slide-content">
-                                            {/* <h3>Tank top<br /> hot collection</h3> */}
-                                            {/* <a href="#">Shop now</a> */}
                                         </div>
                                     </div>
                                 </div>
@@ -199,12 +323,11 @@ const Home = () => {
                                         <div className="banner-img">
                                             <a href="#future-product" onClick={(e) => {
                                                 e.preventDefault();
-                                                smoothScrollTo('future-product', 600); // Fast smooth scroll
+                                                smoothScrollTo('future-product', 600);
                                             }} className="effect-img3 plus-zoom">
                                                 <img  src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
                                             </a>
                                             <div className="box-center content3">
-                                                {/* <a href="#">Womens</a> */}
                                             </div>
                                         </div>
                                     </div>
@@ -212,12 +335,11 @@ const Home = () => {
                                         <div className="banner-img">
                                             <a href="#future-product" onClick={(e) => {
                                                 e.preventDefault();
-                                                smoothScrollTo('future-product', 600); // Fast smooth scroll
+                                                smoothScrollTo('future-product', 600);
                                             }} className="effect-img3 plus-zoom">
                                                 <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
                                             </a>
                                             <div className="box-center content3">
-                                                {/* <a href="#">Kid's</a> */}
                                             </div>
                                         </div>
                                     </div>
@@ -230,87 +352,93 @@ const Home = () => {
                 <div id='future-product' className="zoa-product pad4">
                     <h3 className="title text-center">Featured Products</h3>
                     <div className="container">
-                        <div className="row">
-                            {products.map((product) => (
-                                <div
-                                    className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
-                                    key={product._id}
-                                >
-                                    <div className="product-img">
-                                        <a onClick={() => handleAddToCart(product._id)}>
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="img-responsive"
-                                            />
-                                        </a>
-                                        
-                                        {/* Button Group - Always visible and properly positioned */}
-                                        <div className="product-button-group">
-                                            <a href="#" className="zoa-btn zoa-quickview">
-                                                <span className="zoa-icon-quick-view" />
-                                            </a>
-                                            {/* <a href="#" className="zoa-btn zoa-wishlist">
-                                                <span className="zoa-icon-heart" />
-                                            </a> */}
-                                            <a 
-                                                className="zoa-btn zoa-addcart" 
-                                                onClick={() => handleAddToCart(product._id)}
-                                                style={{ 
-                                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                                    opacity: loading ? 0.6 : 1,
-                                                    position: 'relative'
-                                                }}
-                                            >
-                                                <span className="zoa-icon-cart" />
-                                                {loading && <span style={{ marginLeft: '5px' }}>...</span>}
+                        {/* Show loading, error, or empty state */}
+                        {loading && products.length === 0 && <LoadingSpinner />}
+                        {error && !loading && <ErrorState />}
+                        {!loading && !error && products.length === 0 && <EmptyState />}
+                        
+                        {/* Show products if available */}
+                        {products.length > 0 && (
+                            <>
+                                <div className="row">
+                                    {products.map((product) => (
+                                        <div
+                                            className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
+                                            key={product._id}
+                                        >
+                                            <div className="product-img">
+                                                <a onClick={() => handleAddToCart(product._id)}>
+                                                    <img
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        className="img-responsive"
+                                                    />
+                                                </a>
                                                 
-                                                {/* Show cart count badge if item is in cart */}
-                                                {getProductCartCount(product._id) > 0 && (
-                                                    <span 
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '-5px',
-                                                            right: '-5px',
-                                                            backgroundColor: '#dc3545',
-                                                            color: 'white',
-                                                            borderRadius: '50%',
-                                                            width: '18px',
-                                                            height: '18px',
-                                                            fontSize: '10px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center'
+                                                {/* Button Group */}
+                                                <div className="product-button-group">
+                                                    <a href="#" className="zoa-btn zoa-quickview">
+                                                        <span className="zoa-icon-quick-view" />
+                                                    </a>
+                                                    <a 
+                                                        className="zoa-btn zoa-addcart" 
+                                                        onClick={() => handleAddToCart(product._id)}
+                                                        style={{ 
+                                                            cursor: loading ? 'not-allowed' : 'pointer',
+                                                            opacity: loading ? 0.6 : 1,
+                                                            position: 'relative'
                                                         }}
                                                     >
-                                                        {getProductCartCount(product._id)}
-                                                    </span>
-                                                )}
-                                            </a>
+                                                        <span className="zoa-icon-cart" />
+                                                        {loading && <span style={{ marginLeft: '5px' }}>...</span>}
+                                                        
+                                                        {/* Cart count badge */}
+                                                        {getProductCartCount(product._id) > 0 && (
+                                                            <span 
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '-5px',
+                                                                    right: '-5px',
+                                                                    backgroundColor: '#dc3545',
+                                                                    color: 'white',
+                                                                    borderRadius: '50%',
+                                                                    width: '18px',
+                                                                    height: '18px',
+                                                                    fontSize: '10px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center'
+                                                                }}
+                                                            >
+                                                                {getProductCartCount(product._id)}
+                                                            </span>
+                                                        )}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="product-info text-center">
+                                                <h3 className="product-title">
+                                                    <a href="#">{product.name}</a>
+                                                </h3>
+                                                <div className="product-price">
+                                                    <span>₹{product.price}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div className="product-info text-center">
-                                        <h3 className="product-title">
-                                            <a href="#">{product.name}</a>
-                                        </h3>
-                                        <div className="product-price">
-                                            <span>₹{product.price}</span>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                        <div className="text-center">
-                            <a href="#" className="zoa-btn btn-loadmore">
-                                Load more
-                            </a>
-                        </div>
+                                <div className="text-center">
+                                    <a href="#" className="zoa-btn btn-loadmore">
+                                        Load more
+                                    </a>
+                                </div>
+                            </>
+                        )}
                     </div>
                     
-                    {/* Fixed CSS for mobile responsiveness */}
+                    {/* CSS Styles */}
                     <style jsx>{`
-                        /* Override existing styles to ensure buttons are always visible */
                         .product-item .product-button-group {
                             display: flex !important;
                             opacity: 1 !important;
@@ -348,7 +476,6 @@ const Home = () => {
                             transform: scale(1.1) !important;
                         }
 
-                        /* Mobile specific styles */
                         @media (max-width: 767px) {
                             .product-item {
                                 margin-bottom: 30px !important;
@@ -387,7 +514,6 @@ const Home = () => {
                             }
                         }
 
-                        /* Tablet styles */
                         @media (min-width: 768px) and (max-width: 1024px) {
                             .product-item .product-button-group {
                                 bottom: 8px !important;
@@ -399,7 +525,6 @@ const Home = () => {
                             }
                         }
 
-                        /* Desktop styles - maintain hover effects */
                         @media (min-width: 1025px) {
                             .product-item .product-button-group {
                                 opacity: 0 !important;
@@ -417,7 +542,6 @@ const Home = () => {
                             }
                         }
 
-                        /* Ensure product container has proper positioning */
                         .product-item {
                             position: relative !important;
                         }
@@ -457,7 +581,6 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Content */}
             <div className="newsletter v3">
                 <div className="container">
                     <div className="row">
@@ -509,6 +632,26 @@ const Home = () => {
                     }}
                 >
                     {notification.message}
+                </div>
+            )}
+
+            {/* Retry status indicator */}
+            {isRetrying && (
+                <div 
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        left: '20px',
+                        backgroundColor: '#ffc107',
+                        color: '#212529',
+                        padding: '8px 12px',
+                        borderRadius: '5px',
+                        zIndex: 1000,
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                        fontSize: '14px'
+                    }}
+                >
+                    Retrying... ({retryCount}/3)
                 </div>
             )}
         </div>
