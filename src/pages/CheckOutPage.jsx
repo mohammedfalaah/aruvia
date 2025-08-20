@@ -175,7 +175,7 @@ const CheckOutPage = () => {
           
           // Call your payment verification API
           const verifyResponse = await axios.post(
-            'https://aruvia-backend.onrender.com/api/payment/verify',
+            'https://aruvia-backend-rho.vercel.app/api/payment/verify',
             verificationData,
             {
               headers: {
@@ -302,7 +302,7 @@ const CheckOutPage = () => {
 
     // Make API call
     const response = await axios.post(
-      'https://aruvia-backend.onrender.com/api/order/createorder',
+      'https://aruvia-backend-rho.vercel.app/api/order/createorder',
       orderData,
       {
         headers: {

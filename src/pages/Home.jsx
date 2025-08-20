@@ -69,7 +69,7 @@ const Home = () => {
             
             console.log(`Fetching products... Attempt ${attempt}/${maxAttempts}`);
             
-            const response = await apiClient.get('https://aruvia-backend.onrender.com/api/products');
+            const response = await apiClient.get('https://aruvia-backend-rho.vercel.app/api/products');
             
             // Check if response structure is correct
             if (response.data && response.data.success === "true" && response.data.data) {

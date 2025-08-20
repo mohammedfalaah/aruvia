@@ -85,7 +85,7 @@ export const Context_provider = ({ children }) => {
             }
 
             // If token exists, try API call
-            const response = await axios.post(`https://aruvia-backend.onrender.com/api/cart/${productId}`, {
+            const response = await axios.post(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
                 quantity: quantity
             }, {
                 headers: {
@@ -131,7 +131,7 @@ export const Context_provider = ({ children }) => {
                 return;
             }
 
-            const response = await axios.get(`https://aruvia-backend.onrender.com/api/cart`, {
+            const response = await axios.get(`https://aruvia-backend-rho.vercel.app/api/cart`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -168,7 +168,7 @@ export const Context_provider = ({ children }) => {
             }
 
             // API call for logged-in users
-            const response = await axios.delete(`https://aruvia-backend.onrender.com/api/cart/${productId}`, {
+            const response = await axios.delete(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -227,7 +227,7 @@ export const Context_provider = ({ children }) => {
                 return { success: true, message: "Cart updated successfully" };
             }
 
-            const response = await axios.put(`https://aruvia-backend.onrender.com/api/cart/${productId}`, {
+            const response = await axios.put(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
                 quantity: quantity
             }, {
                 headers: {
@@ -282,7 +282,7 @@ export const Context_provider = ({ children }) => {
                 return { success: true, message: "Cart cleared successfully" };
             }
 
-            const response = await axios.delete(`https://aruvia-backend.onrender.com/api/cart`, {
+            const response = await axios.delete(`https://aruvia-backend-rho.vercel.app/api/cart`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
