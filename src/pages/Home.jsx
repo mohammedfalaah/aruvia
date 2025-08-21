@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
+import WhatsappChat from '../utils/WhatsappChat';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -580,6 +581,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
+            <WhatsappChat />
 
             <div className="newsletter v3">
                 <div className="container">
