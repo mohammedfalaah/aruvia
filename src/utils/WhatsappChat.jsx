@@ -14,7 +14,7 @@ const WhatsappChat = () => {
       rel="noopener noreferrer"
       style={{
         position: "fixed", 
-        bottom: "45px",    
+        bottom: "40px",    
         right: "20px",     
         backgroundColor: "#25D366", 
         color: "white",
