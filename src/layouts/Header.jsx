@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { contextData } from '../services/Context';
 import { Link, useNavigate } from 'react-router-dom';
 import CheckOutPage from '../pages/CheckOutPage';
@@ -21,6 +21,28 @@ const Header = () => {
 
     const navigate = useNavigate();
     const cartCount = getCartItemCount();
+    const [isSticky, setIsSticky] = useState(false);
+
+    // Handle scroll event for sticky header
+    useEffect(() => {
+        const handleScroll = () => {
+            const offset = window.scrollY;
+            const stickyOffset = 100; // Adjust this value as needed
+            
+            if (offset > stickyOffset) {
+                setIsSticky(true);
+            } else {
+                setIsSticky(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        
+        // Cleanup event listener on component unmount
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     // Handle quantity increment
     const handleQuantityIncrease = async (productId, currentQuantity) => {
@@ -448,7 +470,7 @@ const Header = () => {
                 {/* End Account */}
             </div>
             
-            <header id="header" className="header-v1">
+            <header id="header" className={`header-v1 ${isSticky ? 'sticky-header' : ''}`}>
                 <div className="header-center">
                     <div className="container container-content ">
                         <div className="row flex align-items-center justify-content-between">

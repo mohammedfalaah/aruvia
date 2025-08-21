@@ -7301,7 +7301,7 @@ span.star:before {
 .sticky-header {
   border-bottom: 1px solid #efefef;
   line-height: 20px;
-  padding: 12px; }
+   }
   .sticky-header .u-line {
     color: #eb5050;
     text-decoration: underline; }
@@ -16441,3 +16441,30 @@ i.fa.fa-plus {
       width: 100%; } }
 
 /*# sourceMappingURL=styles.css.map */
+.header-v1 {
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.header-v1.sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease;
+    z-index: 1000;
+}
+
+/* Slide down animation */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
