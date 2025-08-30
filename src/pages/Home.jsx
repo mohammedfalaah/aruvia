@@ -421,6 +421,7 @@ const Home = () => {
                                                         
                                                         {/* Cart count badge */}
                                                         {getProductCartCount(product._id) > 0 && (
+                                                            
                                                             <span 
                                                                 style={{
                                                                     position: 'absolute',
