@@ -1,6 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const PrivacyPolicy = () => {
+
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }, []);
+
   return (
    <div className="container container-content">
       <div className="row">
