@@ -496,7 +496,7 @@ const Header = () => {
                             <div className="col-md-4 col flex justify-content-end">
                                 <div className="topbar-left">
                                     <div className="element element-user hidden-xs hidden-sm">
-                                        <a href="#" className="zoa-icon js-user">
+                                        {/* <a href="#" className="zoa-icon js-user">
                                             <svg width={19} height={20} version="1.1" id="Layer_3" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 102.8" style={{enableBackground: 'new 0 0 100 102.8'}} xmlSpace="preserve">
                                                 <g>
                                                     <path d="M75.7,52.4c-2.1,2.3-4.4,4.3-7,6C82.2,58.8,93,69.9,93,83.5v12.3H7V83.5c0-13.6,10.8-24.7,24.3-25.1c-2.6-1.7-5-3.7-7-6
@@ -507,7 +507,7 @@ const Header = () => {
                                                     </g>
                                                 </g>
                                             </svg>
-                                        </a>
+                                        </a> */}
                                     </div>
                                     <div className="element element-cart">
                                         <a onClick={handleCartToggle} className="zoa-icon icon-cart">
