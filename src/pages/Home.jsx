@@ -23,6 +23,14 @@ const Home = () => {
     const [retryCount, setRetryCount] = useState(0);
     const [isRetrying, setIsRetrying] = useState(false);
 
+     useEffect(() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+        }, []);
+
     // Custom smooth scroll function with faster speed
     const smoothScrollTo = (elementId, duration = 600) => {
         const target = document.getElementById(elementId);
@@ -421,7 +429,7 @@ const Home = () => {
                                                         
                                                         {/* Cart count badge */}
                                                         {getProductCartCount(product._id) > 0 && (
-                                                            
+
                                                             <span 
                                                                 style={{
                                                                     position: 'absolute',

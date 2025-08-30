@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import axios from 'axios';
+import { show_toast } from "../utils/Toast";
 
 export const contextData = createContext();
 
@@ -8,7 +9,6 @@ export const Context_provider = ({ children }) => {
     const [sideBarOpen, setSideBarOpen] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [notification, setNotification] = useState('');
     
     const handleCartToggle = () => {
         setIsCartOpen(!isCartOpen);
@@ -24,11 +24,7 @@ export const Context_provider = ({ children }) => {
         document.body.classList.remove('pushmenu-push-toleft');
     };
 
-    // Show toast notification
-    const show_toast = (message, isSuccess = true) => {
-        setNotification({ message, isSuccess });
-        setTimeout(() => setNotification(''), 3000);
-    };
+    // Using imported show_toast utility function
 
     // Get cart from localStorage
     const getCart = () => {
@@ -347,7 +343,6 @@ export const Context_provider = ({ children }) => {
             cartItems,
             setCartItems,
             loading,
-            notification,
             handleSideBarToggle,
             handleSidebarClose,
             handleCartToggle,
