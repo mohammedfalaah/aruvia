@@ -35,6 +35,14 @@ const CheckOutPage = () => {
   const [orderError, setOrderError] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }, []);
+
   // Validate email format
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
