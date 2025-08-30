@@ -79,9 +79,7 @@ const ProductDetails = ({ product, isOpen, onClose }) => {
     // Mock additional images - you can replace with actual product images array
     const productImages = [
         product.image,
-        product.image, // Replace with actual additional images
-        product.image,
-        product.image
+       
     ];
 
     return (
@@ -221,14 +219,12 @@ const ProductDetails = ({ product, isOpen, onClose }) => {
                             {/* Shipping Info */}
                             <div className="shipping-info">
                                 <div className="shipping-item">
-                                    🚚 Free shipping on orders over ₹500
+                                    🚚 Free shipping on orders 
                                 </div>
                                 <div className="shipping-item">
                                     📦 2-3 business days delivery
                                 </div>
-                                <div className="shipping-item">
-                                    🔄 Easy returns within 7 days
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
