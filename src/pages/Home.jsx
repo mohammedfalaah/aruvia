@@ -384,7 +384,10 @@ const Home = () => {
                                             key={product._id}
                                         >
                                             <div className="product-img">
-                                                <a onClick={() => handleAddToCart(product._id)}>
+                                                <a onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleQuickView(product);
+                                                        }}>
                                                     <img
                                                         src={product.image}
                                                         alt={product.name}
@@ -395,7 +398,7 @@ const Home = () => {
                                                 {/* Button Group */}
                                                 <div className="product-button-group">
                                                     <a 
-                                                        href="#" 
+                                                        
                                                         className="zoa-btn zoa-quickview"
                                                         onClick={(e) => {
                                                             e.preventDefault();
