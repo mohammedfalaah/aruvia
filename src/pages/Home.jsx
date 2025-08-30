@@ -4,10 +4,14 @@ import { Link } from 'react-router-dom'
 import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
 import WhatsappChat from '../utils/WhatsappChat';
+import ProductDetails from './ProductDetails';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    
     const { 
         addToCart, 
         fetchCartItems, 
@@ -51,6 +55,18 @@ const Home = () => {
     const getProductCartCount = (productId) => {
         const item = cartItems.find(item => item._id === productId || item.productId === productId);
         return item ? item.quantity : 0;
+    };
+
+    // Handle quick view click
+    const handleQuickView = (product) => {
+        setSelectedProduct(product);
+        setIsProductModalOpen(true);
+    };
+
+    // Handle close modal
+    const handleCloseModal = () => {
+        setIsProductModalOpen(false);
+        setSelectedProduct(null);
     };
 
     // Configure axios with timeout
@@ -378,7 +394,14 @@ const Home = () => {
                                                 
                                                 {/* Button Group */}
                                                 <div className="product-button-group">
-                                                    <a href="#" className="zoa-btn zoa-quickview">
+                                                    <a 
+                                                        href="#" 
+                                                        className="zoa-btn zoa-quickview"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleQuickView(product);
+                                                        }}
+                                                    >
                                                         <span className="zoa-icon-quick-view" />
                                                     </a>
                                                     <a 
@@ -617,6 +640,13 @@ const Home = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Product Details Modal */}
+            <ProductDetails
+                product={selectedProduct}
+                isOpen={isProductModalOpen}
+                onClose={handleCloseModal}
+            />
 
             {/* Toast Notification */}
             {notification && (
