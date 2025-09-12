@@ -7,6 +7,7 @@ import Refund from "./pages/Refund"
 import Contact from "./pages/Contact"
 import Delivery from "./pages/Delivery"
 import CheckoutPage from "./pages/CheckOutPage"
+import ProductPage from "./pages/ProductPage"
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       <Route path="/cancellation-refund" element={<Refund />} />
       <Route path="/shipping-delivery" element={<Delivery />} />
       <Route path="/contact-us" element={<Contact />} />
+      <Route path="/product/:id" element={<ProductPage />} />
 
 
 

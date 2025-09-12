@@ -1,16 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
 import WhatsappChat from '../utils/WhatsappChat';
-import ProductDetails from './ProductDetails';
 
 const Home = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [error, setError] = useState(null);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     
     const { 
         addToCart, 
@@ -65,16 +63,17 @@ const Home = () => {
         return item ? item.quantity : 0;
     };
 
-    // Handle quick view click
-    const handleQuickView = (product) => {
-        setSelectedProduct(product);
-        setIsProductModalOpen(true);
+    // Handle product click - navigate to product page
+    const handleProductClick = (product) => {
+        // Navigate to product detail page with product ID
+        navigate(`/product/${product._id}`, { 
+            state: { product } // Pass product data as state (optional)
+        });
     };
 
-    // Handle close modal
-    const handleCloseModal = () => {
-        setIsProductModalOpen(false);
-        setSelectedProduct(null);
+    // Handle quick view click - navigate to product page
+    const handleQuickView = (product) => {
+        handleProductClick(product);
     };
 
     // Configure axios with timeout
@@ -209,7 +208,13 @@ const Home = () => {
     }, [products.length, loading, isRetrying, error, retryCount, fetchProducts]);
 
     // Handle add to cart click
-    const handleAddToCart = async (productId) => {
+    const handleAddToCart = async (productId, event) => {
+        // Prevent event bubbling to avoid navigating to product page
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
         setLoading(true);
         
         try {
@@ -392,24 +397,24 @@ const Home = () => {
                                             key={product._id}
                                         >
                                             <div className="product-img">
-                                                <a onClick={(e) => {
-                                                            e.preventDefault();
-                                                            handleQuickView(product);
-                                                        }}>
+                                                <div 
+                                                    onClick={() => handleProductClick(product)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
                                                     <img
                                                         src={product.image}
                                                         alt={product.name}
                                                         className="img-responsive"
                                                     />
-                                                </a>
+                                                </div>
                                                 
                                                 {/* Button Group */}
                                                 <div className="product-button-group">
                                                     <a 
-                                                        
                                                         className="zoa-btn zoa-quickview"
                                                         onClick={(e) => {
                                                             e.preventDefault();
+                                                            e.stopPropagation();
                                                             handleQuickView(product);
                                                         }}
                                                     >
@@ -417,7 +422,7 @@ const Home = () => {
                                                     </a>
                                                     <a 
                                                         className="zoa-btn zoa-addcart" 
-                                                        onClick={() => handleAddToCart(product._id)}
+                                                        onClick={(e) => handleAddToCart(product._id, e)}
                                                         style={{ 
                                                             cursor: loading ? 'not-allowed' : 'pointer',
                                                             opacity: loading ? 0.6 : 1,
@@ -429,7 +434,6 @@ const Home = () => {
                                                         
                                                         {/* Cart count badge */}
                                                         {getProductCartCount(product._id) > 0 && (
-
                                                             <span 
                                                                 style={{
                                                                     position: 'absolute',
@@ -455,7 +459,15 @@ const Home = () => {
                                             
                                             <div className="product-info text-center">
                                                 <h3 className="product-title">
-                                                    <a href="#">{product.name}</a>
+                                                    <a 
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleProductClick(product);
+                                                        }}
+                                                    >
+                                                        {product.name}
+                                                    </a>
                                                 </h3>
                                                 <div className="product-price">
                                                     <span>₹{product.price}</span>
@@ -510,6 +522,19 @@ const Home = () => {
                         .product-item .product-button-group .zoa-btn:hover {
                             background-color: #333 !important;
                             transform: scale(1.1) !important;
+                        }
+
+                        .product-img > div {
+                            transition: transform 0.3s ease;
+                        }
+
+                        .product-img > div:hover {
+                            transform: scale(1.05);
+                        }
+
+                        .product-title a:hover {
+                            color: #007bff;
+                            text-decoration: none;
                         }
 
                         @media (max-width: 767px) {
@@ -652,13 +677,6 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Product Details Modal */}
-            <ProductDetails
-                product={selectedProduct}
-                isOpen={isProductModalOpen}
-                onClose={handleCloseModal}
-            />
 
             {/* Toast Notification */}
             {notification && (
