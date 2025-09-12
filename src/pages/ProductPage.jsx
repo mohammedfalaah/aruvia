@@ -460,10 +460,7 @@ const ProductPage = () => {
                                         <span style={{ color: '#28a745', marginRight: '10px', fontSize: '18px' }}>✓</span>
                                         Fast & Secure Delivery
                                     </li>
-                                    <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
-                                        <span style={{ color: '#28a745', marginRight: '10px', fontSize: '18px' }}>✓</span>
-                                        30-Day Return Policy
-                                    </li>
+                                    
                                     <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
                                         <span style={{ color: '#28a745', marginRight: '10px', fontSize: '18px' }}>✓</span>
                                         24/7 Customer Support
@@ -498,18 +495,14 @@ const ProductPage = () => {
                             <div>
                                 <h5 style={{ marginBottom: '10px', color: '#333' }}>Specifications</h5>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#666' }}>
-                                    <li style={{ marginBottom: '5px' }}>
-                                        <strong>Product ID:</strong> {product._id}
-                                    </li>
+                                    
                                     <li style={{ marginBottom: '5px' }}>
                                         <strong>Category:</strong> {product.category || 'General'}
                                     </li>
                                     <li style={{ marginBottom: '5px' }}>
                                         <strong>Brand:</strong> Aruvia
                                     </li>
-                                    <li style={{ marginBottom: '5px' }}>
-                                        <strong>Weight:</strong> {product.weight || 'N/A'}
-                                    </li>
+                                    
                                 </ul>
                             </div>
                             <div>
@@ -519,14 +512,9 @@ const ProductPage = () => {
                                         <strong>Delivery:</strong> 3-7 Business Days
                                     </li>
                                     <li style={{ marginBottom: '5px' }}>
-                                        <strong>Shipping:</strong> Free above ₹500
+                                        <strong>Shipping:</strong> Free above ₹200
                                     </li>
-                                    <li style={{ marginBottom: '5px' }}>
-                                        <strong>Returns:</strong> 30 Days
-                                    </li>
-                                    <li style={{ marginBottom: '5px' }}>
-                                        <strong>Exchange:</strong> Available
-                                    </li>
+                                   
                                 </ul>
                             </div>
                         </div>

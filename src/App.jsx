@@ -20,7 +20,7 @@ function App() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-and-conditions" element={<TermsCondition/>} />
       <Route path="/cancellation-refund" element={<Refund />} />
-      <Route path="/shipping-delivery" element={<Delivery />} />
+      <Route path="/delivery-policy" element={<Delivery />} />
       <Route path="/contact-us" element={<Contact />} />
       <Route path="/product/:id" element={<ProductPage />} />
 

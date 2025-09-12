@@ -13,10 +13,11 @@ const Footer = () => {
         </div>
         <div className="f-col align-items-center">
           
-          <p>© 2025 <a className="red" href="#">Aruvia.</a></p>
-          <ul>
-            <li><Link to={'/privacy-policy'}>Privacy Policy</Link></li>
+          <p style={{textWrap:'nowrap'}}>© 2025 <a className="red" href="/">Aruvia.</a></p>
+          <ul style={{textWrap:'nowrap'}}>
+            <li><Link to={'/delivery-policy'}>Delivery Policy</Link></li>
             <li><Link to={'/terms-and-conditions'}>Terms of Use</Link></li>
+            <li><Link to={'/privacy-policy'}>Privacy Policy</Link></li>
           </ul>
         </div>
         <div className="f-col">
