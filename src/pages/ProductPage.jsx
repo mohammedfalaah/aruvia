@@ -22,6 +22,14 @@ const ProductPage = () => {
         getCartItemCount 
     } = useContext(contextData);
 
+    useEffect(() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+        }, []);
+
     // Get product from location state if available, otherwise fetch from API
     useEffect(() => {
         const fetchProduct = async () => {
@@ -114,7 +122,8 @@ const ProductPage = () => {
         try {
             const result = await addToCart(product._id, product, quantity);
             if (result.success) {
-                navigate('/cart');
+                console.log("success")
+                //navigate('/cart');
             } else {
                 console.log("Failed to add product:", result.message);
             }
