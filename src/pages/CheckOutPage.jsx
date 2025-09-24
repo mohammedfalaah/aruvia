@@ -123,10 +123,8 @@ const CheckOutPage = () => {
   // Calculate shipping cost
   const getShippingCost = () => {
     switch (shippingOption) {
-      case 'flat': return 50.00; // More realistic shipping cost for India
-      case 'local': return 25.00;
-      case 'free': 
-      default: return 0.00;
+     
+      default: return 50;
     }
   };
 
@@ -153,93 +151,116 @@ const CheckOutPage = () => {
   };
 
   // Handle Razorpay payment
-  const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
-    const scriptLoaded = await loadRazorpayScript();
-    
-    if (!scriptLoaded) {
-      show_toast('Razorpay SDK failed to load. Please check your internet connection.', false);
-      setOrderLoading(false);
-      return;
-    }
+  // Fixed handleRazorpayPayment function
+const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
+  const scriptLoaded = await loadRazorpayScript();
+  
+  if (!scriptLoaded) {
+    show_toast('Razorpay SDK failed to load. Please check your internet connection.', false);
+    setOrderLoading(false);
+    return;
+  }
 
-    const options = {
-      key: 'rzp_live_iFvbsicduHI4Lb', // Replace with your actual Razorpay Key ID
-      amount: Math.round(getFinalTotal() * 100), // Amount in paise
-      currency: 'INR',
-      name: 'Aruvia',
-      description: 'Order Payment',
-      order_id: razorpayOrderId,
-      handler: async function (response) {
-        try {
-          // Verify payment with your backend
-          const verificationData = {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            orderId: orderData._id
-          };
+  const options = {
+    key: 'rzp_live_iFvbsicduHI4Lb',
+    amount: Math.round(getFinalTotal() * 100),
+    currency: 'INR',
+    name: 'Aruvia',
+    description: 'Order Payment',
+    order_id: razorpayOrderId,
+    handler: async function (response) {
+      console.log('Razorpay Response:', response);
+      console.log('Order Data passed to payment:', orderData);
+      
+      try {
+        // The correct order ID should come from your order creation response
+        // Check what your backend actually returns in the order creation API
+        const mongoOrderId = orderData._id || orderData.id || orderData.orderId;
+        
+        console.log('MongoDB Order ID:', mongoOrderId);
+        console.log('Razorpay Order ID:', response.razorpay_order_id);
+        
+        if (!mongoOrderId) {
+          throw new Error('Order ID not found in order data');
+        }
 
-          const token = localStorage.getItem("token");
-          
-          // Call your payment verification API
-          const verifyResponse = await axios.post(
-            'https://aruvia-backend-rho.vercel.app/api/payment/verify',
-            verificationData,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 
-                  'Authorization': `Bearer ${token}` // Fixed template literal
-                })
-              }
+        const verificationData = {
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          orderId: mongoOrderId  // Use the MongoDB ObjectId, not Razorpay order ID
+        };
+
+        console.log('Sending verification data:', verificationData);
+
+        const token = localStorage.getItem("token");
+        
+        const verifyResponse = await axios.post(
+          'https://aruvia-backend-rho.vercel.app/api/order/verifyPayment',
+          verificationData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` })
             }
-          );
-
-          if (verifyResponse.data.success) {
-            setOrderSuccess(true);
-            setOrderError('');
-            await clearCart();
-            show_toast('Payment successful! Your order has been placed.', true);
-            
-            // Optional: Redirect to order confirmation page after a delay
-            setTimeout(() => {
-              // window.location.href = '/order-confirmation';
-            }, 2000);
-          } else {
-            throw new Error('Payment verification failed');
           }
-        } catch (error) {
-          console.error('Payment verification error:', error);
-          setOrderError('Payment verification failed. Please contact support.');
-          show_toast('Payment verification failed. Please contact support.', false);
-        } finally {
-          setOrderLoading(false);
-        }
-      },
-      prefill: {
-        name: `${formData.firstName} ${formData.lastName}`, // Fixed template literal
-        email: formData.email,
-        contact: formData.phone
-      },
-      notes: {
-        address: `${formData.street}, ${formData.city}, ${formData.state}`, // Fixed template literal
-        landmark: formData.landmark,
-        orderNote: formData.orderNote
-      },
-      theme: {
-        color: '#f33'
-      },
-      modal: {
-        ondismiss: function() {
-          console.log('Payment modal closed by user');
-          setOrderLoading(false);
-        }
-      }
-    };
+        );
 
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
+        console.log('Verification response:', verifyResponse.data);
+
+        if (verifyResponse.data.success) {
+          setOrderSuccess(true);
+          setOrderError('');
+          await clearCart();
+          show_toast('Payment successful! Your order has been placed.', true);
+          
+          setTimeout(() => {
+            // window.location.href = '/order-confirmation';
+          }, 2000);
+        } else {
+          throw new Error(verifyResponse.data.message || 'Payment verification failed');
+        }
+      } catch (error) {
+        console.error('Payment verification error:', error);
+        console.error('Error details:', error.response?.data);
+        
+        let errorMessage = 'Payment verification failed. Please contact support.';
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        setOrderError(errorMessage);
+        show_toast(`Error: ${errorMessage}`, false);
+      } finally {
+        setOrderLoading(false);
+      }
+    },
+    prefill: {
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      contact: formData.phone
+    },
+    notes: {
+      address: `${formData.street}, ${formData.city}, ${formData.state}`,
+      landmark: formData.landmark,
+      orderNote: formData.orderNote
+    },
+    theme: {
+      color: '#f33'
+    },
+    modal: {
+      ondismiss: function() {
+        console.log('Payment modal closed by user');
+        setOrderLoading(false);
+      }
+    }
   };
+
+  const razorpay = new window.Razorpay(options);
+  razorpay.open();
+};
 
   // Handle form submission
  const handlePlaceOrder = async (e) => {
@@ -572,31 +593,26 @@ const CheckOutPage = () => {
                         <div style={{marginTop: 30, marginBottom: 20}}>
                           <h4>Shipping Options</h4>
                           
-                          <div className={`shipping-option ${shippingOption === 'free' ? 'selected' : ''}`}>
-                            <label>
-                              <input 
-                                type="radio" 
-                                name="shipping"
-                                value="free"
-                                checked={shippingOption === 'free'}
-                                onChange={(e) => setShippingOption(e.target.value)}
-                              />
-                              <span style={{marginLeft: 10}}>Free Shipping (5-7 business days) - ₹0.00</span>
-                            </label>
-                          </div>
+                        
                           
-                          <div className={`shipping-option ${shippingOption === 'flat' ? 'selected' : ''}`}>
-                            <label>
-                              <input 
-                                type="radio" 
-                                name="shipping"
-                                value="flat"
-                                checked={shippingOption === 'flat'}
-                                onChange={(e) => setShippingOption(e.target.value)}
-                              />
-                              <span style={{marginLeft: 10}}>Standard Shipping (3-5 business days) - ₹50.00</span>
-                            </label>
-                          </div>
+                         <div style={{marginTop: 30, marginBottom: 20}}>
+  <h4>Shipping</h4>
+  <div className="shipping-option selected">
+    <label>
+      <input 
+        type="radio" 
+        name="shipping"
+        value="flat"
+        checked
+        readOnly
+      />
+      <span style={{marginLeft: 10}}>
+        Standard Shipping (3-5 business days) - ₹50.00
+      </span>
+    </label>
+  </div>
+</div>
+
                           
                           
                         </div>
