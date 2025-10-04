@@ -40,81 +40,185 @@ export const Context_provider = ({ children }) => {
     };
 
     // Update localStorage cart
-    const updateLocalStorageCart = (product) => {
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
-        const productExists = cart.some((item) => item?._id === product?._id);
+    // const updateLocalStorageCart = (product) => {
+    //     const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    //     const productExists = cart.some((item) => item?._id === product?._id);
 
-        if (!productExists) {
-            const cartItem = {
-                _id: product._id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                quantity: 1,
-                productId: product._id
-            };
-            cart.push(cartItem);
-            localStorage.setItem("cart", JSON.stringify(cart));
-            setCartItems(cart);
-            show_toast("Product added to Cart", true);
-            setIsCartOpen(true); // Open cart sidebar
-            return { success: true, message: "Product added to cart" };
-        } else {
-            show_toast("Product is already in your Cart", false);
-            return { success: false, message: "Product already in cart" };
-        }
-    };
+    //     if (!productExists) {
+    //         const cartItem = {
+    //             _id: product._id,
+    //             name: product.name,
+    //             price: product.price,
+    //             image: product.image,
+    //             quantity: 1,
+    //             productId: product._id
+    //         };
+    //         cart.push(cartItem);
+    //         localStorage.setItem("cart", JSON.stringify(cart));
+    //         setCartItems(cart);
+    //         show_toast("Product added to Cart", true);
+    //         setIsCartOpen(true); // Open cart sidebar
+    //         return { success: true, message: "Product added to cart" };
+    //     } else {
+    //         show_toast("Product is already in your Cart", false);
+    //         return { success: false, message: "Product already in cart" };
+    //     }
+    // };
 
-    // Add to cart function with localStorage integration
-    const addToCart = async (productId, product, quantity = 1) => {
-        console.log(product, "product details");
-        setLoading(true);
+    // // Add to cart function with localStorage integration
+    // const addToCart = async (productId, product, quantity = 1) => {
+    //     console.log(product, "product details");
+    //     setLoading(true);
         
-        try {
-            const token = localStorage.getItem("token"); // Check for token
+    //     try {
+    //         const token = localStorage.getItem("token"); // Check for token
             
-            if (!token) {
-                // No token - use localStorage
-                const result = updateLocalStorageCart(product);
-                setLoading(false);
-                return result;
-            }
+    //         if (!token) {
+    //             // No token - use localStorage
+    //             const result = updateLocalStorageCart(product);
+    //             setLoading(false);
+    //             return result;
+    //         }
 
-            // If token exists, try API call
-            const response = await axios.post(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
-                quantity: quantity
+    //         // If token exists, try API call
+    //         const response = await axios.post(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
+    //             quantity: quantity
+    //         }, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`
+    //             }
+    //         });
+            
+    //         if (response.data.success === "true" || response.data.success === true) {
+    //             console.log("Product added to cart successfully");
+                
+    //             // Fetch updated cart data from API
+    //             await fetchCartItems();
+                
+    //             // Show cart after adding item
+    //             setIsCartOpen(true);
+    //             show_toast("Product added to cart successfully", true);
+                
+    //             return { success: true, message: "Product added to cart" };
+    //         } else {
+    //             show_toast("Product is already in your Cart", false);
+    //             return { success: false, message: response.data.message || "Failed to add product" };
+    //         }
+    //     } catch (error) {
+    //         console.error("Error adding product to cart:", error);
+            
+    //         // If API fails, fallback to localStorage
+    //         const result = updateLocalStorageCart(product);
+    //         show_toast("Added to local cart (offline mode)", true);
+    //         return result;
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    // Update localStorage cart - now increments quantity if product exists
+const updateLocalStorageCart = (product) => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItemIndex = cart.findIndex((item) => item?._id === product?._id);
+
+    if (existingItemIndex !== -1) {
+        // Product exists - increment quantity
+        cart[existingItemIndex].quantity += 1;
+        localStorage.setItem("cart", JSON.stringify(cart));
+        setCartItems(cart);
+        show_toast("Product quantity increased in Cart", true);
+        setIsCartOpen(true);
+        return { success: true, message: "Product quantity increased" };
+    } else {
+        // Product doesn't exist - add new item
+        const cartItem = {
+            _id: product._id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity: 1,
+            productId: product._id
+        };
+        cart.push(cartItem);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        setCartItems(cart);
+        show_toast("Product added to Cart", true);
+        setIsCartOpen(true);
+        return { success: true, message: "Product added to cart" };
+    }
+};
+
+// Add to cart function with localStorage integration
+const addToCart = async (productId, product, quantity = 1) => {
+    console.log(product, "product details");
+    setLoading(true);
+    
+    try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+            // No token - use localStorage
+            const result = updateLocalStorageCart(product);
+            setLoading(false);
+            return result;
+        }
+
+        // If token exists, try API call
+        const response = await axios.post(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
+            quantity: quantity
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        
+        if (response.data.success === "true" || response.data.success === true) {
+            console.log("Product added/updated in cart successfully");
+            
+            // Fetch updated cart data from API
+            await fetchCartItems();
+            
+            // Show cart after adding item
+            setIsCartOpen(true);
+            
+            // Check if it was an increment or new addition
+            const message = response.data.message || "Product added to cart successfully";
+            show_toast(message, true);
+            
+            return { success: true, message: message };
+        } else {
+            // If API returns false, it might mean product exists
+            // In that case, try to update quantity instead
+            const updateResponse = await axios.put(`https://aruvia-backend-rho.vercel.app/api/cart/${productId}`, {
+                quantity: quantity + 1 // Increment by 1
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
             
-            if (response.data.success === "true" || response.data.success === true) {
-                console.log("Product added to cart successfully");
-                
-                // Fetch updated cart data from API
+            if (updateResponse.data.success === "true" || updateResponse.data.success === true) {
                 await fetchCartItems();
-                
-                // Show cart after adding item
                 setIsCartOpen(true);
-                show_toast("Product added to cart successfully", true);
-                
-                return { success: true, message: "Product added to cart" };
-            } else {
-                show_toast("Product is already in your Cart", false);
-                return { success: false, message: response.data.message || "Failed to add product" };
+                show_toast("Product quantity increased in cart", true);
+                return { success: true, message: "Product quantity increased" };
             }
-        } catch (error) {
-            console.error("Error adding product to cart:", error);
             
-            // If API fails, fallback to localStorage
-            const result = updateLocalStorageCart(product);
-            show_toast("Added to local cart (offline mode)", true);
-            return result;
-        } finally {
-            setLoading(false);
+            return { success: false, message: response.data.message || "Failed to add product" };
         }
-    };
+    } catch (error) {
+        console.error("Error adding product to cart:", error);
+        
+        // If API fails, fallback to localStorage
+        const result = updateLocalStorageCart(product);
+        show_toast("Added to local cart (offline mode)", true);
+        return result;
+    } finally {
+        setLoading(false);
+    }
+};
+
+
 
     // Fetch cart items from API (for logged-in users)
     const fetchCartItems = async () => {
