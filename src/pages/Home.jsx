@@ -622,22 +622,97 @@ const Home = () => {
                     </div>
                     <div className="row insta-content">
                         <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="https://www.instagram.com/p/DHlLcSfhI3g/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer">
-                                <img src="/assets/img/aruvia-insta.jpg" alt="Instagram Post Preview" className="img-responsive" />
-                            </a>        
+                            <a 
+                            href="https://www.instagram.com/reel/DKkUfvYhzof/?utm_source=ig_web_copy_link&igsh=c2FhOXRxbG45bHlq" target="_blank" rel="noopener noreferrer">
+   <video 
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            borderRadius: '4px',
+                            maxHeight: '600px',
+                            objectFit: 'cover'
+                        }}
+                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                    >
+                        <source src="/assets/videos/instagram-reel1.mp4" type="video/mp4" />
+                        <source src="/assets/videos/instagram-reel1.webm" type="video/webm" />
+                        Your browser does not support the video tag.
+                    </video>                            </a>        
                         </div>
                         <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="https://www.instagram.com/p/DHvi99gBiBF/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="><img src="/assets/img/instagram1.jpg" alt className="img-responsive" /></a>
+                            <a 
+                            href="https://www.instagram.com/reel/DM2Kb_nBvEX/?utm_source=ig_web_copy_link&igsh=MTdsMDd1a292ZWp1bg==">
+ <video 
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            borderRadius: '4px',
+                            maxHeight: '600px',
+                            objectFit: 'cover'
+                        }}
+                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                    >
+                        <source src="/assets/videos/instagram-reel2.mp4" type="video/mp4" />
+                        <source src="/assets/videos/instagram-reel2.webm" type="video/webm" />
+                        Your browser does not support the video tag.
+                    </video>                             </a>
                         </div>
                         <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="https://www.instagram.com/p/DKUUoOGhrig/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="><img src="/assets/img/instagram5.jpg" alt className="img-responsive" /></a>
+                            <a href="https://www.instagram.com/reel/DMcm2T2B7ig/?utm_source=ig_web_copy_link&igsh=MWx5ZnZxcXd6OTcwcA==">
+ <video 
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            borderRadius: '4px',
+                            maxHeight: '600px',
+                            objectFit: 'cover'
+                        }}
+                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                    >
+                        <source src="/assets/videos/instagram-reel3.mp4" type="video/mp4" />
+                        <source src="/assets/videos/instagram-reel3.webm" type="video/webm" />
+                        Your browser does not support the video tag.
+                    </video>                              </a>
                         </div>
                         <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="#"><img src="/assets/img/instagram6.jpg" alt className="img-responsive" /></a>
+                            <a href="https://www.instagram.com/reel/DLAD3vbB2uJ/?utm_source=ig_web_copy_link&igsh=ZjdyZ2JnaHM4cnd4">
+ <video 
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            borderRadius: '4px',
+                            maxHeight: '600px',
+                            objectFit: 'cover'
+                        }}
+                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                    >
+                        <source src="/assets/videos/instagram-reel4.mp4" type="video/mp4" />
+                        <source src="/assets/videos/instagram-reel4.webm" type="video/webm" />
+                        Your browser does not support the video tag.
+                    </video>                              </a>
                         </div>
-                        <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="#"><img style={{height:'25rem'}} src="/assets/img/instagram10.jpg" alt className="img-responsive" /></a>
-                        </div>
+                        
+                       
                     </div>
                 </div>
             </div>
