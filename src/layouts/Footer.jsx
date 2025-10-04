@@ -23,7 +23,7 @@ const Footer = () => {
         <div className="f-col">
           <div className="social">
             <a href="https://www.instagram.com/aruvia_official/?hl=en"><i className="fa fa-instagram" /></a>
-            <a href="#"><i className="fa fa-facebook" /></a>
+            <a href="https://www.facebook.com/p/Aruvia-61575856720618/"><i className="fa fa-facebook" /></a>
          
           </div>
         </div>
