@@ -127,12 +127,7 @@ const Header = () => {
                         <li><a href="#"><i className="fa fa-user-plus" />Register</a></li>
                         <li><a href="#"><i className="fa fa-heart" />Wishlist</a></li>
                     </ul> */}
-                    <h4 className="mb-title">connect and follow</h4>
-                    <div className="mobile-social mg-bottom-30">
-                        <a href="#"><i className="fa fa-facebook" /></a>
-                        <a href="#"><i className="fa fa-twitter" /></a>
-                        <a href="#"><i className="fa fa-google-plus" /></a>
-                    </div>
+                    
                 </div>
             </div>
             {/* end push menu*/}

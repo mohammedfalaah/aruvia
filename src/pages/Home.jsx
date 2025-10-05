@@ -476,11 +476,11 @@ const Home = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="text-center">
+                                {/* <div className="text-center">
                                     <a href="#" className="zoa-btn btn-loadmore">
                                         Load more
                                     </a>
-                                </div>
+                                </div> */}
                             </>
                         )}
                     </div>
