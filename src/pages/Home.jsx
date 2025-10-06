@@ -726,12 +726,7 @@ const Home = () => {
                                 <h3>get in touch</h3>
                                 <p>Subscribe for latest stories and promotions (35% sale)</p>
                             </div>
-                            <form className="form_newsletter" action="#" method="post">
-                                <input type="email" defaultValue placeholder="Enter your emaill" name="EMAIL" id="mail" className="newsletter-input form-control" />
-                                <button id="subscribe" className="button_mini zoa-btn" type="submit">
-                                    Subscribe
-                                </button>
-                            </form>
+                           
                         </div>
                         <div className="col-md-6 col-sm-6 col-xs-12">
                             <div className="newsletter-flex">
