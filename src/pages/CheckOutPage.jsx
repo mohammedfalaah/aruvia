@@ -215,7 +215,7 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
           show_toast('Payment successful! Your order has been placed.', true);
           
           setTimeout(() => {
-            // window.location.href = '/order-confirmation';
+             window.location.href = '/order-confirmation';
           }, 2000);
         } else {
           throw new Error(verifyResponse.data.message || 'Payment verification failed');
@@ -358,7 +358,7 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
         
         // Optional: Redirect to order confirmation page after delay
         setTimeout(() => {
-          // window.location.href = '/order-confirmation';
+           window.location.href = '/order-confirmation';
         }, 2000);
       }
     } else {

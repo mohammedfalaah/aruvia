@@ -8,6 +8,7 @@ import Contact from "./pages/Contact"
 import Delivery from "./pages/Delivery"
 import CheckoutPage from "./pages/CheckOutPage"
 import ProductPage from "./pages/ProductPage"
+import OrderConfirmationPage from "./pages/OrderConfirmationPage"
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <Route path="/delivery-policy" element={<Delivery />} />
       <Route path="/contact-us" element={<Contact />} />
       <Route path="/product/:id" element={<ProductPage />} />
+      <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
 
 
 
