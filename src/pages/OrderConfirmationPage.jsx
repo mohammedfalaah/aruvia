@@ -257,7 +257,7 @@ const OrderConfirmationPage = () => {
               gap: '6px'
             }}>
               <Phone size={16} />
-              +91 98765 43210
+              +91 9497840126
             </a>
           </div>
         </div>
