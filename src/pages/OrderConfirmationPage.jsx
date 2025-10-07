@@ -3,31 +3,7 @@ import { Check, Package, Truck, Mail, Phone, MapPin, Calendar, CreditCard } from
 
 const OrderConfirmationPage = () => {
   const [showConfetti, setShowConfetti] = useState(true);
-  const [orderDetails] = useState({
-    orderNumber: 'ORD' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-    date: new Date().toLocaleDateString('en-IN', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }),
-    estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }),
-    customerName: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+91 98765 43210',
-    address: '123 Main Street, Koramangala, Bangalore, Karnataka 560095',
-    paymentMethod: 'Online Payment (Razorpay)',
-    subtotal: 2499.00,
-    shipping: 50.00,
-    total: 2549.00,
-    items: [
-      { id: 1, name: 'Premium Cotton T-Shirt', quantity: 2, price: 799.00, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100' },
-      { id: 2, name: 'Denim Jeans', quantity: 1, price: 1499.00, image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=100' }
-    ]
-  });
+ 
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -214,232 +190,18 @@ const OrderConfirmationPage = () => {
             borderRadius: '12px',
             margin: '20px 0'
           }}>
-            <span style={{ fontSize: '14px', color: '#888', fontWeight: '500' }}>
-              Order Number
-            </span>
-            <span style={{ 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
-              color: '#f33',
-              letterSpacing: '1px'
-            }}>
-              {orderDetails.orderNumber}
-            </span>
+        
+           
           </div>
 
           <p style={{ fontSize: '14px', color: '#888', marginTop: '16px' }}>
-            A confirmation email has been sent to <strong>{orderDetails.email}</strong>
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-          {/* Order Timeline */}
-          <div className="card fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Package size={24} color="#f33" />
-              Order Status
-            </h2>
-
-            <div className="timeline-step">
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: '#4caf50',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                zIndex: 1
-              }}>
-                <Check size={24} color="white" strokeWidth={3} />
-              </div>
-              <div>
-                <p style={{ fontWeight: '600', color: '#333', marginBottom: '4px' }}>Order Confirmed</p>
-                <p style={{ fontSize: '13px', color: '#888' }}>{orderDetails.date}</p>
-              </div>
-            </div>
-
-            <div className="timeline-step">
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: '#e3f2fd',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                zIndex: 1
-              }}>
-                <Package size={24} color="#2196f3" />
-              </div>
-              <div>
-                <p style={{ fontWeight: '600', color: '#333', marginBottom: '4px' }}>Processing</p>
-                <p style={{ fontSize: '13px', color: '#888' }}>We're preparing your items</p>
-              </div>
-            </div>
-
-            <div className="timeline-step">
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: '#f5f5f5',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                zIndex: 1
-              }}>
-                <Truck size={24} color="#999" />
-              </div>
-              <div>
-                <p style={{ fontWeight: '600', color: '#999', marginBottom: '4px' }}>Shipped</p>
-                <p style={{ fontSize: '13px', color: '#888' }}>On the way to you</p>
-              </div>
-            </div>
-
-            <div className="timeline-step">
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: '#f5f5f5',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                zIndex: 1
-              }}>
-                <Check size={24} color="#999" />
-              </div>
-              <div>
-                <p style={{ fontWeight: '600', color: '#999', marginBottom: '4px' }}>Delivered</p>
-                <p style={{ fontSize: '13px', color: '#888' }}>Expected by {orderDetails.estimatedDelivery}</p>
-              </div>
-            </div>
-
-            <div style={{
-              background: '#fff3e0',
-              padding: '16px',
-              borderRadius: '8px',
-              marginTop: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <Calendar size={20} color="#ff9800" />
-              <span style={{ fontSize: '14px', color: '#f57c00' }}>
-                Estimated delivery: <strong>{orderDetails.estimatedDelivery}</strong>
-              </span>
-            </div>
-          </div>
-
-          {/* Delivery & Payment Info */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div className="card fade-in-up" style={{ animationDelay: '0.3s' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={20} color="#f33" />
-                Delivery Address
-              </h3>
-              <p style={{ fontSize: '15px', color: '#333', fontWeight: '600', marginBottom: '4px' }}>
-                {orderDetails.customerName}
-              </p>
-              <p style={{ fontSize: '14px', color: '#666', lineHeight: '1.6', marginBottom: '12px' }}>
-                {orderDetails.address}
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#666' }}>
-                  <Mail size={16} color="#888" />
-                  {orderDetails.email}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#666' }}>
-                  <Phone size={16} color="#888" />
-                  {orderDetails.phone}
-                </div>
-              </div>
-            </div>
-
-            <div className="card fade-in-up" style={{ animationDelay: '0.4s' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CreditCard size={20} color="#f33" />
-                Payment Information
-              </h3>
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                padding: '12px',
-                background: '#f8f9fa',
-                borderRadius: '8px'
-              }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>{orderDetails.paymentMethod}</span>
-                <span className="status-pill" style={{ background: '#e8f5e9', color: '#2e7d32' }}>
-                  <Check size={16} />
-                  Paid
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+      
 
         {/* Order Items */}
-        <div className="card fade-in-up" style={{ animationDelay: '0.5s' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>
-            Order Items
-          </h2>
-          
-          {orderDetails.items.map((item, index) => (
-            <div key={item.id} style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '16px',
-              borderBottom: index < orderDetails.items.length - 1 ? '1px solid #f0f0f0' : 'none',
-              gap: '16px'
-            }}>
-              <img 
-                src={item.image} 
-                alt={item.name}
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  border: '1px solid #e0e0e0'
-                }}
-              />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '16px', fontWeight: '600', color: '#333', marginBottom: '4px' }}>
-                  {item.name}
-                </p>
-                <p style={{ fontSize: '14px', color: '#888' }}>
-                  Quantity: {item.quantity}
-                </p>
-              </div>
-              <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
-                ₹{(item.price * item.quantity).toFixed(2)}
-              </p>
-            </div>
-          ))}
-
-          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '2px solid #f0f0f0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '15px', color: '#666' }}>Subtotal</span>
-              <span style={{ fontSize: '15px', color: '#333' }}>₹{orderDetails.subtotal.toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <span style={{ fontSize: '15px', color: '#666' }}>Shipping</span>
-              <span style={{ fontSize: '15px', color: '#333' }}>₹{orderDetails.shipping.toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '16px', borderTop: '2px solid #f0f0f0' }}>
-              <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>Total</span>
-              <span style={{ fontSize: '22px', fontWeight: 'bold', color: '#f33' }}>
-                ₹{orderDetails.total.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
+       
 
         {/* Action Buttons */}
         <div className="fade-in-up" style={{ 
@@ -450,10 +212,10 @@ const OrderConfirmationPage = () => {
           animationDelay: '0.6s',
           flexWrap: 'wrap'
         }}>
-          <button className="btn-primary" onClick={() => window.location.href = '/orders'}>
+          {/* <button className="btn-primary" onClick={() => window.location.href = '/orders'}>
             <Package size={20} />
             View My Orders
-          </button>
+          </button> */}
           <button className="btn-secondary" onClick={() => window.location.href = '/'}>
             Continue Shopping
           </button>
