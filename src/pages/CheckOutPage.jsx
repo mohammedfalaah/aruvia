@@ -184,8 +184,8 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
       // Redirect to order confirmation page
       // Your webhook will update the order status in the background
       setTimeout(() => {
-        window.location.href = '/order-confirmation';
-      }, 2000);
+            navigate('/order-confirmation');
+          }, 2000);
     },
     prefill: {
       name: `${formData.firstName} ${formData.lastName}`,
@@ -324,9 +324,9 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
         setOrderLoading(false);
         
         // Optional: Redirect to order confirmation page after delay
-        setTimeout(() => {
-           window.location.href = '/order-confirmation';
-        }, 2000);
+       setTimeout(() => {
+            navigate('/order-confirmation');
+          }, 2000);
       }
     } else {
       throw new Error(response.data.message || 'Failed to place order');
