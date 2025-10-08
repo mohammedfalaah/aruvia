@@ -241,7 +241,7 @@ const OrderConfirmationPage = () => {
             If you have any questions about your order, feel free to contact us.
           </p>
           <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="mailto:support@aruvia.com" style={{ 
+            <a href="mailto:aruviaproducts@gmail.com" style={{ 
               color: '#f33', 
               textDecoration: 'none',
               fontSize: '14px',
