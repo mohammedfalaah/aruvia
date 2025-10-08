@@ -577,7 +577,7 @@ const ProductPage = () => {
                                         <strong>Delivery:</strong> 3-7 Business Days
                                     </li>
                                     <li style={{ marginBottom: '5px' }}>
-                                        <strong>Shipping:</strong> Free above ₹200
+                                        <strong>Shipping:</strong> Free above ₹100
                                     </li>
                                    
                                 </ul>
