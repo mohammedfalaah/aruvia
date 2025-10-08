@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { contextData } from '../services/Context';
 import WhatsappChat from '../utils/WhatsappChat';
 import axios from 'axios';
+import SEO from '../services/SEO';
 
 const ProductPage = () => {
     const { id } = useParams();
@@ -193,6 +194,16 @@ const ProductPage = () => {
 
     return (
         <div className="product-page">
+             {product && (
+        <SEO
+          title={product.name}
+          description={`Buy ${product.name} - ${product.description}. Premium quality herbal products at Aruvia Herbals.`}
+          keywords={`${product.name}, herbal products, ${product.category}, organic herbs`}
+          image={product.image}
+          url={`https://aruviaherbals.com/product/${id}`}
+          type="product"
+        />
+      )}
             {/* Breadcrumb */}
             <div className="container" style={{ paddingTop: '20px' }}>
                 <nav aria-label="breadcrumb">

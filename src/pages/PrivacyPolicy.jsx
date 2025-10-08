@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import SEO from '../services/SEO';
 
 const PrivacyPolicy = () => {
 
@@ -12,6 +13,11 @@ const PrivacyPolicy = () => {
 
   return (
    <div className="container container-content">
+    <SEO
+  title="Privacy Policy"
+  description="Read our privacy policy to understand how Aruvia Herbals protects your personal information."
+  url="https://aruviaherbals.com/privacy-policy"
+/>
       <div className="row">
         <div className="col-xs-12 col-sm-12 col-md-12">
           <div className="zoa-product pad4">

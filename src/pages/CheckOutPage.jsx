@@ -3,6 +3,7 @@ import axios from 'axios';
 import { contextData } from '../services/Context';
 import { show_toast } from '../utils/Toast';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../services/SEO';
 
 const CheckOutPage = () => {
     const navigate = useNavigate();
@@ -353,6 +354,11 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
 
   return (
     <div>
+      <SEO
+  title="Checkout"
+  description="Complete your purchase securely at Aruvia Herbals. Fast delivery and secure payment options available."
+  url="https://aruviaherbals.com/checkout"
+/>
       <style jsx>{`
         .error-input {
           border: 1px solid #f33 !important;

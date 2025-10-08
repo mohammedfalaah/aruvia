@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
 import WhatsappChat from '../utils/WhatsappChat';
+import SEO from '../services/SEO';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -313,7 +314,15 @@ const Home = () => {
     );
 
     return (
+        
         <div>
+             <SEO 
+        title="Premium Herbal Products"
+        description="Discover Aruvia Herbals - Your trusted source for 100% natural, organic herbal products. Shop premium quality herbs, supplements, and wellness products."
+        keywords="herbal products, organic herbs, natural supplements, ayurvedic products, wellness, herbal remedies"
+        url="https://aruviaherbals.com"
+        type="website"
+      />
             <div className="wrappage">
                 <div className="container container-content">
                     <div className="collection-slide">

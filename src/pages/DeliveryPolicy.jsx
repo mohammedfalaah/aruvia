@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import SEO from '../services/SEO';
 
 const DeliveryPolicy = () => {
 
@@ -12,6 +13,11 @@ const DeliveryPolicy = () => {
 
   return (
    <div className="container container-content">
+    <SEO
+  title="Delivery Policy"
+  description="Fast and reliable delivery of herbal products across India. Learn about our delivery process."
+  url="https://aruviaherbals.com/delivery-policy"
+/>
       <div className="row">
         <div className="col-xs-12 col-sm-12 col-md-12">
           <div className="zoa-product pad4">

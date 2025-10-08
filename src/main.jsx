@@ -6,9 +6,11 @@ import Footer from "./layouts/Footer.jsx";
 import Header from "./layouts/Header.jsx";
 import { Context_provider } from "./services/Context.jsx";
 import { Toaster } from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
+  <HelmetProvider> 
     <Context_provider>
       <Header /> 
       <App />
@@ -57,6 +59,6 @@ createRoot(document.getElementById("root")).render(
             }}
           />
     </Context_provider>
-    
+        </HelmetProvider>
   </BrowserRouter>
 );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, Package, Truck, Mail, Phone, MapPin, Calendar, CreditCard } from 'lucide-react';
+import SEO from '../services/SEO';
 
 const OrderConfirmationPage = () => {
   const [showConfetti, setShowConfetti] = useState(true);
@@ -18,6 +19,11 @@ const OrderConfirmationPage = () => {
       padding: '40px 20px',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
     }}>
+      <SEO
+  title="Order Confirmed"
+  description="Thank you for your order! Your herbal products will be delivered soon."
+  url="https://aruviaherbals.com/order-confirmation"
+/>
       {/* Confetti Effect */}
       {showConfetti && (
         <div style={{

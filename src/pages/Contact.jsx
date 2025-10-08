@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import SEO from '../services/SEO';
 
 const Contact = () => {
 
@@ -12,6 +13,12 @@ const Contact = () => {
 
   return (
     <div>
+      <SEO
+  title="Contact Us"
+  description="Get in touch with Aruvia Herbals. We're here to help with any questions about our herbal products."
+  keywords="contact, customer support, herbal products help"
+  url="https://aruviaherbals.com/contact-us"
+/>
         <div className="container container-content">
       <div className="row">
         <div className="col-xs-12 col-sm-12 col-md-12">

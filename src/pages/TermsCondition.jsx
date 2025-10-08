@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import SEO from '../services/SEO';
 
 const TermsCondition = () => {
 
@@ -12,6 +13,11 @@ const TermsCondition = () => {
 
   return (
     <div>
+      <SEO 
+  title="Terms and Conditions"
+  description="Review the terms and conditions for purchasing from Aruvia Herbals."
+  url="https://aruviaherbals.com/terms-and-conditions"
+/>
         <div className="container container-content">
       <div className="row">
         <div className="col-xs-12 col-sm-12 col-md-12">

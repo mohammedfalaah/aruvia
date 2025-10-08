@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { contextData } from '../services/Context';
 import { Link } from 'react-router-dom';
+import SEO from '../services/SEO';
 
 const ProductDetails = ({ product, isOpen, onClose }) => {
     const [selectedImage, setSelectedImage] = useState(0);
@@ -84,6 +85,14 @@ const ProductDetails = ({ product, isOpen, onClose }) => {
 
     return (
         <div className="product-modal-backdrop" onClick={handleBackdropClick}>
+            <SEO 
+  title={product.name}
+  description={`Buy ${product.name} - ${product.description}. Premium quality herbal products delivered to your door.`}
+  keywords={`${product.name}, ${product.category}, herbal products, organic`}
+  image={product.image}
+  url={`https://aruviaherbals.com/product/${product._id}`}
+  type="product"
+/>
             <div className="product-modal-container">
                 <div className="product-modal-content">
                     {/* Close Button */}

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import SEO from '../services/SEO';
 
 const Refund = () => {
 
@@ -12,6 +13,11 @@ const Refund = () => {
 
   return (
     <div>
+      <SEO
+  title="Cancellation & Refund Policy"
+  description="Learn about our hassle-free cancellation and refund policy at Aruvia Herbals."
+  url="https://aruviaherbals.com/cancellation-refund"
+/>
         <div className="container container-content">
       <div className="row">
         <div className="col-xs-12 col-sm-12 col-md-12">
