@@ -127,7 +127,7 @@ const CheckOutPage = () => {
   const getShippingCost = () => {
     switch (shippingOption) {
      
-      default: return 0;
+      default: return 50;
     }
   };
 
