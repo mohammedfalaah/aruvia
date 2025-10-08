@@ -6,7 +6,6 @@ Allow: /
 # Block checkout and user-specific pages
 Disallow: /checkout
 Disallow: /cart
-Disallow: /order-confirmation
 Disallow: /admin
 
 # Sitemap location
