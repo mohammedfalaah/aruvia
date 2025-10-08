@@ -152,6 +152,8 @@ const CheckOutPage = () => {
 
   // Handle Razorpay payment
   // Fixed handleRazorpayPayment function
+// Updated handleRazorpayPayment function for webhook-based verification
+
 const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
   const scriptLoaded = await loadRazorpayScript();
   
@@ -169,73 +171,21 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
     description: 'Order Payment',
     order_id: razorpayOrderId,
     handler: async function (response) {
-      console.log('Razorpay Response:', response);
-      console.log('Order Data passed to payment:', orderData);
+      console.log('Razorpay Payment Response:', response);
       
-      try {
-        // The correct order ID should come from your order creation response
-        // Check what your backend actually returns in the order creation API
-        const mongoOrderId = orderData._id || orderData.id || orderData.orderId;
-        
-        console.log('MongoDB Order ID:', mongoOrderId);
-        console.log('Razorpay Order ID:', response.razorpay_order_id);
-        
-        if (!mongoOrderId) {
-          throw new Error('Order ID not found in order data');
-        }
-
-        const verificationData = {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          orderId: mongoOrderId  // Use the MongoDB ObjectId, not Razorpay order ID
-        };
-
-        console.log('Sending verification data:', verificationData);
-
-        const token = localStorage.getItem("token");
-        
-        const verifyResponse = await axios.post(
-          'https://aruvia-backend-rho.vercel.app/api/order/verifyPayment',
-          verificationData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              ...(token && { 'Authorization': `Bearer ${token}` })
-            }
-          }
-        );
-
-        console.log('Verification response:', verifyResponse.data);
-
-        if (verifyResponse.data.success) {
-          setOrderSuccess(true);
-          setOrderError('');
-          await clearCart();
-          show_toast('Payment successful! Your order has been placed.', true);
-          
-          setTimeout(() => {
-             window.location.href = '/order-confirmation';
-          }, 2000);
-        } else {
-          throw new Error(verifyResponse.data.message || 'Payment verification failed');
-        }
-      } catch (error) {
-        console.error('Payment verification error:', error);
-        console.error('Error details:', error.response?.data);
-        
-        let errorMessage = 'Payment verification failed. Please contact support.';
-        if (error.response?.data?.message) {
-          errorMessage = error.response.data.message;
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
-        
-        setOrderError(errorMessage);
-        show_toast(`Error: ${errorMessage}`, false);
-      } finally {
-        setOrderLoading(false);
-      }
+      // Payment completed - webhook will handle verification
+      // Just show success message and redirect
+      setOrderSuccess(true);
+      setOrderError('');
+      await clearCart();
+      show_toast('Payment successful! Processing your order...', true);
+      setOrderLoading(false);
+      
+      // Redirect to order confirmation page
+      // Your webhook will update the order status in the background
+      setTimeout(() => {
+        window.location.href = '/order-confirmation';
+      }, 2000);
     },
     prefill: {
       name: `${formData.firstName} ${formData.lastName}`,
@@ -254,11 +204,28 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
       ondismiss: function() {
         console.log('Payment modal closed by user');
         setOrderLoading(false);
+        show_toast('Payment cancelled', false);
+      },
+      // Handle payment errors
+      onerror: function(error) {
+        console.error('Payment error:', error);
+        setOrderLoading(false);
+        setOrderError('Payment failed. Please try again.');
+        show_toast('Payment failed. Please try again.', false);
       }
     }
   };
 
   const razorpay = new window.Razorpay(options);
+  
+  // Handle payment failure
+  razorpay.on('payment.failed', function (response) {
+    console.error('Payment failed:', response.error);
+    setOrderLoading(false);
+    setOrderError(`Payment failed: ${response.error.description}`);
+    show_toast(`Payment failed: ${response.error.description}`, false);
+  });
+
   razorpay.open();
 };
 
