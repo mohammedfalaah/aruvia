@@ -5,6 +5,7 @@ import { useContext } from 'react';
 import { contextData } from '../services/Context'; 
 import WhatsappChat from '../utils/WhatsappChat';
 import SEO from '../services/SEO';
+import { createUniqueSlug } from '../utils/slugHelper';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -64,10 +65,13 @@ const Home = () => {
         return item ? item.quantity : 0;
     };
 
-    // Handle product click - navigate to product page
+    // Handle product click - navigate to product page with slug
     const handleProductClick = (product) => {
-        // Navigate to product detail page with product ID
-        navigate(`/product/${product._id}`, { 
+        // Create slug from product name and ID
+        const slug = createUniqueSlug(product.name, product._id);
+        
+        // Navigate to product detail page with slug
+        navigate(`/product/${slug}`, { 
             state: { product } // Pass product data as state (optional)
         });
     };
@@ -485,11 +489,6 @@ const Home = () => {
                                         </div>
                                     ))}
                                 </div>
-                                {/* <div className="text-center">
-                                    <a href="#" className="zoa-btn btn-loadmore">
-                                        Load more
-                                    </a>
-                                </div> */}
                             </>
                         )}
                     </div>
@@ -624,6 +623,7 @@ const Home = () => {
                 </div>
             </div>
 
+            {/* Rest of the component remains the same */}
             <div className="container container-content">
                 <div className="zoa-instagram">
                     <div className="insta-title2 text-center">
@@ -646,7 +646,7 @@ const Home = () => {
                             maxHeight: '600px',
                             objectFit: 'cover'
                         }}
-                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                        poster="/assets/images/video-thumbnail.jpg"
                     >
                         <source src="/assets/videos/instagram-reel1.mp4" type="video/mp4" />
                         <source src="/assets/videos/instagram-reel1.webm" type="video/webm" />
@@ -669,7 +669,7 @@ const Home = () => {
                             maxHeight: '600px',
                             objectFit: 'cover'
                         }}
-                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                        poster="/assets/images/video-thumbnail.jpg"
                     >
                         <source src="/assets/videos/instagram-reel2.mp4" type="video/mp4" />
                         <source src="/assets/videos/instagram-reel2.webm" type="video/webm" />
@@ -691,7 +691,7 @@ const Home = () => {
                             maxHeight: '600px',
                             objectFit: 'cover'
                         }}
-                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                        poster="/assets/images/video-thumbnail.jpg"
                     >
                         <source src="/assets/videos/instagram-reel3.mp4" type="video/mp4" />
                         <source src="/assets/videos/instagram-reel3.webm" type="video/webm" />
@@ -713,15 +713,13 @@ const Home = () => {
                             maxHeight: '600px',
                             objectFit: 'cover'
                         }}
-                        poster="/assets/images/video-thumbnail.jpg" // Optional: Add a thumbnail image
+                        poster="/assets/images/video-thumbnail.jpg"
                     >
                         <source src="/assets/videos/instagram-reel4.mp4" type="video/mp4" />
                         <source src="/assets/videos/instagram-reel4.webm" type="video/webm" />
                         Your browser does not support the video tag.
                     </video>                              </a>
                         </div>
-                        
-                       
                     </div>
                 </div>
             </div>

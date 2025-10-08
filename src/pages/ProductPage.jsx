@@ -4,9 +4,10 @@ import { contextData } from '../services/Context';
 import WhatsappChat from '../utils/WhatsappChat';
 import axios from 'axios';
 import SEO from '../services/SEO';
+import { extractIdFromSlug, createUniqueSlug } from '../utils/slugHelper';
 
 const ProductPage = () => {
-    const { id } = useParams();
+    const { slug } = useParams(); // Changed from 'id' to 'slug'
     const navigate = useNavigate();
     const location = useLocation();
     const [product, setProduct] = useState(null);
@@ -40,22 +41,66 @@ const ProductPage = () => {
 
                 // If product data is passed via navigation state, use it
                 if (location.state?.product) {
-                    setProduct(location.state.product);
-                    setLoading(false);
-                    return;
+                    // Verify the slug matches the product
+                    const expectedSlug = createUniqueSlug(location.state.product.name, location.state.product._id);
+                    if (slug === expectedSlug) {
+                        setProduct(location.state.product);
+                        setLoading(false);
+                        return;
+                    }
                 }
 
-                // Otherwise fetch from API
-                const response = await axios.get(`https://aruvia-backend-rho.vercel.app/api/products/${id}`);
+                // Extract product ID from slug
+                const productId = extractIdFromSlug(slug);
                 
-                if (response.data && response.data.success === "true" && response.data.data) {
-                    setProduct(response.data.data);
-                } else {
+                if (!productId) {
+                    throw new Error('Invalid product URL');
+                }
+
+                // Try to fetch the specific product
+                try {
+                    const response = await axios.get(`https://aruvia-backend-rho.vercel.app/api/products/${productId}`);
+                    
+                    if (response.data && response.data.success === "true" && response.data.data) {
+                        const fetchedProduct = response.data.data;
+                        
+                        // Verify the slug matches
+                        const expectedSlug = createUniqueSlug(fetchedProduct.name, fetchedProduct._id);
+                        if (slug !== expectedSlug) {
+                            // Redirect to correct slug
+                            navigate(`/product/${expectedSlug}`, { replace: true, state: { product: fetchedProduct } });
+                            return;
+                        }
+                        
+                        setProduct(fetchedProduct);
+                    } else {
+                        throw new Error('Product not found');
+                    }
+                } catch (singleProductError) {
                     // If single product API doesn't work, fetch all products and find the one we need
+                    console.log('Trying to fetch from all products...');
                     const allProductsResponse = await axios.get('https://aruvia-backend-rho.vercel.app/api/products');
+                    
                     if (allProductsResponse.data && allProductsResponse.data.success === "true" && allProductsResponse.data.data) {
-                        const foundProduct = allProductsResponse.data.data.find(p => p._id === id);
+                        // First try to match by ID
+                        let foundProduct = allProductsResponse.data.data.find(p => p._id === productId);
+                        
+                        // If not found by ID, try to match by slug
+                        if (!foundProduct) {
+                            foundProduct = allProductsResponse.data.data.find(p => {
+                                const productSlug = createUniqueSlug(p.name, p._id);
+                                return productSlug === slug;
+                            });
+                        }
+                        
                         if (foundProduct) {
+                            // Verify and redirect if slug doesn't match exactly
+                            const expectedSlug = createUniqueSlug(foundProduct.name, foundProduct._id);
+                            if (slug !== expectedSlug) {
+                                navigate(`/product/${expectedSlug}`, { replace: true, state: { product: foundProduct } });
+                                return;
+                            }
+                            
                             setProduct(foundProduct);
                         } else {
                             throw new Error('Product not found');
@@ -72,10 +117,10 @@ const ProductPage = () => {
             }
         };
 
-        if (id) {
+        if (slug) {
             fetchProduct();
         }
-    }, [id, location.state]);
+    }, [slug, location.state, navigate]);
 
     // Scroll to top when component mounts
     useEffect(() => {
@@ -84,7 +129,8 @@ const ProductPage = () => {
 
     // Get current cart quantity for this product
     const getCurrentCartQuantity = () => {
-        const cartItem = cartItems.find(item => item._id === id || item.productId === id);
+        if (!product) return 0;
+        const cartItem = cartItems.find(item => item._id === product._id || item.productId === product._id);
         return cartItem ? cartItem.quantity : 0;
     };
 
@@ -189,7 +235,6 @@ const ProductPage = () => {
     // Mock additional images (you can replace with actual product images if available)
     const productImages = [
         product.image,
-       
     ];
 
     return (
@@ -200,7 +245,7 @@ const ProductPage = () => {
           description={`Buy ${product.name} - ${product.description}. Premium quality herbal products at Aruvia Herbals.`}
           keywords={`${product.name}, herbal products, ${product.category}, organic herbs`}
           image={product.image}
-          url={`https://aruviaherbals.com/product/${id}`}
+          url={`https://aruviaherbals.com/product/${slug}`}
           type="product"
         />
       )}
