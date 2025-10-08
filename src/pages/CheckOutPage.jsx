@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { contextData } from '../services/Context';
 import { show_toast } from '../utils/Toast';
+import { useNavigate } from 'react-router-dom';
 
 const CheckOutPage = () => {
+    const navigate = useNavigate();
   const { 
     cartItems, 
     getCartTotal, 
