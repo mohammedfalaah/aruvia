@@ -105,15 +105,28 @@ const AllProductsPage = () => {
     };
 
     const handleAddToCart = async (productId, event) => {
+        console.log('Add to cart clicked on products page:', productId);
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
         
+        setLoading(true);
+        
         try {
-            await addToCart(productId, 1);
+            const product = products.find(p => p._id === productId);
+            if (!product) {
+                console.error('Product not found:', productId);
+                setLoading(false);
+                return;
+            }
+            console.log('Adding product to cart:', product.name);
+            await addToCart(productId, product, 1);
+            console.log('Product added to cart successfully');
         } catch (error) {
             console.error('Error adding to cart:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -264,10 +277,9 @@ const AllProductsPage = () => {
                                     <div 
                                         key={product._id}
                                         className="product-card"
-                                        onClick={() => handleProductClick(product)}
                                         style={{ animationDelay: `${index * 0.1}s` }}
                                     >
-                                        <div className="product-image">
+                                        <div className="product-image" onClick={() => handleProductClick(product)}>
                                             <img 
                                                 src={product.image || "/assets/img/home9/product1.png"} 
                                                 alt={product.name}
@@ -275,12 +287,25 @@ const AllProductsPage = () => {
                                             />
                                             <div className="product-overlay">
                                                 <button 
-                                                    onClick={(e) => handleAddToCart(product._id, e)}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleAddToCart(product._id, e);
+                                                    }}
                                                     className="add-to-cart-btn"
+                                                    title="Add to Cart"
                                                 >
                                                     <ShoppingCart size={20} />
                                                 </button>
-                                                <button className="quick-view-btn">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleProductClick(product);
+                                                    }}
+                                                    className="quick-view-btn"
+                                                    title="View Product"
+                                                >
                                                     <Eye size={20} />
                                                 </button>
                                             </div>
