@@ -6,6 +6,7 @@ import { contextData } from '../services/Context';
 import WhatsappChat from '../utils/WhatsappChat';
 import SEO from '../services/SEO';
 import { createUniqueSlug } from '../utils/slugHelper';
+import { ShoppingCart, Eye, Heart, Star, TrendingUp, Leaf, Award, Shield } from 'lucide-react';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -16,48 +17,19 @@ const Home = () => {
         addToCart, 
         fetchCartItems, 
         notification, 
-        getCartItemCount,
         cartItems 
     } = useContext(contextData);
     const [loading, setLoading] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
     const [isRetrying, setIsRetrying] = useState(false);
 
-     useEffect(() => {
-          window.scrollTo({
+    useEffect(() => {
+        window.scrollTo({
             top: 0,
             left: 0,
             behavior: 'smooth'
-          });
-        }, []);
-
-    // Custom smooth scroll function with faster speed
-    const smoothScrollTo = (elementId, duration = 600) => {
-        const target = document.getElementById(elementId);
-        if (!target) return;
-        
-        const targetPosition = target.offsetTop;
-        const startPosition = window.pageYOffset;
-        const distance = targetPosition - startPosition;
-        let startTime = null;
-        
-        const animation = (currentTime) => {
-            if (startTime === null) startTime = currentTime;
-            const timeElapsed = currentTime - startTime;
-            const run = ease(timeElapsed, startPosition, distance, duration);
-            window.scrollTo(0, run);
-            if (timeElapsed < duration) requestAnimationFrame(animation);
-        };
-        
-        const ease = (t, b, c, d) => {
-            t /= d / 2;
-            if (t < 1) return c / 2 * t * t + b;
-            t--;
-            return -c / 2 * (t * (t - 2) - 1) + b;
-        };
-        
-        requestAnimationFrame(animation);
-    };
+        });
+    }, []);
 
     // Get item count for a specific product
     const getProductCartCount = (productId) => {
@@ -65,74 +37,52 @@ const Home = () => {
         return item ? item.quantity : 0;
     };
 
-    // Handle product click - navigate to product page with slug
+    // Handle product click
     const handleProductClick = (product) => {
-        // Create slug from product name and ID
         const slug = createUniqueSlug(product.name, product._id);
-        
-        // Navigate to product detail page with slug
-        navigate(`/product/${slug}`, { 
-            state: { product } // Pass product data as state (optional)
-        });
-    };
-
-    // Handle quick view click - navigate to product page
-    const handleQuickView = (product) => {
-        handleProductClick(product);
+        navigate(`/product/${slug}`, { state: { product } });
     };
 
     // Configure axios with timeout
     const apiClient = axios.create({
-        timeout: 15000, // 15 seconds timeout
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        timeout: 15000,
+        headers: { 'Content-Type': 'application/json' }
     });
 
-    // Memoized fetch function to prevent unnecessary re-renders
+    // Fetch products
     const fetchProducts = useCallback(async (attempt = 1, maxAttempts = 3) => {
         try {
             setLoading(true);
             setError(null);
             if (attempt > 1) setIsRetrying(true);
             
-            console.log(`Fetching products... Attempt ${attempt}/${maxAttempts}`);
-            
             const response = await apiClient.get('https://aruvia-backend-rho.vercel.app/api/products');
             
-            // Check if response structure is correct
             if (response.data && response.data.success === "true" && response.data.data) {
                 setProducts(response.data.data);
                 setRetryCount(0);
                 setIsRetrying(false);
-                console.log(`Successfully fetched ${response.data.data.length} products`);
             } else {
                 throw new Error(response.data?.message || "Invalid response structure");
             }
             
         } catch (error) {
-            console.error(`Attempt ${attempt} failed:`, error.message);
-            
-            // Determine if we should retry
             const shouldRetry = attempt < maxAttempts && (
-                error.code === 'ECONNABORTED' || // Timeout
+                error.code === 'ECONNABORTED' ||
                 error.code === 'NETWORK_ERROR' ||
-                error.response?.status >= 500 || // Server errors
-                !error.response // Network issues
+                error.response?.status >= 500 ||
+                !error.response
             );
             
             if (shouldRetry) {
-                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // Exponential backoff (max 10s)
-                console.log(`Retrying in ${delay}ms...`);
-                
+                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
                 setTimeout(() => {
                     setRetryCount(attempt);
                     fetchProducts(attempt + 1, maxAttempts);
                 }, delay);
             } else {
-                // Final failure
                 setError(error.response?.data?.message || error.message || 'Failed to fetch products');
-                setProducts([]); // Set empty array as fallback
+                setProducts([]);
                 setIsRetrying(false);
             }
         } finally {
@@ -140,81 +90,21 @@ const Home = () => {
         }
     }, []);
 
-    // Manual retry function
     const handleManualRetry = () => {
         setRetryCount(0);
         fetchProducts();
     };
 
-    const handleBannerClick = (e) => {
-        console.log('Banner clicked!');
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const target = document.getElementById('future-product');
-        if (target) {
-            smoothScrollTo('future-product', 600);
-            setTimeout(() => {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-        }
-    };
-
-    // Enhanced useEffect with retry logic
     useEffect(() => {
-        let retryTimer;
-        
         const initializeData = async () => {
-            // Initial fetch
             await fetchProducts();
-            
-            // Also fetch cart items
-            if (fetchCartItems) {
-                fetchCartItems();
-            }
-            
-            // If products didn't load and no error, retry after 3 seconds
-            setTimeout(() => {
-                if (products.length === 0 && !loading && !error) {
-                    console.log('Products not loaded, retrying...');
-                    fetchProducts();
-                }
-            }, 3000);
+            if (fetchCartItems) fetchCartItems();
         };
-
         initializeData();
+    }, []);
 
-        // Cleanup function
-        return () => {
-            if (retryTimer) {
-                clearTimeout(retryTimer);
-            }
-        };
-    }, []); // Empty dependency array for initial load only
-
-    // Additional useEffect to monitor products array and retry if needed
-    useEffect(() => {
-        let retryTimer;
-        
-        // Only retry if we're not currently loading, have no products, no error, and haven't exceeded retry attempts
-        if (!loading && !isRetrying && products.length === 0 && !error && retryCount < 2) {
-            console.log('Products still empty, scheduling retry...');
-            retryTimer = setTimeout(() => {
-                console.log('Auto-retrying due to empty products...');
-                fetchProducts(retryCount + 1, 3);
-            }, 5000); // Wait 5 seconds before auto-retry
-        }
-
-        return () => {
-            if (retryTimer) {
-                clearTimeout(retryTimer);
-            }
-        };
-    }, [products.length, loading, isRetrying, error, retryCount, fetchProducts]);
-
-    // Handle add to cart click
+    // Handle add to cart
     const handleAddToCart = async (productId, event) => {
-        // Prevent event bubbling to avoid navigating to product page
         if (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -224,21 +114,11 @@ const Home = () => {
         
         try {
             const product = products.find(p => p._id === productId);
-            
             if (!product) {
-                console.error("Product not found");
                 setLoading(false);
                 return;
             }
-
-            const result = await addToCart(productId, product, 1);
-            
-            if (result.success) {
-                console.log(`${product.name} added to cart successfully!`);
-            } else {
-                console.log("Failed to add product:", result.message);
-            }
-            
+            await addToCart(productId, product, 1);
         } catch (error) {
             console.error("Error adding to cart:", error);
         } finally {
@@ -246,553 +126,781 @@ const Home = () => {
         }
     };
 
-    // Loading state component
-    const LoadingSpinner = () => (
-        <div className="text-center" style={{ padding: '50px 0' }}>
-            <div style={{ 
-                display: 'inline-block', 
-                width: '40px', 
-                height: '40px', 
-                border: '4px solid #f3f3f3',
-                borderTop: '4px solid #333',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-            }}></div>
-            <p style={{ marginTop: '15px', color: '#666' }}>
-                {isRetrying ? `Retrying... (${retryCount}/3)` : 'Loading products...'}
-            </p>
+    return (
+        <div className="modern-home">
+            <SEO 
+                title="Premium Herbal Products"
+                description="Discover Aruvia Herbals - Your trusted source for 100% natural, organic herbal products."
+                keywords="herbal products, organic herbs, natural supplements, ayurvedic products"
+                url="https://aruviaherbals.com"
+                type="website"
+            />
+
+            {/* Hero Section */}
+            <section className="hero-section">
+                <div className="hero-container">
+                    <div className="hero-content">
+                        <div className="hero-badge">
+                            <Leaf size={16} />
+                            <span>100% Natural & Organic</span>
+                        </div>
+                        <h1 className="hero-title">
+                            Discover the Power of
+                            <span className="hero-highlight"> Nature</span>
+                        </h1>
+                        <p className="hero-description">
+                            Premium herbal products crafted with care for your wellness journey
+                        </p>
+                        <div className="hero-buttons">
+                            <button 
+                                className="btn-primary"
+                                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                            >
+                                Shop Now
+                            </button>
+                            <Link to="/contact-us" className="btn-secondary">
+                                Learn More
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="hero-image">
+                        <img 
+                            src="/assets/images/banner/Aruvia_banner01.jpg" 
+                            alt="Aruvia Herbals"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Section */}
+            <section className="features-section">
+                <div className="container">
+                    <div className="features-grid">
+                        <div className="feature-card">
+                            <div className="feature-icon">
+                                <Leaf size={32} />
+                            </div>
+                            <h3>100% Natural</h3>
+                            <p>Pure herbal ingredients</p>
+                        </div>
+                        <div className="feature-card">
+                            <div className="feature-icon">
+                                <Award size={32} />
+                            </div>
+                            <h3>Premium Quality</h3>
+                            <p>Certified & tested products</p>
+                        </div>
+                        <div className="feature-card">
+                            <div className="feature-icon">
+                                <Shield size={32} />
+                            </div>
+                            <h3>Safe & Effective</h3>
+                            <p>Trusted by thousands</p>
+                        </div>
+                        <div className="feature-card">
+                            <div className="feature-icon">
+                                <TrendingUp size={32} />
+                            </div>
+                            <h3>Fast Delivery</h3>
+                            <p>Quick & secure shipping</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Products Section */}
+            <section id="products" className="products-section">
+                <div className="container">
+                    <div className="section-header">
+                        <h2 className="section-title">Featured Products</h2>
+                        <p className="section-subtitle">Handpicked natural remedies for your wellness</p>
+                    </div>
+
+                    {loading && products.length === 0 && (
+                        <div className="loading-state">
+                            <div className="spinner"></div>
+                            <p>{isRetrying ? `Retrying... (${retryCount}/3)` : 'Loading products...'}</p>
+                        </div>
+                    )}
+
+                    {error && !loading && (
+                        <div className="error-state">
+                            <div className="error-icon">⚠️</div>
+                            <h4>Failed to Load Products</h4>
+                            <p>{error}</p>
+                            <button onClick={handleManualRetry} className="btn-retry">
+                                Try Again
+                            </button>
+                        </div>
+                    )}
+
+                    {!loading && !error && products.length === 0 && (
+                        <div className="empty-state">
+                            <div className="empty-icon">📦</div>
+                            <h4>No Products Found</h4>
+                            <button onClick={handleManualRetry} className="btn-retry">
+                                Refresh Products
+                            </button>
+                        </div>
+                    )}
+
+                    {products.length > 0 && (
+                        <div className="products-grid">
+                            {products.map((product) => (
+                                <div key={product._id} className="product-card">
+                                    <div className="product-image-wrapper">
+                                        <img
+                                            src={product.image}
+                                            alt={product.name}
+                                            className="product-image"
+                                            onClick={() => handleProductClick(product)}
+                                        />
+                                        <div className="product-overlay">
+                                            <button
+                                                className="overlay-btn"
+                                                onClick={() => handleProductClick(product)}
+                                                title="Quick View"
+                                            >
+                                                <Eye size={20} />
+                                            </button>
+                                            <button
+                                                className="overlay-btn"
+                                                onClick={(e) => handleAddToCart(product._id, e)}
+                                                title="Add to Cart"
+                                                disabled={loading}
+                                            >
+                                                <ShoppingCart size={20} />
+                                                {getProductCartCount(product._id) > 0 && (
+                                                    <span className="cart-badge">
+                                                        {getProductCartCount(product._id)}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        </div>
+                                        {product.discount && (
+                                            <div className="product-badge">-{product.discount}%</div>
+                                        )}
+                                    </div>
+                                    <div className="product-info">
+                                        <h3 
+                                            className="product-name"
+                                            onClick={() => handleProductClick(product)}
+                                        >
+                                            {product.name}
+                                        </h3>
+                                        <div className="product-rating">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} size={14} fill="#ffc107" color="#ffc107" />
+                                            ))}
+                                            <span>(4.8)</span>
+                                        </div>
+                                        <div className="product-price">
+                                            <span className="current-price">₹{product.price}</span>
+                                            {product.originalPrice && (
+                                                <span className="original-price">₹{product.originalPrice}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Instagram Section */}
+            <section className="instagram-section">
+                <div className="container">
+                    <div className="section-header">
+                        <h2 className="section-title">Follow Us on Instagram</h2>
+                        <p className="section-subtitle">@aruviaherbals</p>
+                    </div>
+                    <div className="instagram-grid">
+                        {[
+                            { url: "https://www.instagram.com/reel/DKkUfvYhzof/", video: "/assets/videos/instagram-reel1.mp4" },
+                            { url: "https://www.instagram.com/reel/DM2Kb_nBvEX/", video: "/assets/videos/instagram-reel2.mp4" },
+                            { url: "https://www.instagram.com/reel/DMcm2T2B7ig/", video: "/assets/videos/instagram-reel3.mp4" },
+                            { url: "https://www.instagram.com/reel/DLAD3vbB2uJ/", video: "/assets/videos/instagram-reel4.mp4" }
+                        ].map((item, index) => (
+                            <a key={index} href={item.url} target="_blank" rel="noopener noreferrer" className="instagram-item">
+                                <video 
+                                    muted
+                                    loop
+                                    playsInline
+                                    className="instagram-video"
+                                >
+                                    <source src={item.video} type="video/mp4" />
+                                </video>
+                                <div className="instagram-overlay">
+                                    <span>View on Instagram</span>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Newsletter Section */}
+            <section className="newsletter-section">
+                <div className="container">
+                    <div className="newsletter-content">
+                        <div className="newsletter-text">
+                            <h2>Get in Touch</h2>
+                            <p>Subscribe for latest stories and promotions</p>
+                        </div>
+                        <div className="newsletter-links">
+                            <h3>Support</h3>
+                            <ul>
+                                <li><Link to="/cancellation-refund">Cancellation & Refund</Link></li>
+                                <li><Link to="/delivery-policy">Shipping & Delivery</Link></li>
+                                <li><Link to="/contact-us">Contact Us</Link></li>
+                                <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+                                <li><Link to="/terms-and-conditions">Terms & Conditions</Link></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <WhatsappChat />
+
             <style jsx>{`
+                .modern-home {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                }
+
+                /* Hero Section */
+                .hero-section {
+                    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                    padding: 80px 20px;
+                    overflow: hidden;
+                }
+
+                .hero-container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 60px;
+                    align-items: center;
+                }
+
+                .hero-content {
+                    animation: fadeInUp 0.8s ease-out;
+                }
+
+                .hero-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: rgba(76, 175, 80, 0.1);
+                    color: #4caf50;
+                    padding: 8px 16px;
+                    border-radius: 50px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    margin-bottom: 20px;
+                }
+
+                .hero-title {
+                    font-size: 56px;
+                    font-weight: 700;
+                    line-height: 1.2;
+                    color: #1a1a1a;
+                    margin-bottom: 20px;
+                }
+
+                .hero-highlight {
+                    color: #4caf50;
+                    position: relative;
+                }
+
+                .hero-description {
+                    font-size: 18px;
+                    color: #666;
+                    margin-bottom: 30px;
+                    line-height: 1.6;
+                }
+
+                .hero-buttons {
+                    display: flex;
+                    gap: 15px;
+                    flex-wrap: wrap;
+                }
+
+                .btn-primary, .btn-secondary {
+                    padding: 14px 32px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    border: none;
+                    text-decoration: none;
+                    display: inline-block;
+                }
+
+                .btn-primary {
+                    background: #4caf50;
+                    color: white;
+                }
+
+                .btn-primary:hover {
+                    background: #45a049;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+                }
+
+                .btn-secondary {
+                    background: white;
+                    color: #4caf50;
+                    border: 2px solid #4caf50;
+                }
+
+                .btn-secondary:hover {
+                    background: #4caf50;
+                    color: white;
+                }
+
+                .hero-image {
+                    position: relative;
+                    animation: fadeInRight 0.8s ease-out;
+                }
+
+                .hero-image img {
+                    width: 100%;
+                    height: auto;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                }
+
+                /* Features Section */
+                .features-section {
+                    padding: 60px 20px;
+                    background: white;
+                }
+
+                .features-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 30px;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .feature-card {
+                    text-align: center;
+                    padding: 30px 20px;
+                    border-radius: 12px;
+                    transition: all 0.3s ease;
+                }
+
+                .feature-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                }
+
+                .feature-icon {
+                    width: 70px;
+                    height: 70px;
+                    margin: 0 auto 20px;
+                    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                }
+
+                .feature-card h3 {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #1a1a1a;
+                    margin-bottom: 10px;
+                }
+
+                .feature-card p {
+                    color: #666;
+                    font-size: 14px;
+                }
+
+                /* Products Section */
+                .products-section {
+                    padding: 80px 20px;
+                    background: #f8f9fa;
+                }
+
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .section-header {
+                    text-align: center;
+                    margin-bottom: 50px;
+                }
+
+                .section-title {
+                    font-size: 42px;
+                    font-weight: 700;
+                    color: #1a1a1a;
+                    margin-bottom: 10px;
+                }
+
+                .section-subtitle {
+                    font-size: 18px;
+                    color: #666;
+                }
+
+                .products-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                    gap: 30px;
+                }
+
+                .product-card {
+                    background: white;
+                    border-radius: 16px;
+                    overflow: hidden;
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                }
+
+                .product-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+                }
+
+                .product-image-wrapper {
+                    position: relative;
+                    overflow: hidden;
+                    aspect-ratio: 1;
+                    background: #f5f5f5;
+                }
+
+                .product-image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.3s ease;
+                }
+
+                .product-card:hover .product-image {
+                    transform: scale(1.1);
+                }
+
+                .product-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 15px;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+
+                .product-card:hover .product-overlay {
+                    opacity: 1;
+                }
+
+                .overlay-btn {
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    background: white;
+                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    position: relative;
+                }
+
+                .overlay-btn:hover {
+                    background: #4caf50;
+                    color: white;
+                    transform: scale(1.1);
+                }
+
+                .cart-badge {
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                    background: #f44336;
+                    color: white;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                }
+
+                .product-badge {
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: #f44336;
+                    color: white;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                }
+
+                .product-info {
+                    padding: 20px;
+                }
+
+                .product-name {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #1a1a1a;
+                    margin-bottom: 10px;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                .product-rating {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-bottom: 10px;
+                }
+
+                .product-rating span {
+                    font-size: 14px;
+                    color: #666;
+                    margin-left: 5px;
+                }
+
+                .product-price {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .current-price {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #4caf50;
+                }
+
+                .original-price {
+                    font-size: 16px;
+                    color: #999;
+                    text-decoration: line-through;
+                }
+
+                /* Instagram Section */
+                .instagram-section {
+                    padding: 80px 20px;
+                    background: white;
+                }
+
+                .instagram-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 20px;
+                }
+
+                .instagram-item {
+                    position: relative;
+                    aspect-ratio: 9/16;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    display: block;
+                }
+
+                .instagram-video {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                .instagram-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.6);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    color: white;
+                    font-weight: 600;
+                }
+
+                .instagram-item:hover .instagram-overlay {
+                    opacity: 1;
+                }
+
+                /* Newsletter Section */
+                .newsletter-section {
+                    padding: 60px 20px;
+                    background: #1a1a1a;
+                    color: white;
+                }
+
+                .newsletter-content {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 60px;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .newsletter-text h2 {
+                    font-size: 36px;
+                    margin-bottom: 10px;
+                }
+
+                .newsletter-text p {
+                    color: #ccc;
+                }
+
+                .newsletter-links h3 {
+                    font-size: 20px;
+                    margin-bottom: 20px;
+                }
+
+                .newsletter-links ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                .newsletter-links li {
+                    margin-bottom: 12px;
+                }
+
+                .newsletter-links a {
+                    color: #ccc;
+                    text-decoration: none;
+                    transition: color 0.3s ease;
+                }
+
+                .newsletter-links a:hover {
+                    color: #4caf50;
+                }
+
+                /* Loading & Error States */
+                .loading-state, .error-state, .empty-state {
+                    text-align: center;
+                    padding: 60px 20px;
+                }
+
+                .spinner {
+                    width: 50px;
+                    height: 50px;
+                    border: 4px solid #f3f3f3;
+                    border-top: 4px solid #4caf50;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                    margin: 0 auto 20px;
+                }
+
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
+
+                .error-icon, .empty-icon {
+                    font-size: 60px;
+                    margin-bottom: 20px;
+                }
+
+                .btn-retry {
+                    margin-top: 20px;
+                    padding: 12px 30px;
+                    background: #4caf50;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-retry:hover {
+                    background: #45a049;
+                    transform: translateY(-2px);
+                }
+
+                /* Animations */
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                @keyframes fadeInRight {
+                    from {
+                        opacity: 0;
+                        transform: translateX(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    .hero-container {
+                        grid-template-columns: 1fr;
+                        gap: 40px;
+                    }
+
+                    .hero-title {
+                        font-size: 36px;
+                    }
+
+                    .hero-description {
+                        font-size: 16px;
+                    }
+
+                    .section-title {
+                        font-size: 32px;
+                    }
+
+                    .features-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .products-grid {
+                        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                        gap: 15px;
+                    }
+
+                    .newsletter-content {
+                        grid-template-columns: 1fr;
+                        gap: 40px;
+                    }
+
+                    .instagram-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
             `}</style>
-        </div>
-    );
-
-    // Error state component
-    const ErrorState = () => (
-        <div className="text-center" style={{ padding: '50px 0' }}>
-            <div style={{ color: '#dc3545', fontSize: '48px', marginBottom: '20px' }}>⚠️</div>
-            <h4 style={{ color: '#dc3545', marginBottom: '15px' }}>Failed to Load Products</h4>
-            <p style={{ color: '#666', marginBottom: '20px' }}>{error}</p>
-            <button 
-                onClick={handleManualRetry}
-                className="zoa-btn"
-                style={{
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 20px',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
-                }}
-                disabled={loading}
-            >
-                {loading ? 'Retrying...' : 'Try Again'}
-            </button>
-        </div>
-    );
-
-    // Empty state component
-    const EmptyState = () => (
-        <div className="text-center" style={{ padding: '50px 0' }}>
-            <div style={{ fontSize: '48px', marginBottom: '20px' }}>📦</div>
-            <h4 style={{ color: '#666', marginBottom: '15px' }}>No Products Found</h4>
-            <p style={{ color: '#999', marginBottom: '20px' }}>We couldn't find any products right now.</p>
-            <button 
-                onClick={handleManualRetry}
-                className="zoa-btn"
-                style={{
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 20px',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
-                }}
-            >
-                Refresh Products
-            </button>
-        </div>
-    );
-
-    return (
-        
-        <div>
-             <SEO 
-        title="Premium Herbal Products"
-        description="Discover Aruvia Herbals - Your trusted source for 100% natural, organic herbal products. Shop premium quality herbs, supplements, and wellness products."
-        keywords="herbal products, organic herbs, natural supplements, ayurvedic products, wellness, herbal remedies"
-        url="https://aruviaherbals.com"
-        type="website"
-      />
-            <div className="wrappage">
-                <div className="container container-content">
-                    <div className="collection-slide">
-                        <div className="row first">
-                            <div className="col-md-9 col-sm-12 col-xs-12">
-                                <div className="js-slider-v2">
-                                    <div className="slide-img">
-                                        <div
-                                            onClick={handleBannerClick}
-                                            style={{ 
-                                                cursor: 'pointer',
-                                                position: 'relative',
-                                                zIndex: 999,
-                                                display: 'block',
-                                                width: '100%',
-                                                height: '100%'
-                                            }}
-                                        >
-                                            <img 
-                                                src="/assets/images/banner/Aruvia_banner01.jpg" 
-                                                alt="Aruvia Banner" 
-                                                className="img-responsive"
-                                                style={{ 
-                                                    cursor: 'pointer',
-                                                    pointerEvents: 'none'
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="box-center slide-content">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-3 col-sm-12 col-xs-12">
-                                <div className="row banner">
-                                    <div className="col-xs-12 col-sm-6 col-md-12">
-                                        <div className="banner-img">
-                                            <a href="#future-product" onClick={(e) => {
-                                                e.preventDefault();
-                                                smoothScrollTo('future-product', 600);
-                                            }} className="effect-img3 plus-zoom">
-                                                <img  src="/assets/images/banner/av02.jpg" alt className="img-responsive" />
-                                            </a>
-                                            <div className="box-center content3">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xs-12 col-sm-6 col-md-12">
-                                        <div className="banner-img">
-                                            <a href="#future-product" onClick={(e) => {
-                                                e.preventDefault();
-                                                smoothScrollTo('future-product', 600);
-                                            }} className="effect-img3 plus-zoom">
-                                                <img src="/assets/images/banner/av03.jpg" alt className="img-responsive" />
-                                            </a>
-                                            <div className="box-center content3">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id='future-product' className="zoa-product pad4">
-                    <h3 className="title text-center">Featured Products</h3>
-                    <div className="container">
-                        {/* Show loading, error, or empty state */}
-                        {loading && products.length === 0 && <LoadingSpinner />}
-                        {error && !loading && <ErrorState />}
-                        {!loading && !error && products.length === 0 && <EmptyState />}
-                        
-                        {/* Show products if available */}
-                        {products.length > 0 && (
-                            <>
-                                <div className="row">
-                                    {products.map((product) => (
-                                        <div
-                                            className="col-xs-6 col-sm-6 col-md-4 col-lg-4 product-item"
-                                            key={product._id}
-                                        >
-                                            <div className="product-img">
-                                                <div 
-                                                    onClick={() => handleProductClick(product)}
-                                                    style={{ cursor: 'pointer' }}
-                                                >
-                                                    <img
-                                                        src={product.image}
-                                                        alt={product.name}
-                                                        className="img-responsive"
-                                                    />
-                                                </div>
-                                                
-                                                {/* Button Group */}
-                                                <div className="product-button-group">
-                                                    <a 
-                                                        className="zoa-btn zoa-quickview"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            handleQuickView(product);
-                                                        }}
-                                                    >
-                                                        <span className="zoa-icon-quick-view" />
-                                                    </a>
-                                                    <a 
-                                                        className="zoa-btn zoa-addcart" 
-                                                        onClick={(e) => handleAddToCart(product._id, e)}
-                                                        style={{ 
-                                                            cursor: loading ? 'not-allowed' : 'pointer',
-                                                            opacity: loading ? 0.6 : 1,
-                                                            position: 'relative'
-                                                        }}
-                                                    >
-                                                        <span className="zoa-icon-cart" />
-                                                        {loading && <span style={{ marginLeft: '5px' }}>...</span>}
-                                                        
-                                                        {/* Cart count badge */}
-                                                        {getProductCartCount(product._id) > 0 && (
-                                                            <span 
-                                                                style={{
-                                                                    position: 'absolute',
-                                                                    top: '-5px',
-                                                                    right: '-5px',
-                                                                    backgroundColor: '#dc3545',
-                                                                    color: 'white',
-                                                                    borderRadius: '50%',
-                                                                    width: '18px',
-                                                                    height: '18px',
-                                                                    fontSize: '10px',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center'
-                                                                }}
-                                                            >
-                                                                {getProductCartCount(product._id)}
-                                                            </span>
-                                                        )}
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="product-info text-center">
-                                                <h3 className="product-title">
-                                                    <a 
-                                                        href="#"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            handleProductClick(product);
-                                                        }}
-                                                    >
-                                                        {product.name}
-                                                    </a>
-                                                </h3>
-                                                <div className="product-price">
-                                                    <span>₹{product.price}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                    
-                    {/* CSS Styles */}
-                    <style jsx>{`
-                        .product-item .product-button-group {
-                            display: flex !important;
-                            opacity: 1 !important;
-                            visibility: visible !important;
-                            position: absolute !important;
-                            bottom: 10px !important;
-                            left: 50% !important;
-                            transform: translateX(-50%) !important;
-                            width: auto !important;
-                            height: auto !important;
-                            justify-content: center !important;
-                            align-items: center !important;
-                            gap: 5px !important;
-                            z-index: 10 !important;
-                        }
-
-                        .product-item .product-button-group .zoa-btn {
-                            opacity: 1 !important;
-                            visibility: visible !important;
-                            transform: translateY(0px) !important;
-                            width: 40px !important;
-                            height: 40px !important;
-                            border-radius: 50% !important;
-                            background-color: rgba(0, 0, 0, 0.8) !important;
-                            color: white !important;
-                            display: flex !important;
-                            align-items: center !important;
-                            justify-content: center !important;
-                            margin: 0 3px !important;
-                            transition: all 0.3s ease !important;
-                        }
-
-                        .product-item .product-button-group .zoa-btn:hover {
-                            background-color: #333 !important;
-                            transform: scale(1.1) !important;
-                        }
-
-                        .product-img > div {
-                            transition: transform 0.3s ease;
-                        }
-
-                        .product-img > div:hover {
-                            transform: scale(1.05);
-                        }
-
-                        .product-title a:hover {
-                            color: #007bff;
-                            text-decoration: none;
-                        }
-
-                        @media (max-width: 767px) {
-                            .product-item {
-                                margin-bottom: 30px !important;
-                                position: relative !important;
-                            }
-                            
-                            .product-item .product-img {
-                                position: relative !important;
-                                overflow: hidden !important;
-                            }
-
-                            .product-item .product-button-group {
-                                bottom: 5px !important;
-                            }
-
-                            .product-item .product-button-group .zoa-btn {
-                                width: 35px !important;
-                                height: 35px !important;
-                                margin: 0 2px !important;
-                            }
-                            
-                            .product-img img {
-                                width: 100% !important;
-                                height: auto !important;
-                            }
-                            
-                            .product-title {
-                                font-size: 14px !important;
-                                margin: 8px 0 5px 0 !important;
-                            }
-                            
-                            .product-price {
-                                font-size: 16px !important;
-                                font-weight: bold !important;
-                                margin-bottom: 8px !important;
-                            }
-                        }
-
-                        @media (min-width: 768px) and (max-width: 1024px) {
-                            .product-item .product-button-group {
-                                bottom: 8px !important;
-                            }
-
-                            .product-item .product-button-group .zoa-btn {
-                                width: 38px !important;
-                                height: 38px !important;
-                            }
-                        }
-
-                        @media (min-width: 1025px) {
-                            .product-item .product-button-group {
-                                opacity: 0 !important;
-                                visibility: hidden !important;
-                                transition: all 0.3s ease !important;
-                            }
-
-                            .product-item:hover .product-button-group {
-                                opacity: 1 !important;
-                                visibility: visible !important;
-                            }
-
-                            .product-item:hover .product-button-group .zoa-btn {
-                                transform: translateY(-10px) !important;
-                            }
-                        }
-
-                        .product-item {
-                            position: relative !important;
-                        }
-
-                        .product-img {
-                            position: relative !important;
-                            overflow: hidden !important;
-                        }
-                    `}</style>
-                </div>
-            </div>
-
-            {/* Rest of the component remains the same */}
-            <div className="container container-content">
-                <div className="zoa-instagram">
-                    <div className="insta-title2 text-center">
-                        <h3>INSTAGRAM</h3>
-                    </div>
-                    <div className="row insta-content">
-                        <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a 
-                            href="https://www.instagram.com/reel/DKkUfvYhzof/?utm_source=ig_web_copy_link&igsh=c2FhOXRxbG45bHlq" target="_blank" rel="noopener noreferrer">
-   <video 
-                        controls
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        style={{
-                            width: '100%',
-                            height: 'auto',
-                            borderRadius: '4px',
-                            maxHeight: '600px',
-                            objectFit: 'cover'
-                        }}
-                        poster="/assets/images/video-thumbnail.jpg"
-                    >
-                        <source src="/assets/videos/instagram-reel1.mp4" type="video/mp4" />
-                        <source src="/assets/videos/instagram-reel1.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video>                            </a>        
-                        </div>
-                        <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a 
-                            href="https://www.instagram.com/reel/DM2Kb_nBvEX/?utm_source=ig_web_copy_link&igsh=MTdsMDd1a292ZWp1bg==">
- <video 
-                        controls
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        style={{
-                            width: '100%',
-                            height: 'auto',
-                            borderRadius: '4px',
-                            maxHeight: '600px',
-                            objectFit: 'cover'
-                        }}
-                        poster="/assets/images/video-thumbnail.jpg"
-                    >
-                        <source src="/assets/videos/instagram-reel2.mp4" type="video/mp4" />
-                        <source src="/assets/videos/instagram-reel2.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video>                             </a>
-                        </div>
-                        <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="https://www.instagram.com/reel/DMcm2T2B7ig/?utm_source=ig_web_copy_link&igsh=MWx5ZnZxcXd6OTcwcA==">
- <video 
-                        controls
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        style={{
-                            width: '100%',
-                            height: 'auto',
-                            borderRadius: '4px',
-                            maxHeight: '600px',
-                            objectFit: 'cover'
-                        }}
-                        poster="/assets/images/video-thumbnail.jpg"
-                    >
-                        <source src="/assets/videos/instagram-reel3.mp4" type="video/mp4" />
-                        <source src="/assets/videos/instagram-reel3.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video>                              </a>
-                        </div>
-                        <div className="col-md-3 col-sm-5 col-xs-7">
-                            <a href="https://www.instagram.com/reel/DLAD3vbB2uJ/?utm_source=ig_web_copy_link&igsh=ZjdyZ2JnaHM4cnd4">
- <video 
-                        controls
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        style={{
-                            width: '100%',
-                            height: 'auto',
-                            borderRadius: '4px',
-                            maxHeight: '600px',
-                            objectFit: 'cover'
-                        }}
-                        poster="/assets/images/video-thumbnail.jpg"
-                    >
-                        <source src="/assets/videos/instagram-reel4.mp4" type="video/mp4" />
-                        <source src="/assets/videos/instagram-reel4.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video>                              </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <WhatsappChat />
-
-            <div className="newsletter v3">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-md-6 col-sm-6 col-xs-12">
-                            <div className="newsletter-heading">
-                                <h3>get in touch</h3>
-                                <p>Subscribe for latest stories and promotions (35% sale)</p>
-                            </div>
-                           
-                        </div>
-                        <div className="col-md-6 col-sm-6 col-xs-12">
-                            <div className="newsletter-flex">
-                                <div className="newsletter-flex">
-                                    <div className="newsletter-element">
-                                        <h3>Support</h3>
-                                        <ul>
-                                            <li><Link to="/cancellation-refund">Cancellation and Refund</Link></li>
-                                            <li><Link to="/shipping-delivery">Shipping and Delivery</Link></li>
-                                            <li><Link to="/contact-us">Contact Us</Link></li>
-                                            <li><Link to="/privacy-policy">Privacy Policy</Link></li>
-                                            <li><Link to="/terms-and-conditions">Terms and Conditions</Link></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Toast Notification */}
-            {notification && (
-                <div 
-                    style={{
-                        position: 'fixed',
-                        top: '20px',
-                        right: '20px',
-                        backgroundColor: notification.isSuccess ? '#28a745' : '#dc3545',
-                        color: 'white',
-                        padding: '10px 15px',
-                        borderRadius: '5px',
-                        zIndex: 1000,
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-                    }}
-                >
-                    {notification.message}
-                </div>
-            )}
-
-            {/* Retry status indicator */}
-            {isRetrying && (
-                <div 
-                    style={{
-                        position: 'fixed',
-                        bottom: '20px',
-                        left: '20px',
-                        backgroundColor: '#ffc107',
-                        color: '#212529',
-                        padding: '8px 12px',
-                        borderRadius: '5px',
-                        zIndex: 1000,
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                        fontSize: '14px'
-                    }}
-                >
-                    Retrying... ({retryCount}/3)
-                </div>
-            )}
         </div>
     )
 }
