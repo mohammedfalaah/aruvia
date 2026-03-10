@@ -157,123 +157,138 @@ const Header = () => {
             </div>
             {/* end push menu*/}
             
-            {/* Push cart */}
-            <div className={`pushmenu pushmenu-left cart-box-container ${isCartOpen ? "pushmenu-open" : ""}`}>
-                <div className="cart-list">
-                    <div className="cart-list-heading">
-                        <h3 className="cart-title">My cart</h3>
-                        <span onClick={() => setIsCartOpen(false)} className="close-left js-close">
-                            <i className="ion-ios-close-empty" />
-                        </span>
+            {/* Modern Cart Sidebar */}
+            <div className={`modern-cart-sidebar ${isCartOpen ? "cart-open" : ""}`}>
+                <div className="cart-backdrop" onClick={() => setIsCartOpen(false)}></div>
+                <div className="cart-panel">
+                    {/* Modern Cart Header */}
+                    <div className="cart-header-modern">
+                        <div className="cart-title-section">
+                            <h2 className="cart-title-modern">My Cart</h2>
+                            <span className="cart-count-modern">({cartItems?.length || 0} items)</span>
+                        </div>
+                        <button 
+                            onClick={() => setIsCartOpen(false)} 
+                            className="cart-close-modern"
+                            aria-label="Close Cart"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
-                    <div className="cart-inside">
-                         {cartItems && cartItems.length > 0 ? (
+
+                    {/* Cart Content */}
+                    <div className="cart-content-modern">
+                        {cartItems && cartItems.length > 0 ? (
                             <>
-                                <ul className="list">
+                                {/* Cart Items */}
+                                <div className="cart-items-modern">
                                     {cartItems.map((item) => (
-                                        <li key={item._id || item.productId} className="item-cart">
-                                            <div className="product-img-wrap">
-                                                <a href="#" title={item.name}>
-                                                    <img 
-                                                        src={item.image || "/assets/img/home9/product1.png"} 
-                                                        alt={item.name} 
-                                                        className="img-responsive" 
-                                                    />
-                                                </a>
+                                        <div key={item._id || item.productId} className="cart-item-modern">
+                                            <div className="item-image-modern">
+                                                <img 
+                                                    src={item.image || "/assets/img/home9/product1.png"} 
+                                                    alt={item.name}
+                                                />
                                             </div>
-                                            <div className="product-details">
-                                                <div className="inner-left">
-                                                    <div className="product-name">
-                                                        <a href="#">{item.name}</a>
-                                                        {/* Remove button */}
-                                                        <button 
-                                                            onClick={() => handleRemoveItem(item._id || item.productId)}
-                                                            style={{
-                                                                background: 'none',
-                                                                border: 'none',
-                                                                color: '#dc3545',
-                                                                cursor: 'pointer',
-                                                                fontSize: '12px',
-                                                                marginLeft: '10px'
-                                                            }}
-                                                            title="Remove item"
-                                                        >
-                                                            <i className="ion-ios-close-empty"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="product-price">
-                                                        <span>₹{item.price}</span>
-                                                        <small style={{ marginLeft: '5px', color: '#666' }}>
-                                                            (₹{(item.price * item.quantity).toFixed(2)})
-                                                        </small>
-                                                    </div>
-                                                    <div className="cart-qtt">
-                                                        <button 
-                                                            type="button" 
-                                                            className="quantity-left-minus btn btn-number js-minus" 
-                                                            onClick={() => handleQuantityDecrease(item._id || item.productId, item.quantity)}
-                                                            disabled={loading}
-                                                        >
-                                                            <span className="minus-icon">
-                                                                <i className="ion-ios-minus-empty" />
-                                                            </span>
-                                                        </button>
-                                                        <input 
-                                                            type="text" 
-                                                            value={item.quantity} 
-                                                            className="product_quantity_number js-number" 
-                                                            readOnly
-                                                        />
-                                                        <button 
-                                                            type="button" 
-                                                            className="quantity-right-plus btn btn-number js-plus" 
-                                                            onClick={() => handleQuantityIncrease(item._id || item.productId, item.quantity)}
-                                                            disabled={loading}
-                                                        >
-                                                            <span className="plus-icon">
-                                                                <i className="ion-ios-plus-empty" />
-                                                            </span>
-                                                        </button>
-                                                    </div>
+                                            
+                                            <div className="item-details-modern">
+                                                <h4 className="item-name-modern">{item.name}</h4>
+                                                <div className="item-price-modern">₹{item.price}</div>
+                                                
+                                                <div className="quantity-controls-modern">
+                                                    <button 
+                                                        className="qty-btn-modern minus"
+                                                        onClick={() => handleQuantityDecrease(item._id || item.productId, item.quantity)}
+                                                        disabled={loading}
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                        </svg>
+                                                    </button>
+                                                    
+                                                    <span className="qty-display-modern">{item.quantity}</span>
+                                                    
+                                                    <button 
+                                                        className="qty-btn-modern plus"
+                                                        onClick={() => handleQuantityIncrease(item._id || item.productId, item.quantity)}
+                                                        disabled={loading}
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div className="item-total-modern">
+                                                    Total: ₹{(item.price * item.quantity).toFixed(2)}
                                                 </div>
                                             </div>
-                                        </li>
+                                            
+                                            <button 
+                                                className="remove-item-modern"
+                                                onClick={() => handleRemoveItem(item._id || item.productId)}
+                                                title="Remove item"
+                                            >
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <polyline points="3,6 5,6 21,6"></polyline>
+                                                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
                                     ))}
-                                </ul>
-                                <div className="cart-bottom">
-                                    <div className="cart-total" style={{ padding: '15px 0', borderTop: '1px solid #eee' }}>
-                                        <h4>Total: ₹{getCartTotal().toFixed(2)}</h4>
+                                </div>
+
+                                {/* Cart Summary */}
+                                <div className="cart-summary-modern">
+                                    <div className="summary-row-modern">
+                                        <span>Subtotal:</span>
+                                        <span>₹{getCartTotal().toFixed(2)}</span>
                                     </div>
-                                    <div className="cart-button mg-top-30">
-                                        <Link 
-                                            to={'/checkout'} 
-                                            className="zoa-btn checkout" 
-                                            title=""
-                                            onClick={() => {
-                                                // Close the cart sidebar (not the main sidebar)
-                                                setIsCartOpen(false);
-                                            }}
-                                        >
-                                            Check out (₹{getCartTotal().toFixed(2)})
-                                        </Link>
+                                    <div className="summary-row-modern total">
+                                        <span>Total:</span>
+                                        <span>₹{getCartTotal().toFixed(2)}</span>
                                     </div>
+                                </div>
+
+                                {/* Checkout Button */}
+                                <div className="cart-actions-modern">
+                                    <Link 
+                                        to="/checkout" 
+                                        className="checkout-btn-modern"
+                                        onClick={() => setIsCartOpen(false)}
+                                    >
+                                        <span>Proceed to Checkout</span>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12,5 19,12 12,19"></polyline>
+                                        </svg>
+                                    </Link>
                                 </div>
                             </>
                         ) : (
-                            <div className="empty-cart" style={{ textAlign: 'center', padding: '20px' }}>
-                                <i className="ion-ios-cart" style={{ fontSize: '48px', color: '#ccc', marginBottom: '10px' }}></i>
-                                <p style={{ color: '#666' }}>Your cart is empty</p>
+                            <div className="empty-cart-modern">
+                                <div className="empty-cart-icon">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                                        <circle cx="9" cy="21" r="1"></circle>
+                                        <circle cx="20" cy="21" r="1"></circle>
+                                        <path d="m1 1 4 4 2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                    </svg>
+                                </div>
+                                <h3>Your cart is empty</h3>
+                                <p>Add some products to get started</p>
                                 <button 
                                     onClick={() => setIsCartOpen(false)}
-                                    className="zoa-btn"
-                                    style={{ marginTop: '10px' }}
+                                    className="continue-shopping-modern"
                                 >
                                     Continue Shopping
                                 </button>
                             </div>
                         )}
                     </div>
-                    {/* End cart bottom */}
                 </div>
             </div>
             
@@ -605,8 +620,355 @@ const Header = () => {
                 </div>
             </header>
 
-            {/* Fully Responsive Header Styles */}
+            {/* Fully Responsive Header Styles + Modern Cart */}
             <style jsx>{`
+                /* Modern Cart Sidebar */
+                .modern-cart-sidebar {
+                    position: fixed;
+                    top: 0;
+                    right: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 9999;
+                    visibility: hidden;
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .modern-cart-sidebar.cart-open {
+                    visibility: visible;
+                    opacity: 1;
+                }
+
+                .cart-backdrop {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    backdrop-filter: blur(5px);
+                    -webkit-backdrop-filter: blur(5px);
+                }
+
+                .cart-panel {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 420px;
+                    height: 100%;
+                    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    border-left: 1px solid rgba(255, 255, 255, 0.1);
+                    transform: translateX(100%);
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .cart-open .cart-panel {
+                    transform: translateX(0);
+                }
+
+                .cart-header-modern {
+                    padding: 25px 30px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    background: rgba(255, 255, 255, 0.02);
+                }
+
+                .cart-title-section {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .cart-title-modern {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #ffffff;
+                    margin: 0;
+                    background: linear-gradient(135deg, #7877c6, #ff77c6);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
+
+                .cart-count-modern {
+                    font-size: 14px;
+                    color: rgba(255, 255, 255, 0.6);
+                    font-weight: 500;
+                }
+
+                .cart-close-modern {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: none;
+                    color: rgba(255, 255, 255, 0.8);
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .cart-close-modern:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                    color: #ffffff;
+                    transform: scale(1.1);
+                }
+
+                .cart-content-modern {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+
+                .cart-items-modern {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 20px 30px;
+                }
+
+                .cart-item-modern {
+                    display: flex;
+                    gap: 15px;
+                    padding: 20px 0;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    position: relative;
+                }
+
+                .item-image-modern {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    background: rgba(255, 255, 255, 0.05);
+                }
+
+                .item-image-modern img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                .item-details-modern {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+
+                .item-name-modern {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #ffffff;
+                    margin: 0;
+                    line-height: 1.3;
+                }
+
+                .item-price-modern {
+                    font-size: 14px;
+                    color: #7877c6;
+                    font-weight: 600;
+                }
+
+                .quantity-controls-modern {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin: 8px 0;
+                }
+
+                .qty-btn-modern {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    color: #ffffff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .qty-btn-modern:hover {
+                    background: linear-gradient(135deg, #7877c6, #ff77c6);
+                    border-color: transparent;
+                    transform: scale(1.1);
+                }
+
+                .qty-display-modern {
+                    min-width: 40px;
+                    text-align: center;
+                    font-weight: 600;
+                    color: #ffffff;
+                    font-size: 16px;
+                }
+
+                .item-total-modern {
+                    font-size: 14px;
+                    color: rgba(255, 255, 255, 0.8);
+                    font-weight: 500;
+                }
+
+                .remove-item-modern {
+                    position: absolute;
+                    top: 15px;
+                    right: 0;
+                    background: rgba(255, 71, 87, 0.1);
+                    border: none;
+                    color: #ff4757;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .remove-item-modern:hover {
+                    background: #ff4757;
+                    color: #ffffff;
+                    transform: scale(1.1);
+                }
+
+                .cart-summary-modern {
+                    padding: 25px 30px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    background: rgba(255, 255, 255, 0.02);
+                }
+
+                .summary-row-modern {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 0;
+                    color: rgba(255, 255, 255, 0.8);
+                    font-size: 16px;
+                }
+
+                .summary-row-modern.total {
+                    font-weight: 700;
+                    font-size: 18px;
+                    color: #ffffff;
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    padding-top: 15px;
+                    margin-top: 10px;
+                }
+
+                .cart-actions-modern {
+                    padding: 25px 30px;
+                }
+
+                .checkout-btn-modern {
+                    width: 100%;
+                    background: linear-gradient(135deg, #7877c6, #ff77c6);
+                    border: none;
+                    color: #ffffff;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                }
+
+                .checkout-btn-modern:hover {
+                    background: linear-gradient(135deg, #ff77c6, #77dbe2);
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 30px rgba(120, 119, 198, 0.4);
+                }
+
+                .empty-cart-modern {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 40px 30px;
+                    text-align: center;
+                }
+
+                .empty-cart-icon {
+                    margin-bottom: 20px;
+                    opacity: 0.3;
+                    color: rgba(255, 255, 255, 0.3);
+                }
+
+                .empty-cart-modern h3 {
+                    font-size: 20px;
+                    color: #ffffff;
+                    margin: 0 0 10px 0;
+                    font-weight: 600;
+                }
+
+                .empty-cart-modern p {
+                    color: rgba(255, 255, 255, 0.6);
+                    margin: 0 0 25px 0;
+                    font-size: 16px;
+                }
+
+                .continue-shopping-modern {
+                    background: linear-gradient(135deg, #7877c6, #ff77c6);
+                    border: none;
+                    color: #ffffff;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .continue-shopping-modern:hover {
+                    background: linear-gradient(135deg, #ff77c6, #77dbe2);
+                    transform: translateY(-2px);
+                }
+
+                @media (max-width: 768px) {
+                    .cart-panel {
+                        width: 100%;
+                    }
+                    
+                    .cart-header-modern {
+                        padding: 20px 20px;
+                    }
+                    
+                    .cart-items-modern {
+                        padding: 15px 20px;
+                    }
+                    
+                    .cart-summary-modern,
+                    .cart-actions-modern {
+                        padding: 20px 20px;
+                    }
+                    
+                    .cart-item-modern {
+                        padding: 15px 0;
+                    }
+                    
+                    .item-image-modern {
+                        width: 70px;
+                        height: 70px;
+                    }
+                }
+
                 /* Base Header Styles */
                 .modern-enhanced {
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
