@@ -32,6 +32,7 @@ const Home = () => {
     };
 
     const handleProductClick = (product) => {
+        console.log('Product clicked:', product.name);
         const slug = createUniqueSlug(product.name, product._id);
         navigate(`/product/${slug}`, { state: { product } });
     };
@@ -94,21 +95,21 @@ const Home = () => {
         initializeData();
     }, []);
 
-    const handleAddToCart = async (productId, event) => {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
+    const handleAddToCart = async (productId) => {
+        console.log('Add to cart function called for product ID:', productId);
         
         setLoading(true);
         
         try {
             const product = products.find(p => p._id === productId);
             if (!product) {
+                console.error('Product not found:', productId);
                 setLoading(false);
                 return;
             }
+            console.log('Adding product to cart:', product.name);
             await addToCart(productId, product, 1);
+            console.log('Product added to cart successfully');
         } catch (error) {
             console.error("Error adding to cart:", error);
         } finally {
@@ -321,28 +322,41 @@ const Home = () => {
                                         <img
                                             src={product.image}
                                             alt={product.name}
-                                            onClick={() => handleProductClick(product)}
+                                            className="product-main-image"
                                         />
-                                        <div className="product-overlay-modern">
+                                        
+                                        {/* Always Visible Action Buttons */}
+                                        <div className="product-actions-modern">
                                             <button
-                                                className="overlay-btn-modern view-btn"
-                                                onClick={() => handleProductClick(product)}
+                                                type="button"
+                                                className="action-btn-modern view-btn-modern"
+                                                onClick={() => {
+                                                    console.log('Eye button clicked for:', product.name);
+                                                    handleProductClick(product);
+                                                }}
+                                                title="View Product Details"
                                             >
-                                                <Eye size={20} />
+                                                <Eye size={18} />
                                             </button>
                                             <button
-                                                className="overlay-btn-modern cart-btn"
-                                                onClick={(e) => handleAddToCart(product._id, e)}
+                                                type="button"
+                                                className="action-btn-modern cart-btn-modern"
+                                                onClick={() => {
+                                                    console.log('Cart button clicked for:', product.name);
+                                                    handleAddToCart(product._id);
+                                                }}
                                                 disabled={loading}
+                                                title="Add to Cart"
                                             >
-                                                <ShoppingCart size={20} />
+                                                <ShoppingCart size={18} />
                                                 {getProductCartCount(product._id) > 0 && (
-                                                    <span className="cart-badge-modern">
+                                                    <span className="cart-count-badge">
                                                         {getProductCartCount(product._id)}
                                                     </span>
                                                 )}
                                             </button>
                                         </div>
+
                                         <div className="product-glow-modern"></div>
                                         {product.discount && (
                                             <div className="discount-badge-modern">-{product.discount}%</div>
@@ -356,8 +370,11 @@ const Home = () => {
                                     <div className="product-info-modern">
                                         <span className="product-category-modern">Premium</span>
                                         <h3 
-                                            className="product-name-modern"
-                                            onClick={() => handleProductClick(product)}
+                                            className="product-name-modern clickable-title"
+                                            onClick={() => {
+                                                console.log('Product title clicked for:', product.name);
+                                                handleProductClick(product);
+                                            }}
                                         >
                                             {product.name}
                                         </h3>
@@ -375,8 +392,14 @@ const Home = () => {
                                                 )}
                                             </div>
                                             <button 
+                                                type="button"
                                                 className="add-btn-modern"
-                                                onClick={(e) => handleAddToCart(product._id, e)}
+                                                onClick={() => {
+                                                    console.log('Bottom cart button clicked for:', product.name);
+                                                    handleAddToCart(product._id);
+                                                }}
+                                                disabled={loading}
+                                                title="Add to Cart"
                                             >
                                                 <ShoppingCart size={16} />
                                             </button>
@@ -1094,10 +1117,12 @@ const Home = () => {
                     gap: 15px;
                     opacity: 0;
                     transition: all 0.3s ease;
+                    pointer-events: none;
                 }
 
                 .product-card-modern:hover .product-overlay-modern {
                     opacity: 1;
+                    pointer-events: all;
                 }
 
                 .overlay-btn-modern {
@@ -1114,6 +1139,7 @@ const Home = () => {
                     cursor: pointer;
                     transition: all 0.3s ease;
                     position: relative;
+                    pointer-events: all;
                 }
 
                 .overlay-btn-modern:hover {
@@ -1125,6 +1151,31 @@ const Home = () => {
                 .overlay-btn-modern.cart-btn {
                     background: linear-gradient(135deg, #7877c6, #ff77c6);
                     border-color: transparent;
+                }
+
+                /* Mobile: Always show overlay buttons */
+                @media (max-width: 768px) {
+                    .product-overlay-modern {
+                        opacity: 1;
+                        pointer-events: all;
+                        background: rgba(15, 15, 35, 0.6);
+                    }
+                    
+                    .overlay-btn-modern {
+                        width: 45px;
+                        height: 45px;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .product-overlay-modern {
+                        gap: 10px;
+                    }
+                    
+                    .overlay-btn-modern {
+                        width: 40px;
+                        height: 40px;
+                    }
                 }
 
                 .cart-badge-modern {
@@ -1185,6 +1236,109 @@ const Home = () => {
                     align-items: center;
                     gap: 5px;
                     z-index: 2;
+                }
+
+                /* Always Visible Action Buttons - NEW APPROACH */
+                .product-actions-modern {
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    z-index: 10;
+                }
+
+                .action-btn-modern {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(20px);
+                    border: none;
+                    color: #333;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    position: relative;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                }
+
+                .action-btn-modern:hover {
+                    transform: scale(1.1);
+                    background: linear-gradient(135deg, #7877c6, #ff77c6);
+                    color: white;
+                    box-shadow: 0 6px 20px rgba(120, 119, 198, 0.4);
+                }
+
+                .action-btn-modern:active {
+                    transform: scale(0.95);
+                }
+
+                .view-btn-modern {
+                    background: rgba(255, 255, 255, 0.95);
+                }
+
+                .cart-btn-modern {
+                    background: linear-gradient(135deg, #7877c6, #ff77c6);
+                    color: white;
+                }
+
+                .cart-btn-modern:hover {
+                    background: linear-gradient(135deg, #ff77c6, #77dbe2);
+                }
+
+                .cart-count-badge {
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                    background: #ff4757;
+                    color: white;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    font-size: 10px;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 2px solid white;
+                }
+
+                .clickable-title {
+                    cursor: pointer;
+                    transition: color 0.3s ease;
+                }
+
+                .clickable-title:hover {
+                    color: #7877c6;
+                }
+
+                /* Mobile Responsive for Action Buttons */
+                @media (max-width: 768px) {
+                    .product-actions-modern {
+                        top: 10px;
+                        right: 10px;
+                        gap: 8px;
+                    }
+                    
+                    .action-btn-modern {
+                        width: 40px;
+                        height: 40px;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .product-actions-modern {
+                        gap: 6px;
+                    }
+                    
+                    .action-btn-modern {
+                        width: 36px;
+                        height: 36px;
+                    }
                 }
 
                 .product-info-modern {

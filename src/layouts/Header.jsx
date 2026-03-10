@@ -132,16 +132,7 @@ const Header = () => {
                             <Link to="/" onClick={handleSidebarClose}>Home</Link>
                         </li>
                         <li className="level1 active dropdown">
-                            <a 
-                                href="#" 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleShopClick();
-                                }}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                Shop
-                            </a>
+                            <Link to="/products" onClick={handleSidebarClose}>Shop</Link>
                         </li>
                         <li className="level1 active dropdown">
                             <a 
@@ -554,10 +545,7 @@ const Header = () => {
                                             <span>Home</span>
                                             <div className="nav-underline"></div>
                                         </Link>
-                                        <Link to="/products"
-                                           
-                                            className="nav-link-modern"
-                                        >
+                                        <Link to="/products" className="nav-link-modern">
                                             <span>Products</span>
                                             <div className="nav-underline"></div>
                                         </Link>
