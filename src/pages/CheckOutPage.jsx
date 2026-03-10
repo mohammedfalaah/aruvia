@@ -4,6 +4,7 @@ import { contextData } from '../services/Context';
 import { show_toast } from '../utils/Toast';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../services/SEO';
+import { ShoppingBag, CreditCard, Truck, Shield, CheckCircle, AlertCircle, Lock, Sparkles, Crown, Star } from 'lucide-react';
 
 const CheckOutPage = () => {
     const navigate = useNavigate();
@@ -353,149 +354,198 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
   };
 
   return (
-    <div>
+    <div className="modern-checkout-page">
       <SEO
-  title="Checkout"
-  description="Complete your purchase securely at Aruvia Herbals. Fast delivery and secure payment options available."
-  url="https://aruviaherbals.com/checkout"
-/>
-      <style jsx>{`
-        .error-input {
-          border: 1px solid #f33 !important;
-          background-color: #ffebee !important;
-        }
-        .error-text {
-          color: #f33;
-          font-size: 12px;
-          margin-top: 5px;
-          display: block;
-        }
-        .shipping-option {
-          margin: 10px 0;
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-        }
-        .shipping-option.selected {
-          border-color: #f33;
-          background-color: #fff5f5;
-        }
-      `}</style>
+        title="Checkout - Aruvia Herbals"
+        description="Complete your purchase securely at Aruvia Herbals. Fast delivery and secure payment options available."
+        url="https://aruviaherbals.com/checkout"
+      />
 
-      <div className="wrappage">
-        <div className="container container-content">
-          <ul className="breadcrumb v2">
-            <li><a href="#">Home</a></li>
-            <li className="active">Checkout</li>
-          </ul>
+      {/* Modern Hero Section */}
+      <section className="checkout-hero">
+        <div className="hero-background">
+          <div className="gradient-mesh"></div>
+          <div className="floating-elements">
+            <div className="floating-element"></div>
+            <div className="floating-element"></div>
+            <div className="floating-element"></div>
+          </div>
         </div>
-        
-        <div className="check-out">
-          <div className="container">
-            <div className="titlell">
-              <h2>Checkout</h2>
+        <div className="hero-content">
+          <div className="hero-icon">
+            <ShoppingBag size={48} />
+          </div>
+          <h1>Secure Checkout</h1>
+          <p>Complete your order with confidence</p>
+        </div>
+      </section>
+
+      <div className="checkout-container">
+        {cartItems.length === 0 ? (
+          <div className="empty-cart-modern">
+            <div className="empty-icon">
+              <ShoppingBag size={80} />
             </div>
-            
-            {cartItems.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '50px 0' }}>
-                <h3>Your cart is empty</h3>
-                <p>Please add items to your cart before checkout.</p>
-              </div>
-            ) : (
-              <div className="row">
-                {/* Order Details Form */}
-                <div className="col-md-7 col-sm-7">
-                  <div className="form-name">
-                    <div className="billing">
-                      <h2 style={{fontSize: 26, paddingBottom: 20, fontWeight: 'bold'}}>
-                        Order Details
-                      </h2>
-                      
-                      <form onSubmit={handlePlaceOrder}>
-                        <div className="row">
-                          <div className="col-md-6 col-sm-6">
-                            <label className="out">
-                              First Name<span style={{color: '#f33'}}>*</span>
-                            </label><br />
-                            <input 
-                              type="text" 
-                              name="firstName"
-                              value={formData.firstName}
-                              onChange={handleInputChange}
-                              placeholder="Enter first name" 
-                              required 
-                              className={getInputClass('firstName', 'firstname')}
-                            />
-                            {formErrors.firstName && <span className="error-text">{formErrors.firstName}</span>}
-                          </div>
-                          <div className="col-md-6 col-sm-6">
-                            <label className="out">
-                              Last Name<span style={{color: '#f33'}}>*</span>
-                            </label><br />
-                            <input 
-                              type="text" 
-                              name="lastName"
-                              value={formData.lastName}
-                              onChange={handleInputChange}
-                              placeholder="Enter last name" 
-                              required 
-                              className={getInputClass('lastName', 'lastname')}
-                            />
-                            {formErrors.lastName && <span className="error-text">{formErrors.lastName}</span>}
-                          </div>
-                        </div>
-                        
-                        <div className="row">
-                          <div className="col-md-6 col-sm-6">
-                            <label className="out">
-                              Email Address<span style={{color: '#f33'}}>*</span>
-                            </label><br />
-                            <input 
-                              type="email" 
-                              name="email"
-                              value={formData.email}
-                              onChange={handleInputChange}
-                              placeholder="Enter email address"
-                              required 
-                              className={getInputClass('email', 'district')}
-                            />
-                            {formErrors.email && <span className="error-text">{formErrors.email}</span>}
-                          </div>
-                          <div className="col-md-6 col-sm-6">
-                            <label className="out">
-                              Phone<span style={{color: '#f33'}}>*</span>
-                            </label><br />
-                            <input 
-                              type="tel" 
-                              name="phone"
-                              value={formData.phone}
-                              onChange={handleInputChange}
-                              placeholder="Enter 10-digit phone number"
-                              required 
-                              maxLength="10"
-                              className={getInputClass('phone', 'district')}
-                            />
-                            {formErrors.phone && <span className="error-text">{formErrors.phone}</span>}
-                          </div>
-                        </div>
-                        
-                        <label className="out">
-                          Street Address<span style={{color: '#f33'}}>*</span>
-                        </label><br />
+            <h2>Your cart is empty</h2>
+            <p>Add some amazing products to get started</p>
+            <button 
+              onClick={() => navigate('/products')}
+              className="shop-now-btn-modern"
+            >
+              <Sparkles size={20} />
+              <span>Start Shopping</span>
+            </button>
+          </div>
+        ) : (
+          <div className="checkout-grid">
+            {/* Left Column - Order Form */}
+            <div className="checkout-form-section">
+              <div className="form-card-modern">
+                <div className="form-header-modern">
+                  <div className="step-indicator">
+                    <div className="step active">
+                      <div className="step-number">1</div>
+                      <span>Details</span>
+                    </div>
+                    <div className="step-line"></div>
+                    <div className="step">
+                      <div className="step-number">2</div>
+                      <span>Payment</span>
+                    </div>
+                  </div>
+                </div>
+
+                <form onSubmit={handlePlaceOrder} className="modern-form">
+                  {/* Personal Information */}
+                  <div className="form-section-modern">
+                    <h3 className="section-title-modern">
+                      <Crown size={24} />
+                      Personal Information
+                    </h3>
+                    
+                    <div className="form-grid">
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          First Name <span className="required">*</span>
+                        </label>
                         <input 
                           type="text" 
-                          name="street"
-                          value={formData.street}
+                          name="firstName"
+                          value={formData.firstName}
                           onChange={handleInputChange}
-                          placeholder="Enter street address"
+                          placeholder="Enter your first name" 
                           required 
-                          className={getInputClass('street', 'district')}
+                          className={`form-input-modern ${formErrors.firstName ? 'error' : ''}`}
                         />
-                        {formErrors.street && <span className="error-text">{formErrors.street}</span>}
-                        
-                        <label className="out">
-                          City<span style={{color: '#f33'}}>*</span>
-                        </label><br />
+                        {formErrors.firstName && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.firstName}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          Last Name <span className="required">*</span>
+                        </label>
+                        <input 
+                          type="text" 
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          placeholder="Enter your last name" 
+                          required 
+                          className={`form-input-modern ${formErrors.lastName ? 'error' : ''}`}
+                        />
+                        {formErrors.lastName && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.lastName}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-grid">
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          Email Address <span className="required">*</span>
+                        </label>
+                        <input 
+                          type="email" 
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="your@email.com"
+                          required 
+                          className={`form-input-modern ${formErrors.email ? 'error' : ''}`}
+                        />
+                        {formErrors.email && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.email}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          Phone Number <span className="required">*</span>
+                        </label>
+                        <input 
+                          type="tel" 
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          placeholder="10-digit phone number"
+                          required 
+                          maxLength="10"
+                          className={`form-input-modern ${formErrors.phone ? 'error' : ''}`}
+                        />
+                        {formErrors.phone && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.phone}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shipping Address */}
+                  <div className="form-section-modern">
+                    <h3 className="section-title-modern">
+                      <Truck size={24} />
+                      Shipping Address
+                    </h3>
+                    
+                    <div className="form-group-modern full-width">
+                      <label className="form-label-modern">
+                        Street Address <span className="required">*</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        name="street"
+                        value={formData.street}
+                        onChange={handleInputChange}
+                        placeholder="Enter your street address"
+                        required 
+                        className={`form-input-modern ${formErrors.street ? 'error' : ''}`}
+                      />
+                      {formErrors.street && (
+                        <span className="error-message-modern">
+                          <AlertCircle size={16} />
+                          {formErrors.street}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-grid">
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          City <span className="required">*</span>
+                        </label>
                         <input 
                           type="text" 
                           name="city"
@@ -503,13 +553,20 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
                           onChange={handleInputChange}
                           placeholder="Enter city"
                           required 
-                          className={getInputClass('city', 'district')}
+                          className={`form-input-modern ${formErrors.city ? 'error' : ''}`}
                         />
-                        {formErrors.city && <span className="error-text">{formErrors.city}</span>}
-                        
-                        <label className="out">
-                          State<span style={{color: '#f33'}}>*</span>
-                        </label><br />
+                        {formErrors.city && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.city}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          State <span className="required">*</span>
+                        </label>
                         <input 
                           type="text" 
                           name="state"
@@ -517,239 +574,1007 @@ const handleRazorpayPayment = async (orderData, razorpayOrderId) => {
                           onChange={handleInputChange}
                           placeholder="Enter state"
                           required 
-                          className={getInputClass('state', 'district')}
+                          className={`form-input-modern ${formErrors.state ? 'error' : ''}`}
                         />
-                        {formErrors.state && <span className="error-text">{formErrors.state}</span>}
-                        
-                        <label className="out">
-                          Country<span style={{color: '#f33'}}>*</span>
-                        </label><br />
+                        {formErrors.state && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.state}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-grid">
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          Postal Code
+                        </label>
                         <input 
                           type="text" 
-                          name="country"
-                          value={formData.country}
+                          name="postcode"
+                          value={formData.postcode}
                           onChange={handleInputChange}
-                          placeholder="Enter country"
-                          required 
-                          className={getInputClass('country', 'district')}
+                          placeholder="6-digit postal code"
+                          maxLength="6"
+                          className={`form-input-modern ${formErrors.postcode ? 'error' : ''}`}
                         />
-                        {formErrors.country && <span className="error-text">{formErrors.country}</span>}
+                        {formErrors.postcode && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.postcode}
+                          </span>
+                        )}
+                      </div>
 
-                        <div className="row">
-                          <div className="col-md-6 col-sm-6">
-                            <label className="out">Postal Code</label><br />
-                            <input 
-                              type="text" 
-                              name="postcode"
-                              value={formData.postcode}
-                              onChange={handleInputChange}
-                              placeholder="Enter 6-digit postal code"
-                              maxLength="6"
-                              className={getInputClass('postcode', 'country')}
-                            />
-                            {formErrors.postcode && <span className="error-text">{formErrors.postcode}</span>}
-                          </div>
-                          <div className="col-md-6 col-sm-6">
-                            <label className="out">Landmark</label><br />
-                            <input 
-                              type="text" 
-                              name="landmark"
-                              value={formData.landmark}
-                              onChange={handleInputChange}
-                              placeholder="Enter landmark"
-                              className="district" 
-                            />
-                           {formErrors.landmark && <span className="error-text">{formErrors.landmark}</span>}
-
-                          </div>
-                        </div>
-                        
-                        {/* Shipping Options */}
-                        <div style={{marginTop: 30, marginBottom: 20}}>
-                          <h4>Shipping Options</h4>
-                          
-                        
-                          
-                         <div style={{marginTop: 30, marginBottom: 20}}>
-  <h4>Shipping</h4>
-  <div className="shipping-option selected">
-    <label>
-      <input 
-        type="radio" 
-        name="shipping"
-        value="flat"
-        checked
-        readOnly
-      />
-      <span style={{marginLeft: 10}}>
-        Standard Shipping (3-5 business days) - ₹50.00
-      </span>
-    </label>
-  </div>
-</div>
-
-                          
-                          
-                        </div>
-                        
-                        <label className="out" style={{marginTop: 20}}>
-                          Order Notes (Optional)
+                      <div className="form-group-modern">
+                        <label className="form-label-modern">
+                          Landmark <span className="required">*</span>
                         </label>
-                        <textarea 
-                          name="orderNote" 
-                          value={formData.orderNote}
+                        <input 
+                          type="text" 
+                          name="landmark"
+                          value={formData.landmark}
                           onChange={handleInputChange}
-                          placeholder="Special instructions for your order"
-                          className="comment"
-                          rows="4"
+                          placeholder="Enter landmark"
+                          className={`form-input-modern ${formErrors.landmark ? 'error' : ''}`}
                         />
-                      </form>
+                        {formErrors.landmark && (
+                          <span className="error-message-modern">
+                            <AlertCircle size={16} />
+                            {formErrors.landmark}
+                          </span>
+                        )}
+                      </div>
                     </div>
+
+                    <div className="form-group-modern full-width">
+                      <label className="form-label-modern">
+                        Country <span className="required">*</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        placeholder="Enter country"
+                        required 
+                        className={`form-input-modern ${formErrors.country ? 'error' : ''}`}
+                      />
+                      {formErrors.country && (
+                        <span className="error-message-modern">
+                          <AlertCircle size={16} />
+                          {formErrors.country}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order Notes */}
+                  <div className="form-section-modern">
+                    <h3 className="section-title-modern">
+                      <Star size={24} />
+                      Additional Information
+                    </h3>
+                    
+                    <div className="form-group-modern full-width">
+                      <label className="form-label-modern">
+                        Order Notes (Optional)
+                      </label>
+                      <textarea 
+                        name="orderNote" 
+                        value={formData.orderNote}
+                        onChange={handleInputChange}
+                        placeholder="Special instructions for your order..."
+                        className="form-textarea-modern"
+                        rows="4"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Right Column - Order Summary */}
+            <div className="order-summary-section">
+              <div className="summary-card-modern">
+                <div className="summary-header-modern">
+                  <h2>Order Summary</h2>
+                  <span className="item-count">({getCartItemCount()} items)</span>
+                </div>
+
+                {/* Cart Items */}
+                <div className="cart-items-summary">
+                  {cartItems.map((item) => (
+                    <div key={item._id || item.productId} className="cart-item-summary">
+                      <div className="item-image-summary">
+                        <img 
+                          src={item.image || "/assets/img/home9/product1.png"} 
+                          alt={item.name}
+                        />
+                        <div className="item-quantity">{item.quantity}</div>
+                      </div>
+                      <div className="item-details-summary">
+                        <h4>{item.name}</h4>
+                        <div className="item-price">₹{item.price} × {item.quantity}</div>
+                      </div>
+                      <div className="item-total">
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Shipping Options */}
+                <div className="shipping-section-modern">
+                  <h3>
+                    <Truck size={20} />
+                    Shipping
+                  </h3>
+                  <div className="shipping-option-modern selected">
+                    <div className="shipping-info">
+                      <div className="shipping-name">Standard Delivery</div>
+                      <div className="shipping-time">3-5 business days</div>
+                    </div>
+                    <div className="shipping-price">₹50.00</div>
                   </div>
                 </div>
 
-                {/* Order Summary */}
-                <div className="col-md-5 col-sm-5">
-                  <div className="order">
-                    <div className="content-order">
-                      <div className="table">
-                        <table>
-                          <caption>Your Order ({getCartItemCount()} items)</caption>
-                          <thead>
-                            <tr>
-                              <th>Product</th>
-                              <th>Qty</th>
-                              <th>Total</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {cartItems.map((item) => (
-                              <tr key={item._id || item.productId}>
-                                <td>
-                                  <div style={{display: 'flex', alignItems: 'center'}}>
-                                    {item.image && (
-                                      <img 
-                                        src={item.image} 
-                                        alt={item.name}
-                                        style={{width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px'}}
-                                      />
-                                    )}
-                                    <span>{item.name}</span>
-                                  </div>
-                                </td>
-                                <td>
-                                  <i className="fa fa-times" aria-hidden="true" />
-                                  {item.quantity}
-                                </td>
-                                <td>₹{(item.price * item.quantity).toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      
-                      <div className="content-total">
-                        <div className="total">
-                          <h5 className="sub-total">Subtotal</h5>
-                          <h5 className="prince">₹{getCartTotal().toFixed(2)}</h5>
+                {/* Payment Method */}
+                <div className="payment-section-modern">
+                  <h3>
+                    <CreditCard size={20} />
+                    Payment Method
+                  </h3>
+                  
+                  <div className="payment-options-modern">
+                    <label className="payment-option-modern">
+                      <input 
+                        type="radio" 
+                        name="payment"
+                        value="bank"
+                        checked={paymentMethod === 'bank'}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      />
+                      <div className="payment-content">
+                        <div className="payment-icon">
+                          <Lock size={20} />
                         </div>
-                        
-                        <div className="total">
-                          <h5 className="sub-total">Shipping</h5>
-                          <h5 className="prince">₹{getShippingCost().toFixed(2)}</h5>
-                        </div>
-                        
-                        <div className="total" style={{borderTop: '2px solid #333', paddingTop: 10}}>
-                          <h5 className="sub-total" style={{fontWeight: 'bold'}}>Total</h5>
-                          <h5 className="prince" style={{fontWeight: 'bold', color: '#f33'}}>
-                            ₹{getFinalTotal().toFixed(2)}
-                          </h5>
-                        </div>
-                        
-                        <div className="payment">
-                          <h4 style={{marginBottom: 15}}>Payment Method</h4>
-                          
-                          <label style={{display: 'block', marginBottom: 15}}>
-                            <input 
-                              type="radio" 
-                              name="payment"
-                              value="bank"
-                              checked={paymentMethod === 'bank'}
-                              onChange={(e) => setPaymentMethod(e.target.value)}
-                            />
-                            <span style={{fontSize: 16, color: '#494949', fontWeight: 'bold', marginLeft: 5}}>
-                              Online Payment (Razorpay)
-                            </span>
-                          </label>
-                          <p style={{paddingLeft: 25, marginBottom: 15, fontSize: 14, color: '#666'}}>
-                            Pay securely using credit card, debit card, UPI, or net banking through Razorpay.
-                          </p>
-                          
-                         
-                          <p style={{paddingLeft: 25, marginBottom: 20, fontSize: 14, color: '#666'}}>
-                            Pay when your order is delivered to your doorstep.
-                          </p>
-                        </div>
-                        
-                        <div className="place-ober">
-                          {orderError && (
-                            <div style={{
-                              color: '#f33', 
-                              marginBottom: '15px', 
-                              padding: '12px', 
-                              backgroundColor: '#ffebee',
-                              border: '1px solid #f33',
-                              borderRadius: '6px',
-                              fontSize: '14px'
-                            }}>
-                              {orderError}
-                            </div>
-                          )}
-                          
-                          {orderSuccess && (
-                            <div style={{
-                              color: '#4caf50', 
-                              marginBottom: '15px', 
-                              padding: '12px', 
-                              backgroundColor: '#e8f5e8',
-                              border: '1px solid #4caf50',
-                              borderRadius: '6px',
-                              fontSize: '14px'
-                            }}>
-                              ✓ Order placed successfully! Thank you for your purchase.
-                            </div>
-                          )}
-                          
-                          <button 
-                            className="ober"
-                            type="button"
-                            onClick={handlePlaceOrder}
-                            disabled={cartItems.length === 0 || orderLoading || orderSuccess}
-                            style={{
-                              opacity: (cartItems.length === 0 || orderLoading || orderSuccess) ? 0.6 : 1,
-                              cursor: (cartItems.length === 0 || orderLoading || orderSuccess) ? 'not-allowed' : 'pointer',
-                              width: '100%',
-                              padding: '12px',
-                              fontSize: '16px',
-                              fontWeight: 'bold'
-                            }}
-                          >
-                            {orderLoading ? 
-                              (paymentMethod === 'bank' ? 'Redirecting to Payment...' : 'Placing Order...') : 
-                              orderSuccess ? 'Order Placed!' :
-                              (paymentMethod === 'bank' ? 'Proceed to Payment' : 'Place Order')
-                            }
-                          </button>
+                        <div className="payment-info">
+                          <div className="payment-name">Online Payment</div>
+                          <div className="payment-desc">Secure payment via Razorpay</div>
                         </div>
                       </div>
-                    </div>
+                    </label>
                   </div>
+                </div>
+
+                {/* Order Total */}
+                <div className="order-total-modern">
+                  <div className="total-row">
+                    <span>Subtotal:</span>
+                    <span>₹{getCartTotal().toFixed(2)}</span>
+                  </div>
+                  <div className="total-row">
+                    <span>Shipping:</span>
+                    <span>₹{getShippingCost().toFixed(2)}</span>
+                  </div>
+                  <div className="total-row final-total">
+                    <span>Total:</span>
+                    <span>₹{getFinalTotal().toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Error/Success Messages */}
+                {orderError && (
+                  <div className="message-modern error">
+                    <AlertCircle size={20} />
+                    <span>{orderError}</span>
+                  </div>
+                )}
+                
+                {orderSuccess && (
+                  <div className="message-modern success">
+                    <CheckCircle size={20} />
+                    <span>Order placed successfully! Thank you for your purchase.</span>
+                  </div>
+                )}
+
+                {/* Place Order Button */}
+                <button 
+                  className="place-order-btn-modern"
+                  type="button"
+                  onClick={handlePlaceOrder}
+                  disabled={cartItems.length === 0 || orderLoading || orderSuccess}
+                >
+                  <div className="btn-content">
+                    {orderLoading ? (
+                      <>
+                        <div className="loading-spinner"></div>
+                        <span>
+                          {paymentMethod === 'bank' ? 'Redirecting to Payment...' : 'Placing Order...'}
+                        </span>
+                      </>
+                    ) : orderSuccess ? (
+                      <>
+                        <CheckCircle size={20} />
+                        <span>Order Placed!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Shield size={20} />
+                        <span>
+                          {paymentMethod === 'bank' ? 'Proceed to Payment' : 'Place Order'}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <div className="btn-shine"></div>
+                </button>
+
+                {/* Security Badge */}
+                <div className="security-badge-modern">
+                  <Shield size={16} />
+                  <span>Your payment information is secure and encrypted</span>
                 </div>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+      <style jsx>{`
+        .modern-checkout-page {
+          background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+          min-height: 100vh;
+          color: white;
+          padding-top: 80px;
+        }
+
+        /* Hero Section */
+        .checkout-hero {
+          position: relative;
+          height: 300px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          margin-bottom: 60px;
+        }
+
+        .hero-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        }
+
+        .gradient-mesh {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: 
+            radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(119, 219, 226, 0.3) 0%, transparent 50%);
+        }
+
+        .floating-elements {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+        }
+
+        .floating-element {
+          position: absolute;
+          width: 100px;
+          height: 100px;
+          background: linear-gradient(135deg, rgba(120, 119, 198, 0.1), rgba(255, 119, 198, 0.1));
+          border-radius: 50%;
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+          top: 20%;
+          left: 10%;
+          animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+          top: 60%;
+          right: 15%;
+          animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+          bottom: 20%;
+          left: 50%;
+          animation-delay: 4s;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .hero-content {
+          position: relative;
+          z-index: 2;
+          text-align: center;
+          color: white;
+        }
+
+        .hero-icon {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, #77dbe2, #7877c6);
+          border-radius: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          color: white;
+        }
+
+        .hero-content h1 {
+          font-size: 48px;
+          font-weight: 900;
+          margin-bottom: 15px;
+          background: linear-gradient(135deg, #77dbe2, #7877c6, #ff77c6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .hero-content p {
+          font-size: 18px;
+          opacity: 0.8;
+          max-width: 500px;
+          margin: 0 auto;
+        }
+
+        /* Main Container */
+        .checkout-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 20px 60px;
+        }
+
+        /* Empty Cart State */
+        .empty-cart-modern {
+          text-align: center;
+          padding: 80px 20px;
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .empty-icon {
+          width: 120px;
+          height: 120px;
+          background: linear-gradient(135deg, rgba(120, 119, 198, 0.2), rgba(255, 119, 198, 0.2));
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 30px;
+          color: #7877c6;
+        }
+
+        .empty-cart-modern h2 {
+          font-size: 32px;
+          font-weight: 700;
+          margin-bottom: 15px;
+          color: white;
+        }
+
+        .empty-cart-modern p {
+          font-size: 18px;
+          opacity: 0.7;
+          margin-bottom: 30px;
+        }
+
+        .shop-now-btn-modern {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 15px 30px;
+          background: linear-gradient(135deg, #7877c6, #ff77c6);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .shop-now-btn-modern:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(120, 119, 198, 0.4);
+        }
+
+        /* Checkout Grid */
+        .checkout-grid {
+          display: grid;
+          grid-template-columns: 1fr 400px;
+          gap: 40px;
+          align-items: start;
+        }
+
+        /* Form Section */
+        .checkout-form-section {
+          width: 100%;
+        }
+
+        .form-card-modern {
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 30px;
+        }
+
+        .form-header-modern {
+          margin-bottom: 30px;
+        }
+
+        .step-indicator {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+        }
+
+        .step {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          opacity: 0.5;
+        }
+
+        .step.active {
+          opacity: 1;
+        }
+
+        .step-number {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #7877c6, #ff77c6);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          color: white;
+        }
+
+        .step-line {
+          width: 60px;
+          height: 2px;
+          background: linear-gradient(90deg, #7877c6, #ff77c6);
+          opacity: 0.3;
+        }
+
+        /* Form Sections */
+        .form-section-modern {
+          margin-bottom: 40px;
+        }
+
+        .section-title-modern {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 24px;
+          font-weight: 700;
+          margin-bottom: 25px;
+          color: white;
+        }
+
+        .section-title-modern svg {
+          color: #7877c6;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+
+        .form-group-modern {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .form-group-modern.full-width {
+          grid-column: 1 / -1;
+        }
+
+        .form-label-modern {
+          font-size: 14px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .required {
+          color: #ff4757;
+        }
+
+        .form-input-modern,
+        .form-textarea-modern {
+          padding: 15px;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          color: white;
+          font-size: 16px;
+          transition: all 0.3s ease;
+        }
+
+        .form-input-modern:focus,
+        .form-textarea-modern:focus {
+          outline: none;
+          border-color: #7877c6;
+          box-shadow: 0 0 20px rgba(120, 119, 198, 0.3);
+        }
+
+        .form-input-modern::placeholder,
+        .form-textarea-modern::placeholder {
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input-modern.error {
+          border-color: #ff4757;
+          box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .error-message-modern {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: #ff4757;
+          font-size: 12px;
+          margin-top: 5px;
+        }
+
+        /* Order Summary Section */
+        .order-summary-section {
+          position: sticky;
+          top: 100px;
+        }
+
+        .summary-card-modern {
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 30px;
+        }
+
+        .summary-header-modern {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 25px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-header-modern h2 {
+          font-size: 24px;
+          font-weight: 700;
+          color: white;
+        }
+
+        .item-count {
+          color: #7877c6;
+          font-weight: 600;
+        }
+
+        /* Cart Items Summary */
+        .cart-items-summary {
+          margin-bottom: 25px;
+        }
+
+        .cart-item-summary {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 15px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cart-item-summary:last-child {
+          border-bottom: none;
+        }
+
+        .item-image-summary {
+          position: relative;
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .item-image-summary img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .item-quantity {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          width: 24px;
+          height: 24px;
+          background: linear-gradient(135deg, #ff4757, #ff3742);
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+        }
+
+        .item-details-summary {
+          flex: 1;
+        }
+
+        .item-details-summary h4 {
+          font-size: 16px;
+          font-weight: 600;
+          color: white;
+          margin-bottom: 5px;
+        }
+
+        .item-price {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .item-total {
+          font-size: 16px;
+          font-weight: 700;
+          color: #77dbe2;
+        }
+
+        /* Shipping Section */
+        .shipping-section-modern {
+          margin-bottom: 25px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .shipping-section-modern h3 {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 15px;
+          color: white;
+        }
+
+        .shipping-option-modern {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+        }
+
+        .shipping-option-modern.selected {
+          border-color: #7877c6;
+          background: rgba(120, 119, 198, 0.1);
+        }
+
+        .shipping-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .shipping-name {
+          font-weight: 600;
+          color: white;
+        }
+
+        .shipping-time {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .shipping-price {
+          font-weight: 700;
+          color: #77dbe2;
+        }
+
+        /* Payment Section */
+        .payment-section-modern {
+          margin-bottom: 25px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-section-modern h3 {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 15px;
+          color: white;
+        }
+
+        .payment-options-modern {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .payment-option-modern {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 15px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .payment-option-modern:hover {
+          border-color: #7877c6;
+          background: rgba(120, 119, 198, 0.1);
+        }
+
+        .payment-option-modern input[type="radio"] {
+          accent-color: #7877c6;
+        }
+
+        .payment-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .payment-icon {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #7877c6, #ff77c6);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+        }
+
+        .payment-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .payment-name {
+          font-weight: 600;
+          color: white;
+        }
+
+        .payment-desc {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Order Total */
+        .order-total-modern {
+          margin-bottom: 25px;
+        }
+
+        .total-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 0;
+          font-size: 16px;
+        }
+
+        .total-row span:first-child {
+          color: rgba(255, 255, 255, 0.8);
+        }
+
+        .total-row span:last-child {
+          font-weight: 600;
+          color: white;
+        }
+
+        .total-row.final-total {
+          border-top: 2px solid rgba(255, 255, 255, 0.1);
+          padding-top: 15px;
+          margin-top: 10px;
+          font-size: 20px;
+          font-weight: 700;
+        }
+
+        .total-row.final-total span:last-child {
+          color: #77dbe2;
+        }
+
+        /* Messages */
+        .message-modern {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 15px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          font-size: 14px;
+        }
+
+        .message-modern.error {
+          background: rgba(255, 71, 87, 0.1);
+          border: 1px solid rgba(255, 71, 87, 0.3);
+          color: #ff4757;
+        }
+
+        .message-modern.success {
+          background: rgba(46, 213, 115, 0.1);
+          border: 1px solid rgba(46, 213, 115, 0.3);
+          color: #2ed573;
+        }
+
+        /* Place Order Button */
+        .place-order-btn-modern {
+          position: relative;
+          width: 100%;
+          padding: 18px;
+          background: linear-gradient(135deg, #7877c6, #ff77c6);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 18px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          overflow: hidden;
+          margin-bottom: 20px;
+        }
+
+        .place-order-btn-modern:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 15px 40px rgba(120, 119, 198, 0.4);
+        }
+
+        .place-order-btn-modern:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .btn-content {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .btn-shine {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+          animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+          0% { left: -100%; }
+          50% { left: 100%; }
+          100% { left: 100%; }
+        }
+
+        .loading-spinner {
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* Security Badge */
+        .security-badge-modern {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px;
+          background: rgba(46, 213, 115, 0.1);
+          border: 1px solid rgba(46, 213, 115, 0.3);
+          border-radius: 8px;
+          color: #2ed573;
+          font-size: 14px;
+          text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+          .checkout-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+          }
+
+          .order-summary-section {
+            position: static;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .checkout-container {
+            padding: 0 15px 40px;
+          }
+
+          .hero-content h1 {
+            font-size: 36px;
+          }
+
+          .form-card-modern,
+          .summary-card-modern {
+            padding: 20px;
+          }
+
+          .form-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .step-indicator {
+            flex-direction: column;
+            gap: 15px;
+          }
+
+          .step-line {
+            width: 2px;
+            height: 40px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-content h1 {
+            font-size: 28px;
+          }
+
+          .section-title-modern {
+            font-size: 20px;
+          }
+
+          .form-card-modern,
+          .summary-card-modern {
+            padding: 15px;
+          }
+        }
+      `}</style>
     </div>
   );
 };
