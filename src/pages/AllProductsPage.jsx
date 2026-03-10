@@ -346,7 +346,6 @@ const AllProductsPage = () => {
                 .all-products-page {
                     min-height: 100vh;
                     background: #0f0f23;
-                    padding-top: 80px;
                 }
 
                 /* Hero Section */
