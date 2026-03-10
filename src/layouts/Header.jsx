@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { contextData } from '../services/Context';
 import { Link, useNavigate } from 'react-router-dom';
-import CheckOutPage from '../pages/CheckOutPage';
 
 const Header = () => {
     const { 
@@ -92,6 +91,32 @@ const Header = () => {
         }
     };
 
+    // Handle Social navigation - scroll to Instagram section
+    const handleSocialClick = () => {
+        // Navigate to home if not already there
+        if (window.location.pathname !== '/') {
+            navigate('/');
+            // Wait for navigation then scroll
+            setTimeout(() => {
+                scrollToInstagramSection();
+            }, 100);
+        } else {
+            // Already on home page, just scroll
+            scrollToInstagramSection();
+        }
+    };
+
+    // Function to scroll to Instagram section
+    const scrollToInstagramSection = () => {
+        const instagramSection = document.querySelector('.instagram-modern');
+        if (instagramSection) {
+            instagramSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    };
+
     return (
         <div>
             {/* push menu*/}
@@ -118,16 +143,25 @@ const Header = () => {
                                 Shop
                             </a>
                         </li>
+                        <li className="level1 active dropdown">
+                            <a 
+                                href="#" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSocialClick();
+                                }}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Social
+                            </a>
+                        </li>
                         <li className="level1">
                             <Link to="/checkout" onClick={handleSidebarClose}>Checkout</Link>
                         </li>
+                        <li className="level1">
+                            <Link to="/contact-us" onClick={handleSidebarClose}>Contact</Link>
+                        </li>
                     </ul>
-                    {/* <ul className="mobile-account">
-                        <li><a href="#"><i className="fa fa-unlock-alt" />Login</a></li>
-                        <li><a href="#"><i className="fa fa-user-plus" />Register</a></li>
-                        <li><a href="#"><i className="fa fa-heart" />Wishlist</a></li>
-                    </ul> */}
-                    
                 </div>
             </div>
             {/* end push menu*/}
@@ -465,74 +499,563 @@ const Header = () => {
                 {/* End Account */}
             </div>
             
-            <header id="header" className={`header-v1 ${isSticky ? 'sticky-header' : ''}`}>
+            <header id="header" className={`header-v1 modern-enhanced ${isSticky ? 'sticky-header' : ''}`}>
                 <div className="header-center">
-                    <div className="container container-content ">
-                        <div className="row flex align-items-center justify-content-between">
-                            <div className="col-md-4 col">
-                                <div className="topbar-right">
-                                    <div className="element">
-                                        <a onClick={handleSideBarToggle} className={`icon-pushmenu js-push-menu ${sideBarOpen ? "active" : ""}`}>
-                                            <svg width={26} height={16} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66 41" style={{enableBackground: 'new 0 0 66 41'}} xmlSpace="preserve">
-                                                <style type="text/css" dangerouslySetInnerHTML={{__html: "\n                                                .st0 {\n                                                    fill: none;\n                                                    stroke: #000000;\n                                                    stroke-width: 3;\n                                                    stroke-linecap: round;\n                                                    stroke-miterlimit: 10;\n                                                }\n                                                " }} />
-                                                <g>
-                                                    <line className="st0" x1="1.5" y1="1.5" x2="64.5" y2="1.5" />
-                                                    <line className="st0" x1="1.5" y1="20.5" x2="64.5" y2="20.5" />
-                                                    <line className="st0" x1="1.5" y1="39.5" x2="64.5" y2="39.5" />
-                                                </g>
-                                            </svg>
-                                        </a>
-                                    </div>
+                    <div className="container container-content">
+                        <div className="header-row-responsive">
+                            {/* Mobile Layout */}
+                            <div className="mobile-header d-md-none">
+                                <div className="mobile-left">
+                                    <a onClick={handleSideBarToggle} className={`icon-pushmenu js-push-menu modern-menu-btn ${sideBarOpen ? "active" : ""}`}>
+                                        <svg width={24} height={14} version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 66 41" style={{enableBackground: 'new 0 0 66 41'}} xmlSpace="preserve">
+                                            <style type="text/css" dangerouslySetInnerHTML={{__html: "\n                                                .st0 {\n                                                    fill: none;\n                                                    stroke: #000000;\n                                                    stroke-width: 3;\n                                                    stroke-linecap: round;\n                                                    stroke-miterlimit: 10;\n                                                }\n                                                " }} />
+                                            <g>
+                                                <line className="st0" x1="1.5" y1="1.5" x2="64.5" y2="1.5" />
+                                                <line className="st0" x1="1.5" y1="20.5" x2="64.5" y2="20.5" />
+                                                <line className="st0" x1="1.5" y1="39.5" x2="64.5" y2="39.5" />
+                                            </g>
+                                        </svg>
+                                    </a>
+                                </div>
+                                
+                                <div className="mobile-center">
+                                    <Link to="/" className="modern-logo-link">
+                                        <img src="/assets/img/logo.jpg" alt="Aruvia Herbals" className="img-reponsive modern-logo mobile-logo" />
+                                    </Link>
+                                </div>
+                                
+                                <div className="mobile-right">
+                                    <a onClick={handleCartToggle} className="zoa-icon icon-cart modern-cart-btn mobile-cart">
+                                        <svg width={18} height={18} version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.4 55.4" style={{enableBackground: 'new 0 0 55.4 55.4'}} xmlSpace="preserve">
+                                            <g>
+                                                <rect x="0.2" y="17.4" width={55} height="3.4" />
+                                            </g>
+                                            <g>
+                                                <polygon points="7.1,55.4 3.4,27.8 3.4,24.1 7.3,24.1 7.3,27.6 10.5,51.6 44.9,51.6 48.1,27.6 48.1,24.1 52,24.1 52,27.9 48.3,55.4" />
+                                            </g>
+                                            <g>
+                                                <path d="M14,31.4c-0.1,0-0.3,0-0.5-0.1c-1-0.2-1.6-1.3-1.4-2.3L19,1.5C19.2,0.6,20,0,20.9,0c0.1,0,0.3,0,0.4,0c0.5,0.1,0.9,0.4,1.2,0.9c0.3,0.4,0.4,1,0.3,1.5l-6.9,27.5C15.6,30.8,14.8,31.4,14,31.4z" />
+                                            </g>
+                                            <g>
+                                                <path d="M41.5,31.4c-0.9,0-1.7-0.6-1.9-1.5L32.7,2.4c-0.1-0.5,0-1.1,0.3-1.5s0.7-0.7,1.2-0.8c0.1,0,0.3,0,0.4,0c0.9,0,1.7,0.6,1.9,1.5L43.4,29c0.1,0.5,0,1-0.2,1.5c-0.3,0.5-0.7,0.8-1.1,0.9c-0.2,0-0.3,0-0.4,0.1C41.6,31.4,41.6,31.4,41.5,31.4z" />
+                                            </g>
+                                        </svg>
+                                        <span className="count cart-count modern-cart-badge">{cartCount}</span>
+                                    </a>
                                 </div>
                             </div>
-                            <div className="col-md-4 col flex justify-content-center">
-                                <Link to="/"><img style={{height:'75px'}} src="/assets/img/logo.jpg" alt className="img-reponsive" /></Link>
-                            </div>
-                            <div className="col-md-4 col flex justify-content-end">
-                                <div className="topbar-left">
-                                    <div className="element element-user hidden-xs hidden-sm">
-                                        {/* <a href="#" className="zoa-icon js-user">
-                                            <svg width={19} height={20} version="1.1" id="Layer_3" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 102.8" style={{enableBackground: 'new 0 0 100 102.8'}} xmlSpace="preserve">
-                                                <g>
-                                                    <path d="M75.7,52.4c-2.1,2.3-4.4,4.3-7,6C82.2,58.8,93,69.9,93,83.5v12.3H7V83.5c0-13.6,10.8-24.7,24.3-25.1c-2.6-1.7-5-3.7-7-6
-  C10.3,55.9,0,68.5,0,83.5v15.8c0,1.9,1.6,3.5,3.5,3.5h93c1.9,0,3.5-1.6,3.5-3.5V83.5C100,68.5,89.7,55.9,75.7,52.4z" />
-                                                    <g>
-                                                        <path d="M50,58.9c-16.2,0-29.5-13.2-29.5-29.5S33.8,0,50,0s29.5,13.2,29.5,29.5S66.2,58.9,50,58.9z M50,7
-      C37.6,7,27.5,17.1,27.5,29.5S37.6,51.9,50,51.9s22.5-10.1,22.5-22.5S62.4,7,50,7z" />
-                                                    </g>
-                                                </g>
-                                            </svg>
-                                        </a> */}
+
+                            {/* Desktop Layout */}
+                            <div className="desktop-header d-none d-md-flex">
+                                <div className="desktop-nav-container">
+                                    {/* Left Navigation */}
+                                    <nav className="nav-left">
+                                        <Link to="/" className="nav-link-modern">
+                                            <span>Home</span>
+                                            <div className="nav-underline"></div>
+                                        </Link>
+                                        <Link to="/products"
+                                           
+                                            className="nav-link-modern"
+                                        >
+                                            <span>Products</span>
+                                            <div className="nav-underline"></div>
+                                        </Link>
+                                    </nav>
+                                    
+                                    {/* Center Logo */}
+                                    <div className="logo-center">
+                                        <Link to="/" className="modern-logo-link">
+                                            <img style={{height:'75px'}} src="/assets/img/logo.jpg" alt="Aruvia Herbals" className="img-reponsive modern-logo desktop-logo" />
+                                        </Link>
                                     </div>
-                                    <div className="element element-cart">
-                                        <a onClick={handleCartToggle} className="zoa-icon icon-cart">
-                                            <svg width={20} height={20} version="1.1" id="Layer_4" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.4 55.4" style={{enableBackground: 'new 0 0 55.4 55.4'}} xmlSpace="preserve">
-                                                <g>
-                                                    <rect x="0.2" y="17.4" width={55} height="3.4" />
-                                                </g>
-                                                <g>
-                                                    <polygon points="7.1,55.4 3.4,27.8 3.4,24.1 7.3,24.1 7.3,27.6 10.5,51.6 44.9,51.6 48.1,27.6 48.1,24.1 52,24.1 52,27.9 
-  48.3,55.4   " />
-                                                </g>
-                                                <g>
-                                                    <path d="M14,31.4c-0.1,0-0.3,0-0.5-0.1c-1-0.2-1.6-1.3-1.4-2.3L19,1.5C19.2,0.6,20,0,20.9,0c0.1,0,0.3,0,0.4,0
-  c0.5,0.1,0.9,0.4,1.2,0.9c0.3,0.4,0.4,1,0.3,1.5l-6.9,27.5C15.6,30.8,14.8,31.4,14,31.4z" />
-                                                </g>
-                                                <g>
-                                                    <path d="M41.5,31.4c-0.9,0-1.7-0.6-1.9-1.5L32.7,2.4c-0.1-0.5,0-1.1,0.3-1.5s0.7-0.7,1.2-0.8c0.1,0,0.3,0,0.4,0
-  c0.9,0,1.7,0.6,1.9,1.5L43.4,29c0.1,0.5,0,1-0.2,1.5c-0.3,0.5-0.7,0.8-1.1,0.9c-0.2,0-0.3,0-0.4,0.1C41.6,31.4,41.6,31.4,41.5,31.4
-  z" />
-                                                </g>
-                                            </svg>
-                                            <span className="count cart-count">{cartCount}</span>
+                                    
+                                    {/* Right Navigation */}
+                                    <nav className="nav-right">
+                                        <a 
+                                            href="#" 
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                handleSocialClick();
+                                            }}
+                                            className="nav-link-modern"
+                                        >
+                                            <span>Social</span>
+                                            <div className="nav-underline"></div>
                                         </a>
-                                    </div>
+                                       
+                                        <Link to="/contact-us" className="nav-link-modern">
+                                            <span>Contact</span>
+                                            <div className="nav-underline"></div>
+                                        </Link>
+                                    </nav>
+                                </div>
+                                
+                                {/* Desktop Cart */}
+                                <div className="desktop-cart">
+                                    <a onClick={handleCartToggle} className="zoa-icon icon-cart modern-cart-btn desktop-cart-btn">
+                                        <svg width={20} height={20} version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55.4 55.4" style={{enableBackground: 'new 0 0 55.4 55.4'}} xmlSpace="preserve">
+                                            <g>
+                                                <rect x="0.2" y="17.4" width={55} height="3.4" />
+                                            </g>
+                                            <g>
+                                                <polygon points="7.1,55.4 3.4,27.8 3.4,24.1 7.3,24.1 7.3,27.6 10.5,51.6 44.9,51.6 48.1,27.6 48.1,24.1 52,24.1 52,27.9 48.3,55.4" />
+                                            </g>
+                                            <g>
+                                                <path d="M14,31.4c-0.1,0-0.3,0-0.5-0.1c-1-0.2-1.6-1.3-1.4-2.3L19,1.5C19.2,0.6,20,0,20.9,0c0.1,0,0.3,0,0.4,0c0.5,0.1,0.9,0.4,1.2,0.9c0.3,0.4,0.4,1,0.3,1.5l-6.9,27.5C15.6,30.8,14.8,31.4,14,31.4z" />
+                                            </g>
+                                            <g>
+                                                <path d="M41.5,31.4c-0.9,0-1.7-0.6-1.9-1.5L32.7,2.4c-0.1-0.5,0-1.1,0.3-1.5s0.7-0.7,1.2-0.8c0.1,0,0.3,0,0.4,0c0.9,0,1.7,0.6,1.9,1.5L43.4,29c0.1,0.5,0,1-0.2,1.5c-0.3,0.5-0.7,0.8-1.1,0.9c-0.2,0-0.3,0-0.4,0.1C41.6,31.4,41.6,31.4,41.5,31.4z" />
+                                            </g>
+                                        </svg>
+                                        <span className="count cart-count modern-cart-badge">{cartCount}</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </header>
+
+            {/* Fully Responsive Header Styles */}
+            <style jsx>{`
+                /* Base Header Styles */
+                .modern-enhanced {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+                }
+
+                .modern-enhanced.sticky-header {
+                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                }
+
+                /* Responsive Header Row */
+                .header-row-responsive {
+                    width: 100%;
+                    padding: 0;
+                }
+
+                /* Mobile Header Layout (< 768px) */
+                .mobile-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 10px 15px;
+                    min-height: 60px;
+                }
+
+                .mobile-left, .mobile-right {
+                    flex: 0 0 auto;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .mobile-center {
+                    flex: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .mobile-logo {
+                    height: 50px !important;
+                    max-height: 50px;
+                    width: auto;
+                }
+
+                .mobile-cart {
+                    padding: 8px !important;
+                    border-radius: 8px !important;
+                }
+
+                /* Desktop Header Layout (>= 768px) */
+                .desktop-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 15px 20px;
+                    min-height: 80px;
+                }
+
+                .desktop-nav-container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 40px;
+                    flex: 1;
+                }
+
+                .desktop-cart {
+                    flex: 0 0 auto;
+                    margin-left: 20px;
+                }
+
+                /* Navigation Sections */
+                .nav-left, .nav-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 25px;
+                }
+
+                .logo-center {
+                    margin: 0 20px;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .desktop-logo {
+                    height: 75px !important;
+                    max-height: 75px;
+                    width: auto;
+                }
+
+                /* Navigation Link Styles */
+                .nav-link-modern {
+                    position: relative;
+                    text-decoration: none;
+                    color: #333;
+                    font-weight: 500;
+                    font-size: 16px;
+                    padding: 8px 0;
+                    transition: all 0.3s ease;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+
+                .nav-link-modern:hover {
+                    color: #007bff;
+                    transform: translateY(-2px);
+                }
+
+                .nav-underline {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 0;
+                    height: 2px;
+                    background: linear-gradient(135deg, #007bff, #0056b3);
+                    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-radius: 2px;
+                }
+
+                .nav-link-modern:hover .nav-underline {
+                    width: 100%;
+                }
+
+                /* Modern logo enhancements */
+                .modern-logo-link {
+                    transition: all 0.3s ease;
+                    display: inline-block;
+                }
+
+                .modern-logo-link:hover {
+                    transform: scale(1.05);
+                }
+
+                .modern-logo {
+                    border-radius: 12px;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                    object-fit: contain;
+                }
+
+                .modern-logo:hover {
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                }
+
+                /* Modern menu button */
+                .modern-menu-btn {
+                    transition: all 0.3s ease;
+                    padding: 8px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .modern-menu-btn:hover {
+                    background: rgba(0, 0, 0, 0.05);
+                    transform: scale(1.1);
+                }
+
+                .modern-menu-btn svg {
+                    transition: all 0.3s ease;
+                }
+
+                .modern-menu-btn:hover svg {
+                    transform: rotate(90deg);
+                }
+
+                /* Modern cart button */
+                .modern-cart-btn {
+                    position: relative;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    padding: 12px;
+                    border-radius: 12px;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .modern-cart-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+                }
+
+                .modern-cart-btn svg {
+                    transition: all 0.3s ease;
+                }
+
+                .modern-cart-btn:hover svg {
+                    transform: scale(1.1);
+                }
+
+                /* Modern cart badge */
+                .modern-cart-badge {
+                    background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+                    animation: modernPulse 2s infinite;
+                    box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+                    border-radius: 50% !important;
+                    font-weight: 700 !important;
+                    min-width: 18px !important;
+                    height: 18px !important;
+                    font-size: 11px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+
+                @keyframes modernPulse {
+                    0%, 100% { 
+                        transform: scale(1); 
+                        box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+                    }
+                    50% { 
+                        transform: scale(1.1); 
+                        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
+                    }
+                }
+
+                /* Smooth animations for all interactive elements */
+                .header-v1 * {
+                    transition: all 0.3s ease;
+                }
+
+                /* Enhanced hover effects for navigation in sidebar */
+                .nav-home5 li a {
+                    transition: all 0.3s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .nav-home5 li a:hover {
+                    transform: translateX(10px);
+                    color: #007bff;
+                }
+
+                .nav-home5 li a::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 0;
+                    height: 100%;
+                    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
+                    transition: width 0.3s ease;
+                    z-index: -1;
+                }
+
+                .nav-home5 li a:hover::before {
+                    width: 100%;
+                }
+
+                /* Modern cart sidebar enhancements */
+                .cart-list {
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                }
+
+                .item-cart {
+                    transition: all 0.3s ease;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    padding: 10px;
+                }
+
+                .item-cart:hover {
+                    background: rgba(0, 0, 0, 0.02);
+                    transform: translateX(5px);
+                }
+
+                /* Modern buttons */
+                .zoa-btn {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-radius: 8px;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .zoa-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                }
+
+                .zoa-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                    transition: left 0.5s ease;
+                }
+
+                .zoa-btn:hover::before {
+                    left: 100%;
+                }
+
+                /* Bootstrap Responsive Classes */
+                .d-none {
+                    display: none !important;
+                }
+
+                .d-md-flex {
+                    display: none !important;
+                }
+
+                .d-md-none {
+                    display: flex !important;
+                }
+
+                /* Responsive Breakpoints */
+                
+                /* Tablet and Desktop (768px and up) */
+                @media (min-width: 768px) {
+                    .d-md-flex {
+                        display: flex !important;
+                    }
+                    
+                    .d-md-none {
+                        display: none !important;
+                    }
+
+                    .desktop-header {
+                        padding: 15px 30px;
+                    }
+
+                    .desktop-nav-container {
+                        gap: 50px;
+                    }
+
+                    .nav-left, .nav-right {
+                        gap: 30px;
+                    }
+                }
+
+                /* Large Desktop (1024px and up) */
+                @media (min-width: 1024px) {
+                    .desktop-header {
+                        padding: 20px 40px;
+                    }
+
+                    .desktop-nav-container {
+                        gap: 60px;
+                    }
+
+                    .nav-left, .nav-right {
+                        gap: 35px;
+                    }
+
+                    .nav-link-modern {
+                        font-size: 17px;
+                    }
+                }
+
+                /* Small Mobile (480px and down) */
+                @media (max-width: 480px) {
+                    .mobile-header {
+                        padding: 8px 12px;
+                        min-height: 55px;
+                    }
+
+                    .mobile-logo {
+                        height: 45px !important;
+                    }
+
+                    .modern-menu-btn {
+                        padding: 6px;
+                    }
+
+                    .mobile-cart {
+                        padding: 6px !important;
+                    }
+
+                    .modern-cart-badge {
+                        min-width: 16px !important;
+                        height: 16px !important;
+                        font-size: 10px !important;
+                    }
+                }
+
+                /* Extra Small Mobile (360px and down) */
+                @media (max-width: 360px) {
+                    .mobile-header {
+                        padding: 5px 10px;
+                        min-height: 50px;
+                    }
+
+                    .mobile-logo {
+                        height: 40px !important;
+                    }
+
+                    .modern-menu-btn svg {
+                        width: 20px;
+                        height: 12px;
+                    }
+
+                    .mobile-cart svg {
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+
+                /* Container and Row Overrides */
+                .header-center .container {
+                    max-width: 100%;
+                    padding: 0;
+                }
+
+                .header-center .container-content {
+                    padding: 0;
+                }
+
+                /* Flex utilities */
+                .flex {
+                    display: flex;
+                }
+
+                .align-items-center {
+                    align-items: center;
+                }
+
+                .justify-content-center {
+                    justify-content: center;
+                }
+
+                .justify-content-between {
+                    justify-content: space-between;
+                }
+            `}</style>
         </div>
     )
 }

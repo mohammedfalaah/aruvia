@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import Header from "./layouts/Header"
 import PrivacyPolicy from "./pages/PrivacyPolicy"
 import Home from "./pages/Home"
 import TermsCondition from "./pages/TermsCondition"
@@ -9,6 +8,7 @@ import Delivery from "./pages/Delivery"
 import CheckoutPage from "./pages/CheckOutPage"
 import ProductPage from "./pages/ProductPage"
 import OrderConfirmationPage from "./pages/OrderConfirmationPage"
+import AllProductsPage from "./pages/AllProductsPage"
 
 
 function App() {
@@ -16,6 +16,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Home/>} /> 
+        <Route path="/products" element={<AllProductsPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />   
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsCondition/>} />
